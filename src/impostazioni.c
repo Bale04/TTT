@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : TTT.c
+ Name        : impostazioni.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
  Version     : V 0.3
  Copyright   : Your copyright notice
@@ -12,12 +12,12 @@
 #include <stdlib.h>
 #include <string.h>
 // struttura della gestione delle stringhe
-#include "TTT.h"
+#include "impostazioni.h"
 
 
 
 // DEFINIZIONE FUNZIONI DI ACCESSO
-
+#pragma region definizione funzioni di accesso
 void Set_modoPartita(int m, Impostazioni* impostazioni);
 int Get_modoPartita(Impostazioni impostazioni);
 void Set_nomeGiocatore1(Stringa n1, Impostazioni *impostazioni);
@@ -36,9 +36,9 @@ void Set_numeroRound(int r, Impostazioni* impostazioni);
 int Get_numeroRound(Impostazioni impostazioni);
 void Set_nomePartita(Stringa n, Impostazioni* impostazioni);
 Stringa Get_nomePartita(Impostazioni impostazioni);
+#pragma endregion
 
-
-
+#pragma region main
 int main(void) {
 	// appena si avvia il codice si impostano le impostazioni di default.
 	Impostazioni impostazioni={1, {"giocatore1"}, 'X', {"giocatore2"}, 'O',{""}, 1, 3, {"partita"}};
@@ -63,12 +63,12 @@ int main(void) {
 	// printf("\n%s\n", Get_nomeGiocatore1(impostazioni).data);
 	return EXIT_SUCCESS;
 }
+#pragma endregion
 
 
 
 // FUNZIONI DI ACCESSO
-
-
+#pragma region 
 // ---------------------MODO PARTITA---------------------------
 void Set_modoPartita(int m, Impostazioni* impostazioni){
 	impostazioni->modoPartita = m;
@@ -144,3 +144,4 @@ void Set_nomePartita(Stringa n, Impostazioni* impostazioni){
 Stringa Get_nomePartita(Impostazioni impostazioni){
 	return impostazioni.nomePartita;
 }
+#pragma endregion

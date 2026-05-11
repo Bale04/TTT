@@ -1,7 +1,7 @@
 
 
-#ifndef TTT_H
-#define TTT_H
+#ifndef impostazioni_H
+#define impostazioni_H
 
 // Definizione della stringa di caratteri
 typedef struct {
@@ -22,4 +22,4 @@ typedef struct{
 }Impostazioni;
 
 
-#endif /* TTT_H */
+#endif
