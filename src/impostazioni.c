@@ -2,7 +2,7 @@
  ============================================================================
  Name        : impostazioni.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
- Version     : V 0.3
+ Version     : V 0.4
  Copyright   : Your copyright notice
  Description : Hello World in C, Ansi-style
  ============================================================================
@@ -13,7 +13,6 @@
 #include <string.h>
 // struttura della gestione delle stringhe
 #include "impostazioni.h"
-
 
 
 // DEFINIZIONE FUNZIONI DI ACCESSO
@@ -38,27 +37,24 @@ void Set_nomePartita(Stringa n, Impostazioni* impostazioni);
 Stringa Get_nomePartita(Impostazioni impostazioni);
 #pragma endregion
 
+// DEFINIZIONE ALTRE FUNZIONI
+#pragma region dichiarazione altre funzioni
+void resetImpostazioni(Impostazioni* impostazioni);
+void stampaSchermata(Stringa s);
+void modificaNomi(Impostazioni impostazioni);
+#pragma endregion
+
 #pragma region main
-int main(void) {
+int main() {
 	// appena si avvia il codice si impostano le impostazioni di default.
-	Impostazioni impostazioni={1, {"giocatore1"}, 'X', {"giocatore2"}, 'O',{""}, 1, 3, {"partita"}};
-	FILE *fpImpostazioni;
-	int c;
+	Impostazioni impostazioni;
+	resetImpostazioni(&impostazioni);
 
-	// apre il file in lettura per caricare la schermata di impostazioni
-	fpImpostazioni = fopen("Impostazioni.txt", "r");
-	if (fpImpostazioni == NULL) {
-		printf("Errore Caricamento Impostazioni\n");
-	} else {
-		// finchè non raggiunge la fine del file legge i caratteri man mano e li stampa a schermo
-		while ((c = fgetc(fpImpostazioni)) != EOF) {
-			putchar(c);
-		}
-		fclose(fpImpostazioni);
-		printf("\n");
-	}
+	// vettore che carica i nomi delle schermate da visualizzare alla selezione
+	Stringa vettoreSchermate[7]= {"Impostazioni", "NomiGiocatori", "ModalitaDiGioco", "CaricaPartita", "SimboliGiocatori", "AnnullaImpostazioni", "PartitaERound"};
+	// stampa la schermata di impostazioni
+	stampaSchermata(vettoreSchermate[0]);
 
-	Stringa nom = {""};
 	// Set_nomeGiocatore1(nom, &impostazioni);
 	// printf("\n%s\n", Get_nomeGiocatore1(impostazioni).data);
 	return EXIT_SUCCESS;
@@ -68,7 +64,7 @@ int main(void) {
 
 
 // FUNZIONI DI ACCESSO
-#pragma region 
+#pragma region funzioni di accesso
 // ---------------------MODO PARTITA---------------------------
 void Set_modoPartita(int m, Impostazioni* impostazioni){
 	impostazioni->modoPartita = m;
@@ -144,4 +140,75 @@ void Set_nomePartita(Stringa n, Impostazioni* impostazioni){
 Stringa Get_nomePartita(Impostazioni impostazioni){
 	return impostazioni.nomePartita;
 }
+#pragma endregion
+
+
+// ALTRE FUNZIONI
+#pragma region altre funzioni
+void resetImpostazioni(Impostazioni* impostazioni){
+	Set_nomeGiocatore1((Stringa){"giocatore1"}, impostazioni);
+	Set_nomeGiocatore2((Stringa){"giocatore2"}, impostazioni);
+	Set_modoPartita(1, impostazioni);
+	Set_partitaPrecedente((Stringa){""}, impostazioni);
+	Set_simboloGiocatore1('X', impostazioni);
+	Set_simboloGiocatore2('O', impostazioni);
+	Set_annullaImpostazioni(1, impostazioni);
+	Set_numeroRound(3, impostazioni);
+	Set_nomePartita((Stringa){"partita"}, impostazioni);
+}
+
+
+
+
+void stampaSchermata(Stringa s){
+	FILE *fpImpostazioni;
+	int c;
+	char nomeCompleto[256];
+
+	// serve per unire il nome dell'impostazione da passare aggiungendo l'estensione .txt
+	sprintf(nomeCompleto, "/home/Bale/GitHub/TTT/Interfacce/%s.txt", s.data);
+	// apre il file in lettura per caricare la schermata di impostazioni
+	fpImpostazioni = fopen(nomeCompleto, "r");
+	if (fpImpostazioni == NULL) {
+		printf("Errore Caricamento Schermata\n");
+	} else {
+		// finchè non raggiunge la fine del file legge i caratteri man mano e li stampa a schermo
+		while ((c = fgetc(fpImpostazioni)) != EOF) {
+			putchar(c);
+		}
+		fclose(fpImpostazioni);
+		printf("\n");
+	}
+}
+
+
+
+// funzione di modifica del nome dei giocatori
+void modificaNomi(Impostazioni impostazioni){
+	Stringa nome1, nome2;
+	printf("Inserisci il nome del giocatore 1: ");
+	scanf("%s", nome1.data);
+	Set_nomeGiocatore1(nome1, &impostazioni);
+	printf("Inserisci il nome del giocatore 2: ");
+	scanf("%s", nome2.data);
+	Set_nomeGiocatore2(nome2, &impostazioni);
+}
+
+// funzione di modifica della modalità di gioco
+void modificaModoPartita(Impostazioni impostazioni){
+	int scelta;
+	printf("Scegli la modalità di gioco:\n");
+	printf("1. CPU\n");
+	printf("2. Giocatore\n");
+	scanf("%d", &scelta);
+	if (scelta == 1) {
+		Set_modoPartita(1, &impostazioni);
+	} else if (scelta == 2) {
+		Set_modoPartita(0, &impostazioni);
+	} else {
+		printf("Scelta non valida. La modalità di gioco rimarrà invariata.\n");
+	}
+}
+
+
 #pragma endregion
