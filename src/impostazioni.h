@@ -21,5 +21,13 @@ typedef struct{
 	Stringa nomePartita;  // nome della partita da giocare
 }Impostazioni;
 
+// area che definisce i pulsanti cliccabili
+typedef struct{
+	int r; // riga del pulsante
+	int c1; // colonna di inizio
+	int c2; // colonna di fine
+	int v; // valore del pulsante
+}AreaCliccabile;
+
 
 #endif
