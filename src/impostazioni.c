@@ -12,9 +12,14 @@
 #include <string.h>
 // struttura della gestione delle stringhe, impostazioni e aree cliccabili
 #include "impostazioni.h"
-// gestione del mouse
+// gestione del mouse e del terminale
+#ifdef _WIN32
+#include <conio.h>
+#include <windows.h>
+#else
 #include <termios.h>
 #include <unistd.h>
+#endif
 
 // DEFINIZIONE FUNZIONI DI ACCESSO
 #pragma region definizione funzioni di accesso
@@ -83,7 +88,9 @@ int Get_modoPartita(Impostazioni impostazioni) {
 void Set_nomeGiocatore1(Stringa n1, Impostazioni *impostazioni) {
   strncpy(impostazioni->nomeGiocatore1.data, n1.data,
           sizeof(impostazioni->nomeGiocatore1.data) - 1);
-  // la funzione copia una stringa di caratteri (n1) in un'altra stringa (nomeGiocatore1) dando come limite la dimensione massima dell'array di destinazione.
+  // la funzione copia una stringa di caratteri (n1) in un'altra stringa
+  // (nomeGiocatore1) dando come limite la dimensione massima dell'array di
+  // destinazione.
 }
 Stringa Get_nomeGiocatore1(Impostazioni impostazioni) {
   return impostazioni.nomeGiocatore1;
@@ -175,9 +182,15 @@ void stampaSchermata(Stringa s) {
   int c;
   char nomeCompleto[256];
 
-  // serve per unire il nome dell'impostazione da passare aggiungendo
-  // l'estensione .txt
-  sprintf(nomeCompleto, "/home/Bale/GitHub/TTT/Interfacce/%s.txt", s.data);
+  // prova diversi percorsi relativi per trovare la cartella Interfacce
+  const char *percorsi[] = {"Interfacce/%s.txt", "../Interfacce/%s.txt", "src/Interfacce/%s.txt"};
+  int trovato = 0;
+  for (int i = 0; i < 3 && !trovato; i++) {
+    sprintf(nomeCompleto, percorsi[i], s.data);
+    fpImpostazioni = fopen(nomeCompleto, "r");
+    if (fpImpostazioni != NULL)
+      trovato = 1;
+  }
   // apre il file in lettura per caricare la schermata di impostazioni
   fpImpostazioni = fopen(nomeCompleto, "r");
   if (fpImpostazioni == NULL) {
@@ -209,8 +222,25 @@ void modificaNomi(Impostazioni impostazioni) {
 // FUNZIONI CURSORE E NAVIGAZIONE
 #pragma region funzioni cursore
 // ---------------------LETTURA CLICK MOUSE---------------------------
-// legge le coordinate di un click sinistro del mouse (formato SGR)
+// legge le coordinate di un click sinistro del mouse
 // restituisce 1 se click valido, 0 altrimenti
+#ifdef _WIN32
+int leggiClick(int *r, int *c) {
+  HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+  INPUT_RECORD rec;
+  DWORD count;
+  while (1) {
+    if (!ReadConsoleInput(hIn, &rec, 1, &count))
+      return 0;
+    if (rec.EventType == MOUSE_EVENT &&
+        rec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
+      *r = rec.Event.MouseEvent.dwMousePosition.Y + 1;
+      *c = rec.Event.MouseEvent.dwMousePosition.X + 1;
+      return 1;
+    }
+  }
+}
+#else
 int leggiClick(int *r, int *c) {
   char ch;
   while (1) {
@@ -245,8 +275,23 @@ int leggiClick(int *r, int *c) {
     }
   }
 }
+#endif
 // ---------------------INPUT DA TASTIERA---------------------------
-// disabilita mouse, abilita echo, legge stringa, poi ripristina raw mode
+// disabilita mouse, abilita echo, legge stringa, poi ripristina
+#ifdef _WIN32
+void inputTastiera(const char *prompt, char *buf, int maxLen) {
+  HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD modeOld;
+  GetConsoleMode(hIn, &modeOld);
+  SetConsoleMode(hIn, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT |
+                          ENABLE_PROCESSED_INPUT);
+  printf("\n%s", prompt);
+  fflush(stdout);
+  if (fgets(buf, maxLen, stdin) != NULL)
+    buf[strcspn(buf, "\n")] = '\0';
+  SetConsoleMode(hIn, modeOld);
+}
+#else
 void inputTastiera(const char *prompt, char *buf, int maxLen) {
   struct termios att, norm;
   tcgetattr(STDIN_FILENO, &att);
@@ -262,6 +307,7 @@ void inputTastiera(const char *prompt, char *buf, int maxLen) {
   printf("\033[?1000h\033[?1006h"); // riabilita mouse
   fflush(stdout);
 }
+#endif
 // ---------------------CERCA BOTTONE---------------------------
 // controlla se il click (r,c) cade su uno dei bottoni, restituisce il codice
 int cercaBottone(AreaCliccabile b[], int n, int r, int c) {
@@ -273,22 +319,31 @@ int cercaBottone(AreaCliccabile b[], int n, int r, int c) {
 // ---------------------NAVIGAZIONE IMPOSTAZIONI---------------------------
 // loop principale: stampa schermata, leggi click, esegui azione
 void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
-  struct termios orig;
   int r, c, az, pagina = 0, esci = 0;
 
   // bottoni per ogni schermata
   AreaCliccabile bMenu[] = {{9, 26, 51, 1},  {11, 27, 49, 2}, {13, 30, 45, 3},
-                     {15, 28, 47, 4}, {17, 26, 49, 5}, {19, 26, 50, 6},
-                     {20, 65, 70, 99}};
-  AreaCliccabile bNomi[] = {{12, 31, 44, 11}, {16, 31, 44, 12}, {18, 38, 44, 99}};
-  AreaCliccabile bModo[] = {{13, 19, 27, 21}, {13, 49, 53, 22}, {16, 38, 44, 99}};
+                            {15, 28, 47, 4}, {17, 26, 49, 5}, {19, 26, 50, 6},
+                            {20, 65, 70, 99}};
+  AreaCliccabile bNomi[] = {
+      {12, 31, 44, 11}, {16, 31, 44, 12}, {18, 38, 44, 99}};
+  AreaCliccabile bModo[] = {
+      {13, 19, 27, 21}, {13, 49, 53, 22}, {16, 38, 44, 99}};
   AreaCliccabile bCarica[] = {{12, 40, 42, 31}, {14, 38, 44, 99}};
-  AreaCliccabile bSimb[] = {{12, 39, 42, 41}, {16, 39, 42, 42}, {18, 38, 44, 99}};
+  AreaCliccabile bSimb[] = {
+      {12, 39, 42, 41}, {16, 39, 42, 42}, {18, 38, 44, 99}};
   AreaCliccabile bAnnulla[] = {{13, 29, 33, 51}, {13, 49, 52, 52}};
-  AreaCliccabile bRound[] = {{12, 37, 46, 61}, {16, 40, 43, 62}, {18, 38, 44, 99}};
+  AreaCliccabile bRound[] = {
+      {12, 37, 46, 61}, {16, 40, 43, 62}, {18, 38, 44, 99}};
 
   // rende il terminale cliccabile
-  struct termios raw;
+#ifdef _WIN32
+  HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD modeOld;
+  GetConsoleMode(hIn, &modeOld);
+  SetConsoleMode(hIn, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
+#else
+  struct termios orig, raw;
   tcgetattr(STDIN_FILENO, &orig);
   raw = orig;
   raw.c_lflag &= ~(ICANON | ECHO);
@@ -297,9 +352,14 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
   tcsetattr(STDIN_FILENO, TCSANOW, &raw);
   printf("\033[?1000h\033[?1006h");
   fflush(stdout);
+#endif
 
   while (!esci) {
+#ifdef _WIN32
+    system("cls");
+#else
     system("clear");
+#endif
     stampaSchermata(schermate[pagina]);
     if (!leggiClick(&r, &c))
       continue;
@@ -343,18 +403,18 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
 
     case 2: // --------- ModalitaDiGioco ---------
       az = cercaBottone(bModo, 3, r, c);
-      if (az == 21){
+      if (az == 21) {
         Set_modoPartita(0, impostazioni);
-		printf("MODALIÀ PERSONA\n");
-		pagina = 0;
-	  }else if (az == 22){
-        Set_modoPartita(1, impostazioni);
-		printf("MODALIÀ CPU\n");
-		pagina = 0;
-	  }
-      if (az == 99){
+        printf("MODALIÀ PERSONA\n");
         pagina = 0;
-	  }
+      } else if (az == 22) {
+        Set_modoPartita(1, impostazioni);
+        printf("MODALIÀ CPU\n");
+        pagina = 0;
+      }
+      if (az == 99) {
+        pagina = 0;
+      }
       break;
 
     case 3: // --------- CaricaPartita ---------
@@ -427,10 +487,15 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
   }
 
   // ripristina il terminale
+#ifdef _WIN32
+  SetConsoleMode(hIn, modeOld);
+  system("cls");
+#else
   printf("\033[?1006l\033[?1000l");
   fflush(stdout);
   tcsetattr(STDIN_FILENO, TCSANOW, &orig);
   system("clear");
+#endif
   printf("Impostazioni chiuse.\n");
 }
 #pragma endregion
