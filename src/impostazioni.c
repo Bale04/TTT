@@ -1,8 +1,8 @@
 /*
  ============================================================================
  Name        : impostazioni.c
- Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia,
- Ruggiero Dicorato Version     : V 0.4 Copyright   : Your copyright notice
+ Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
+ Version     : V 0.4 Copyright   : Your copyright notice
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
@@ -182,16 +182,8 @@ void stampaSchermata(Stringa s) {
   int c;
   char nomeCompleto[256];
 
-  // prova diversi percorsi relativi per trovare la cartella Interfacce
-  const char *percorsi[] = {"Interfacce/%s.txt", "../Interfacce/%s.txt", "src/Interfacce/%s.txt"};
-  int trovato = 0;
-  for (int i = 0; i < 3 && !trovato; i++) {
-    sprintf(nomeCompleto, percorsi[i], s.data);
-    fpImpostazioni = fopen(nomeCompleto, "r");
-    if (fpImpostazioni != NULL)
-      trovato = 1;
-  }
-  // apre il file in lettura per caricare la schermata di impostazioni
+  // apertura del file in lettura per caricare la schermata di impostazioni
+  sprintf(nomeCompleto, PERCORSO_FILE, s.data);
   fpImpostazioni = fopen(nomeCompleto, "r");
   if (fpImpostazioni == NULL) {
     printf("Errore Caricamento Schermata\n");
@@ -439,17 +431,20 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
       if (az == 41) {
         char buf[4];
         inputTastiera("Simbolo Giocatore 1 (1 carattere): ", buf, 4);
-        if (buf[0] != '\0')
+        if (buf[0] != '\0'){
           Set_simboloGiocatore1(buf[0], impostazioni);
+        }
         pagina = 0;
       } else if (az == 42) {
         char buf[4];
         inputTastiera("Simbolo Giocatore 2 (1 carattere): ", buf, 4);
-        if (buf[0] != '\0')
+        if (buf[0] != '\0'){
           Set_simboloGiocatore2(buf[0], impostazioni);
+        }
         pagina = 0;
-      } else if (az == 99)
+      } else if (az == 99){
         pagina = 0;
+      }
       break;
 
     case 5: // --------- AnnullaImpostazioni ---------

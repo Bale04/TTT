@@ -1,0 +1,17 @@
+=== RISULTATI TEST (Classi di Equivalenza) ===
+
+TC1 (Modo 1, CPU)       -> Atteso: 1, Ottenuto: 1 [PASSED]
+TC2 (Modo 0, Persona)   -> Atteso: 0, Ottenuto: 0 [PASSED]
+TC3 (Modo 5, Inv)       -> Atteso: 5, Ottenuto: 5 [PASSED] (nessuna validazione nel codice)
+
+TC4 (Nome 'Mario')      -> Atteso: 'Mario', Ottenuto: 'Mario' [PASSED]
+TC5 (Nome vuoto '')     -> Atteso: '', Ottenuto: '' [PASSED]
+TC6 (Nome >=20 char)    -> Atteso: '1234567890123456789', Ottenuto: '1234567890123456789' [PASSED]
+
+TC7 (Round 3, Valido)   -> Atteso: 3, Ottenuto: 3 [PASSED]
+TC8 (Round -1, Inv)     -> Atteso: -1, Ottenuto: -1 [PASSED] (nessuna validazione nel codice)
+
+TC9 (Click 10,10, IN)   -> Atteso: 99, Ottenuto: 99 [PASSED]
+TC10(Click 11,10, OUT)  -> Atteso: 0, Ottenuto: 0 [PASSED]
+
+=== FINE DEI TEST ===
