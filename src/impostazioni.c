@@ -2,7 +2,7 @@
  ============================================================================
  Name        : impostazioni.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 0.4 Copyright   : Your copyright notice
+ Version     : V 1.0 Copyright   : Your copyright notice
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
