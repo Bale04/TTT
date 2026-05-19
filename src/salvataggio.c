@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// struttura della gestione delle stringhe, impostazioni e aree cliccabili
-#include "impostazioni.h"
+// gestione delle strutture per il salvataggio dati
+#include "salvataggio.h"
 // gestione del mouse e del terminale
 #ifdef _WIN32
 #include <conio.h>
@@ -20,6 +20,21 @@
 #include <termios.h>
 #include <unistd.h>
 #endif
+
+#pragma region definizione funzioni di accesso
+void Set_griglia(Partita* partita, char grigliaDiGioco[3][3]);
+char Get_griglia(Partita partita);
+void Set_impostazioni(Partita* partita, Impostazioni impostazioni);
+Impostazioni Get_impostazioni(Partita partita);
+void Set_turno(Partita* partita, int turnoCorrente);
+int Get_turno(Partita partita);
+void Set_round(Partita* partita, int roundCorrente);
+int Get_round(Partita partita);
+
+#pragma endregion
+
+
+
 
 
 int main(){
