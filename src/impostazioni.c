@@ -1,8 +1,8 @@
 /*
  ============================================================================
  Name        : impostazioni.c
- Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 1.0 Copyright   : Your copyright notice
+ Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia,
+ Ruggiero Dicorato Version     : V 1.0 Copyright   : Your copyright notice
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
@@ -47,7 +47,6 @@ Stringa Get_nomePartita(Impostazioni impostazioni);
 #pragma region dichiarazione altre funzioni
 void resetImpostazioni(Impostazioni *impostazioni);
 void stampaSchermata(Stringa s);
-void modificaNomi(Impostazioni impostazioni);
 #pragma endregion
 
 #pragma region input
@@ -55,6 +54,8 @@ void modificaNomi(Impostazioni impostazioni);
 int leggiClick(int *r, int *c);
 void inputTastiera(const char *prompt, char *buf, int maxLen);
 void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]);
+void goTo(int x, int y);
+int areaCliccata(AreaCliccabile a, int r, int c);
 #pragma endregion
 
 #pragma region main
@@ -129,18 +130,7 @@ Stringa Get_partitaPrecedente(Impostazioni impostazioni) {
 void Set_annullaImpostazioni(int x, Impostazioni *impostazioni) {
   impostazioni->annullaImpostazioni = x;
   if (x == 1) {
-    impostazioni->modoPartita = 1;
-    strncpy(impostazioni->nomeGiocatore1.data, "giocatore1",
-            sizeof(impostazioni->nomeGiocatore1.data) - 1);
-    impostazioni->simboloGiocatore1 = 'X';
-    strncpy(impostazioni->nomeGiocatore2.data, "giocatore2",
-            sizeof(impostazioni->nomeGiocatore2.data) - 1);
-    impostazioni->simboloGiocatore2 = 'O';
-    strncpy(impostazioni->partitaPrecedente.data, "",
-            sizeof(impostazioni->partitaPrecedente.data) - 1);
-    impostazioni->numeroRound = 1;
-    strncpy(impostazioni->nomePartita.data, "partita",
-            sizeof(impostazioni->nomePartita.data) - 1);
+    resetImpostazioni(impostazioni);
   }
 }
 int Get_annullaImpostazioni(Impostazioni impostazioni) {
@@ -198,17 +188,6 @@ void stampaSchermata(Stringa s) {
   }
 }
 
-// funzione di modifica del nome dei giocatori
-void modificaNomi(Impostazioni impostazioni) {
-  Stringa nome1, nome2;
-  printf("Inserisci il nome del giocatore 1: ");
-  scanf("%s", nome1.data);
-  Set_nomeGiocatore1(nome1, &impostazioni);
-  printf("Inserisci il nome del giocatore 2: ");
-  scanf("%s", nome2.data);
-  Set_nomeGiocatore2(nome2, &impostazioni);
-}
-
 #pragma endregion
 
 // FUNZIONI CURSORE E NAVIGAZIONE
@@ -228,6 +207,7 @@ int leggiClick(int *r, int *c) {
         rec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
       *r = rec.Event.MouseEvent.dwMousePosition.Y + 1;
       *c = rec.Event.MouseEvent.dwMousePosition.X + 1;
+      goTo(*c, *r);
       return 1;
     }
   }
@@ -261,6 +241,7 @@ int leggiClick(int *r, int *c) {
         if (sscanf(seq + 2, "%d;%d;%d", &btn, &col, &row) == 3 && btn == 0) {
           *r = row;
           *c = col;
+          goTo(*c, *r);
           return 1;
         }
       }
@@ -300,33 +281,28 @@ void inputTastiera(const char *prompt, char *buf, int maxLen) {
   fflush(stdout);
 }
 #endif
-// ---------------------CERCA BOTTONE---------------------------
-// controlla se il click (r,c) cade su uno dei bottoni, restituisce il codice
-int cercaBottone(AreaCliccabile b[], int n, int r, int c) {
-  for (int i = 0; i < n; i++)
-    if (r == b[i].r && c >= b[i].c1 && c <= b[i].c2)
-      return b[i].v;
-  return 0;
+// ---------------------FUNZIONI SUPPORTO CURSORE E
+// AREE---------------------------
+void goTo(int x, int y) {
+#ifdef _WIN32
+  HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+  COORD pos;
+  pos.X = x - 1;
+  pos.Y = y - 1;
+  SetConsoleCursorPosition(hConsole, pos);
+#else
+  printf("\033[%d;%dH", y, x);
+  fflush(stdout);
+#endif
+}
+
+int areaCliccata(AreaCliccabile a, int r, int c) {
+  return (r == a.r && c >= a.c1 && c <= a.c2);
 }
 // ---------------------NAVIGAZIONE IMPOSTAZIONI---------------------------
 // loop principale: stampa schermata, leggi click, esegui azione
 void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
-  int r, c, az, pagina = 0, esci = 0;
-
-  // bottoni per ogni schermata
-  AreaCliccabile bMenu[] = {{9, 26, 51, 1},  {11, 27, 49, 2}, {13, 30, 45, 3},
-                            {15, 28, 47, 4}, {17, 26, 49, 5}, {19, 26, 50, 6},
-                            {20, 65, 70, 99}};
-  AreaCliccabile bNomi[] = {
-      {12, 31, 44, 11}, {16, 31, 44, 12}, {18, 38, 44, 99}};
-  AreaCliccabile bModo[] = {
-      {13, 19, 27, 21}, {13, 49, 53, 22}, {16, 38, 44, 99}};
-  AreaCliccabile bCarica[] = {{12, 40, 42, 31}, {14, 38, 44, 99}};
-  AreaCliccabile bSimb[] = {
-      {12, 39, 42, 41}, {16, 39, 42, 42}, {18, 38, 44, 99}};
-  AreaCliccabile bAnnulla[] = {{13, 29, 33, 51}, {13, 49, 52, 52}};
-  AreaCliccabile bRound[] = {
-      {12, 37, 46, 61}, {16, 40, 43, 62}, {18, 38, 44, 99}};
+  int r, c, pagina = 0, esci = 0;
 
   // rende il terminale cliccabile
 #ifdef _WIN32
@@ -362,16 +338,24 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
 
     switch (pagina) {
     case 0: // --------- Impostazioni ---------
-      az = cercaBottone(bMenu, 7, r, c);
-      if (az >= 1 && az <= 6)
-        pagina = az;
-      else if (az == 99)
+      if (areaCliccata((AreaCliccabile){9, 26, 51}, r, c))
+        pagina = 1;
+      else if (areaCliccata((AreaCliccabile){11, 27, 49}, r, c))
+        pagina = 2;
+      else if (areaCliccata((AreaCliccabile){13, 30, 45}, r, c))
+        pagina = 3;
+      else if (areaCliccata((AreaCliccabile){15, 28, 47}, r, c))
+        pagina = 4;
+      else if (areaCliccata((AreaCliccabile){17, 26, 49}, r, c))
+        pagina = 5;
+      else if (areaCliccata((AreaCliccabile){19, 26, 50}, r, c))
+        pagina = 6;
+      else if (areaCliccata((AreaCliccabile){20, 65, 70}, r, c))
         esci = 1;
       break;
 
     case 1: // --------- NomiGiocatori ---------
-      az = cercaBottone(bNomi, 3, r, c);
-      if (az == 11) {
+      if (areaCliccata((AreaCliccabile){12, 31, 44}, r, c)) {
         char buf[20];
         inputTastiera("Inserisci nome Giocatore 1: ", buf, 20);
         if (buf[0] != '\0') {
@@ -380,7 +364,7 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
           nome.data[sizeof(nome.data) - 1] = '\0';
           Set_nomeGiocatore1(nome, impostazioni);
         }
-      } else if (az == 12) {
+      } else if (areaCliccata((AreaCliccabile){16, 31, 44}, r, c)) {
         char buf[20];
         inputTastiera("Inserisci nome Giocatore 2: ", buf, 20);
         if (buf[0] != '\0') {
@@ -389,29 +373,27 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
           nome.data[sizeof(nome.data) - 1] = '\0';
           Set_nomeGiocatore2(nome, impostazioni);
         }
-      } else if (az == 99)
+      } else if (areaCliccata((AreaCliccabile){18, 38, 44}, r, c)) {
         pagina = 0;
+      }
       break;
 
     case 2: // --------- ModalitaDiGioco ---------
-      az = cercaBottone(bModo, 3, r, c);
-      if (az == 21) {
+      if (areaCliccata((AreaCliccabile){13, 19, 27}, r, c)) {
         Set_modoPartita(0, impostazioni);
         printf("MODALIÀ PERSONA\n");
         pagina = 0;
-      } else if (az == 22) {
+      } else if (areaCliccata((AreaCliccabile){13, 49, 53}, r, c)) {
         Set_modoPartita(1, impostazioni);
         printf("MODALIÀ CPU\n");
         pagina = 0;
-      }
-      if (az == 99) {
+      } else if (areaCliccata((AreaCliccabile){16, 38, 44}, r, c)) {
         pagina = 0;
       }
       break;
 
     case 3: // --------- CaricaPartita ---------
-      az = cercaBottone(bCarica, 2, r, c);
-      if (az == 31) {
+      if (areaCliccata((AreaCliccabile){12, 40, 42}, r, c)) {
         char buf[20];
         inputTastiera("Nome partita da caricare: ", buf, 20);
         if (buf[0] != '\0') {
@@ -421,44 +403,42 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
           Set_partitaPrecedente(nome, impostazioni);
         }
         pagina = 0;
-      }
-      if (az == 99)
+      } else if (areaCliccata((AreaCliccabile){14, 38, 44}, r, c)) {
         pagina = 0;
+      }
       break;
 
     case 4: // --------- SimboliGiocatori ---------
-      az = cercaBottone(bSimb, 3, r, c);
-      if (az == 41) {
+      if (areaCliccata((AreaCliccabile){12, 39, 42}, r, c)) {
         char buf[4];
         inputTastiera("Simbolo Giocatore 1 (1 carattere): ", buf, 4);
-        if (buf[0] != '\0'){
+        if (buf[0] != '\0') {
           Set_simboloGiocatore1(buf[0], impostazioni);
         }
         pagina = 0;
-      } else if (az == 42) {
+      } else if (areaCliccata((AreaCliccabile){16, 39, 42}, r, c)) {
         char buf[4];
         inputTastiera("Simbolo Giocatore 2 (1 carattere): ", buf, 4);
-        if (buf[0] != '\0'){
+        if (buf[0] != '\0') {
           Set_simboloGiocatore2(buf[0], impostazioni);
         }
         pagina = 0;
-      } else if (az == 99){
+      } else if (areaCliccata((AreaCliccabile){18, 38, 44}, r, c)) {
         pagina = 0;
       }
       break;
 
     case 5: // --------- AnnullaImpostazioni ---------
-      az = cercaBottone(bAnnulla, 2, r, c);
-      if (az == 51) {
+      if (areaCliccata((AreaCliccabile){13, 29, 33}, r, c)) {
         resetImpostazioni(impostazioni);
         pagina = 0;
-      } else if (az == 52)
+      } else if (areaCliccata((AreaCliccabile){13, 49, 52}, r, c)) {
         pagina = 0;
+      }
       break;
 
     case 6: // --------- PartitaERound ---------
-      az = cercaBottone(bRound, 3, r, c);
-      if (az == 61) {
+      if (areaCliccata((AreaCliccabile){12, 37, 46}, r, c)) {
         char buf[20];
         inputTastiera("Nome partita: ", buf, 20);
         if (buf[0] != '\0') {
@@ -468,15 +448,15 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
           Set_nomePartita(nome, impostazioni);
         }
         pagina = 0;
-      } else if (az == 62) {
+      } else if (areaCliccata((AreaCliccabile){16, 40, 43}, r, c)) {
         char buf[4];
         inputTastiera("Numero round: ", buf, 4);
         if (buf[0] != '\0')
           Set_numeroRound(atoi(buf), impostazioni);
         pagina = 0;
-      }
-      if (az == 99)
+      } else if (areaCliccata((AreaCliccabile){18, 38, 44}, r, c)) {
         pagina = 0;
+      }
       break;
     }
   }
