@@ -14,12 +14,13 @@
 #include "impostazioni.h"
 // gestione del mouse e del terminale
 #ifdef _WIN32
-#include <conio.h>
 #include <windows.h>
 #else
 #include <termios.h>
 #include <unistd.h>
 #endif
+
+void resetImpostazioni(Impostazioni *impostazioni);
 
 // DEFINIZIONE FUNZIONI DI ACCESSO
 #pragma region definizione funzioni di accesso
@@ -45,15 +46,15 @@ Stringa Get_nomePartita(Impostazioni impostazioni);
 
 // DEFINIZIONE ALTRE FUNZIONI
 #pragma region dichiarazione altre funzioni
-void resetImpostazioni(Impostazioni *impostazioni);
-void stampaSchermata(Stringa s);
+void stampaSchermata(Stringa s, Impostazioni impostazioni);
 #pragma endregion
 
 #pragma region input
 // dichiarazioni funzioni cursore
 int leggiClick(int *r, int *c);
-void inputTastiera(const char *prompt, char *buf, int maxLen);
 void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]);
+void abilitaTastiera();
+void abilitaMouse();
 void goTo(int x, int y);
 int areaCliccata(AreaCliccabile a, int r, int c);
 #pragma endregion
@@ -69,6 +70,7 @@ int main() {
                           {"ModalitaDiGioco"},  {"CaricaPartita"},
                           {"SimboliGiocatori"}, {"AnnullaImpostazioni"},
                           {"PartitaERound"}};
+  stampaSchermata(schermate[0], impostazioni);
   // avvia la navigazione con il mouse nelle schermate impostazioni
   navigaImpostazioni(&impostazioni, schermate);
 
@@ -76,7 +78,7 @@ int main() {
 }
 #pragma endregion
 
-// FUNZIONI DI ACCESSO
+// ------------------------------ FUNZIONI DI ACCESSO ------------------------------------
 #pragma region funzioni di accesso
 // ---------------------MODO PARTITA---------------------------
 void Set_modoPartita(int m, Impostazioni *impostazioni) {
@@ -120,8 +122,8 @@ char Get_simboloGiocatore2(Impostazioni impostazioni) {
 }
 // ------------------PARTITA PRECEDENTE------------------------------
 void Set_partitaPrecedente(Stringa p, Impostazioni *impostazioni) {
-  strncpy(impostazioni->nomeGiocatore2.data, p.data,
-          sizeof(impostazioni->nomeGiocatore2.data) - 1);
+  strncpy(impostazioni->partitaPrecedente.data, p.data,
+          sizeof(impostazioni->partitaPrecedente.data) - 1);
 }
 Stringa Get_partitaPrecedente(Impostazioni impostazioni) {
   return impostazioni.partitaPrecedente;
@@ -130,7 +132,14 @@ Stringa Get_partitaPrecedente(Impostazioni impostazioni) {
 void Set_annullaImpostazioni(int x, Impostazioni *impostazioni) {
   impostazioni->annullaImpostazioni = x;
   if (x == 1) {
-    resetImpostazioni(impostazioni);
+    Set_nomeGiocatore1((Stringa){"giocatore1"}, impostazioni);
+    Set_nomeGiocatore2((Stringa){"giocatore2"}, impostazioni);
+    Set_modoPartita(1, impostazioni);
+    Set_partitaPrecedente((Stringa){""}, impostazioni);
+    Set_simboloGiocatore1('X', impostazioni);
+    Set_simboloGiocatore2('O', impostazioni);
+    Set_numeroRound(1, impostazioni);
+    Set_nomePartita((Stringa){"partita"}, impostazioni);
   }
 }
 int Get_annullaImpostazioni(Impostazioni impostazioni) {
@@ -138,7 +147,12 @@ int Get_annullaImpostazioni(Impostazioni impostazioni) {
 }
 // ---------------------ROUND DA GIOCARE---------------------------
 void Set_numeroRound(int r, Impostazioni *impostazioni) {
-  impostazioni->numeroRound = r;
+  if(r>MAX_ROUND){
+    impostazioni->numeroRound = MAX_ROUND;
+  }else{
+    impostazioni->numeroRound = r;
+  }
+  
 }
 int Get_numeroRound(Impostazioni impostazioni) {
   return impostazioni.numeroRound;
@@ -155,6 +169,10 @@ Stringa Get_nomePartita(Impostazioni impostazioni) {
 
 // ALTRE FUNZIONI
 #pragma region altre funzioni
+
+// ---------------------RESET DELLE IMPOSTAZIONI---------------------------
+// dichiarata prima per poter resettare le impostazioni all'avvio
+
 void resetImpostazioni(Impostazioni *impostazioni) {
   Set_nomeGiocatore1((Stringa){"giocatore1"}, impostazioni);
   Set_nomeGiocatore2((Stringa){"giocatore2"}, impostazioni);
@@ -167,7 +185,7 @@ void resetImpostazioni(Impostazioni *impostazioni) {
   Set_nomePartita((Stringa){"partita"}, impostazioni);
 }
 
-void stampaSchermata(Stringa s) {
+void stampaSchermata(Stringa s, Impostazioni Impostazioni) {
   FILE *fpImpostazioni;
   int c;
   char nomeCompleto[256];
@@ -178,8 +196,7 @@ void stampaSchermata(Stringa s) {
   if (fpImpostazioni == NULL) {
     printf("Errore Caricamento Schermata\n");
   } else {
-    // finchè non raggiunge la fine del file legge i caratteri man mano e li
-    // stampa a schermo
+    // finchè non raggiunge la fine del file legge i caratteri man mano e li stampa a schermo
     while ((c = fgetc(fpImpostazioni)) != EOF) {
       putchar(c);
     }
@@ -193,131 +210,110 @@ void stampaSchermata(Stringa s) {
 // FUNZIONI CURSORE E NAVIGAZIONE
 #pragma region funzioni cursore
 // ---------------------LETTURA CLICK MOUSE---------------------------
-// legge le coordinate di un click sinistro del mouse
-// restituisce 1 se click valido, 0 altrimenti
 #ifdef _WIN32
-int leggiClick(int *r, int *c) {
-  HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-  INPUT_RECORD rec;
-  DWORD count;
+int leggiClick(int *riga, int *colonna) {
+  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
+  INPUT_RECORD evento;
+  DWORD contatore;
   while (1) {
-    if (!ReadConsoleInput(hIn, &rec, 1, &count))
-      return 0;
-    if (rec.EventType == MOUSE_EVENT &&
-        rec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-      *r = rec.Event.MouseEvent.dwMousePosition.Y + 1;
-      *c = rec.Event.MouseEvent.dwMousePosition.X + 1;
-      goTo(*c, *r);
+    ReadConsoleInput(handleInput, &evento, 1, &contatore);
+    if (evento.EventType == MOUSE_EVENT &&
+        evento.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
+      *colonna = evento.Event.MouseEvent.dwMousePosition.X + 1;
+      *riga = evento.Event.MouseEvent.dwMousePosition.Y + 1;
+      goTo(*colonna, *riga);
       return 1;
     }
   }
 }
 #else
-int leggiClick(int *r, int *c) {
-  char ch;
+int leggiClick(int *riga, int *colonna) {
+  char sequenza[32];
+  int indice;
   while (1) {
-    if (read(STDIN_FILENO, &ch, 1) != 1)
-      return 0;
-    if (ch == '\033') {
-      char seq[32];
-      int i = 0;
-      if (read(STDIN_FILENO, &seq[i], 1) != 1 || seq[i] != '[')
-        continue;
-      i++;
-      if (read(STDIN_FILENO, &seq[i], 1) != 1 || seq[i] != '<')
-        continue;
-      i++;
-      while (i < 30) {
-        if (read(STDIN_FILENO, &seq[i], 1) != 1)
-          break;
-        if (seq[i] == 'M' || seq[i] == 'm') {
-          seq[i + 1] = '\0';
-          break;
-        }
-        i++;
-      }
-      if (seq[i] == 'M') {
-        int btn, col, row;
-        if (sscanf(seq + 2, "%d;%d;%d", &btn, &col, &row) == 3 && btn == 0) {
-          *r = row;
-          *c = col;
-          goTo(*c, *r);
-          return 1;
-        }
+    // essendo il click passato per codice cerca l'inizio della sequenza del codice \033 e controlla che i simboli del click siano presenti fino a trovare la pressione M e il rilascio m estraendo poi i dati di bottone, colonna e riga
+    if (read(STDIN_FILENO, sequenza, 1) != 1) return 0;
+    if (sequenza[0] != '\033') continue;
+    if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '[') continue;
+    if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '<') continue;
+    for (indice = 0; indice < 30; indice++) {
+      if (read(STDIN_FILENO, &sequenza[indice], 1) != 1) break;
+      if (sequenza[indice] == 'M' || sequenza[indice] == 'm') { sequenza[indice+1] = '\0'; break; }
+    }
+    if (sequenza[indice] == 'M') {
+      int bottone, col, rig;
+      if (sscanf(sequenza, "%d;%d;%d", &bottone, &col, &rig) == 3 && bottone == 0) {
+        *colonna = col;
+        *riga = rig;
+        goTo(*colonna, *riga);
+        return 1;
       }
     }
   }
 }
 #endif
-// ---------------------INPUT DA TASTIERA---------------------------
-// disabilita mouse, abilita echo, legge stringa, poi ripristina
-#ifdef _WIN32
-void inputTastiera(const char *prompt, char *buf, int maxLen) {
-  HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-  DWORD modeOld;
-  GetConsoleMode(hIn, &modeOld);
-  SetConsoleMode(hIn, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT |
-                          ENABLE_PROCESSED_INPUT);
-  printf("\n%s", prompt);
-  fflush(stdout);
-  if (fgets(buf, maxLen, stdin) != NULL)
-    buf[strcspn(buf, "\n")] = '\0';
-  SetConsoleMode(hIn, modeOld);
-}
-#else
-void inputTastiera(const char *prompt, char *buf, int maxLen) {
-  struct termios att, norm;
-  tcgetattr(STDIN_FILENO, &att);
-  norm = att;
-  norm.c_lflag |= (ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &norm);
-  printf("\033[?1006l\033[?1000l"); // disabilita mouse
-  printf("\033[25;1H\033[K%s", prompt);
-  fflush(stdout);
-  if (fgets(buf, maxLen, stdin) != NULL)
-    buf[strcspn(buf, "\n")] = '\0';
-  tcsetattr(STDIN_FILENO, TCSANOW, &att);
-  printf("\033[?1000h\033[?1006h"); // riabilita mouse
-  fflush(stdout);
-}
-#endif
-// ---------------------FUNZIONI SUPPORTO CURSORE E
-// AREE---------------------------
+// ---------------------FUNZIONI SUPPORTO CURSORE E AREE---------------------------
 void goTo(int x, int y) {
 #ifdef _WIN32
-  HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-  COORD pos;
-  pos.X = x - 1;
-  pos.Y = y - 1;
-  SetConsoleCursorPosition(hConsole, pos);
+  HANDLE handleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+  COORD posizione = {x - 1, y - 1};
+  SetConsoleCursorPosition(handleOutput, posizione);
 #else
   printf("\033[%d;%dH", y, x);
   fflush(stdout);
 #endif
 }
 
-int areaCliccata(AreaCliccabile a, int r, int c) {
-  return (r == a.r && c >= a.c1 && c <= a.c2);
+int areaCliccata(AreaCliccabile area, int riga, int colonna) {
+  return (riga == area.r && colonna >= area.c1 && colonna <= area.c2);
+}
+
+// disabilita il mouse e riabilita echo + modalità canonica per permettere scanf
+void abilitaTastiera() {
+#ifdef _WIN32
+  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
+  SetConsoleMode(handleInput, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
+#else
+  printf("\033[?1000l\033[?1006l");
+  fflush(stdout);
+  struct termios modalita;
+  tcgetattr(STDIN_FILENO, &modalita);
+  modalita.c_lflag |= (ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &modalita);
+#endif
+}
+
+// riabilita il mouse e disabilita echo per tornare alla navigazione
+void abilitaMouse() {
+#ifdef _WIN32
+  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
+  SetConsoleMode(handleInput, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
+#else
+  struct termios modalita;
+  tcgetattr(STDIN_FILENO, &modalita);
+  modalita.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &modalita);
+  printf("\033[?1000h\033[?1006h");
+  fflush(stdout);
+#endif
 }
 // ---------------------NAVIGAZIONE IMPOSTAZIONI---------------------------
 // loop principale: stampa schermata, leggi click, esegui azione
 void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
-  int r, c, pagina = 0, esci = 0;
+  int riga, colonna, pagina = 0, esci = 0;
 
   // rende il terminale cliccabile
 #ifdef _WIN32
-  HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-  DWORD modeOld;
-  GetConsoleMode(hIn, &modeOld);
-  SetConsoleMode(hIn, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
+  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD modalitaPrecedente;
+  GetConsoleMode(handleInput, &modalitaPrecedente);
+  SetConsoleMode(handleInput, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
 #else
-  struct termios orig, raw;
-  tcgetattr(STDIN_FILENO, &orig);
-  raw = orig;
-  raw.c_lflag &= ~(ICANON | ECHO);
-  raw.c_cc[VMIN] = 1;
-  raw.c_cc[VTIME] = 0;
-  tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+  struct termios originale, grezza;
+  tcgetattr(STDIN_FILENO, &originale);
+  grezza = originale;
+  grezza.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &grezza);
   printf("\033[?1000h\033[?1006h");
   fflush(stdout);
 #endif
@@ -328,133 +324,147 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
 #else
     system("clear");
 #endif
-    stampaSchermata(schermate[pagina]);
-    if (!leggiClick(&r, &c))
-      continue;
+    stampaSchermata(schermate[pagina], *impostazioni);
+    // gestione dei dati nelle schermate stampate
+    switch (pagina){
+      case 1:
+        goTo(bNomi[0].c1+1, bNomi[0].r);
+        printf("%s]", Get_nomeGiocatore1(*impostazioni).data);
+        goTo(bNomi[1].c1+1, bNomi[1].r);
+        printf("%s]", Get_nomeGiocatore2(*impostazioni).data);
+        fflush(stdout);
+        break;
+      case 3:
+        goTo(bCarica[0].c1+1, bCarica[0].r);
+        printf("%s]", Get_partitaPrecedente(*impostazioni).data);
+        fflush(stdout);
+        break;
+      case 4:
+        goTo(bSimb[0].c1+1, bSimb[0].r);
+        printf("%c", Get_simboloGiocatore1(*impostazioni));
+        goTo(bSimb[1].c1+1, bSimb[1].r);
+        printf("%c", Get_simboloGiocatore2(*impostazioni));
+        fflush(stdout);
+      case 6:
+        goTo(bRound[0].c1+1, bRound[0].r);
+        printf("%s]", Get_nomePartita(*impostazioni).data);
+        goTo(bRound[1].c1+1, bRound[1].r);
+        printf("%d]", Get_numeroRound(*impostazioni));
+        fflush(stdout);
+    }
 
-    // DEBUG: coordinate del click
-    printf("\033[26;1H\033[KDEBUG -> riga: %d, colonna: %d", r, c);
-    fflush(stdout);
+    // gestione del click nelle pagine
+    if (!leggiClick(&riga, &colonna))
+      continue;
 
     switch (pagina) {
     case 0: // --------- Impostazioni ---------
-      if (areaCliccata((AreaCliccabile){9, 26, 51}, r, c))
+      if (areaCliccata(bMenu[0], riga, colonna))
         pagina = 1;
-      else if (areaCliccata((AreaCliccabile){11, 27, 49}, r, c))
+      else if (areaCliccata(bMenu[1], riga, colonna))
         pagina = 2;
-      else if (areaCliccata((AreaCliccabile){13, 30, 45}, r, c))
+      else if (areaCliccata(bMenu[2], riga, colonna))
         pagina = 3;
-      else if (areaCliccata((AreaCliccabile){15, 28, 47}, r, c))
+      else if (areaCliccata(bMenu[3], riga, colonna))
         pagina = 4;
-      else if (areaCliccata((AreaCliccabile){17, 26, 49}, r, c))
+      else if (areaCliccata(bMenu[4], riga, colonna))
         pagina = 5;
-      else if (areaCliccata((AreaCliccabile){19, 26, 50}, r, c))
+      else if (areaCliccata(bMenu[5], riga, colonna))
         pagina = 6;
-      else if (areaCliccata((AreaCliccabile){20, 65, 70}, r, c))
+      else if (areaCliccata(bMenu[6], riga, colonna))
         esci = 1;
       break;
 
     case 1: // --------- NomiGiocatori ---------
-      if (areaCliccata((AreaCliccabile){12, 31, 44}, r, c)) {
-        char buf[20];
-        inputTastiera("Inserisci nome Giocatore 1: ", buf, 20);
-        if (buf[0] != '\0') {
-          Stringa nome;
-          strncpy(nome.data, buf, sizeof(nome.data) - 1);
-          nome.data[sizeof(nome.data) - 1] = '\0';
-          Set_nomeGiocatore1(nome, impostazioni);
-        }
-      } else if (areaCliccata((AreaCliccabile){16, 31, 44}, r, c)) {
-        char buf[20];
-        inputTastiera("Inserisci nome Giocatore 2: ", buf, 20);
-        if (buf[0] != '\0') {
-          Stringa nome;
-          strncpy(nome.data, buf, sizeof(nome.data) - 1);
-          nome.data[sizeof(nome.data) - 1] = '\0';
-          Set_nomeGiocatore2(nome, impostazioni);
-        }
-      } else if (areaCliccata((AreaCliccabile){18, 38, 44}, r, c)) {
+      if (areaCliccata(bNomi[0], riga, colonna)) {
+        Stringa nuovoNome1;
+        goTo(bNomi[0].c1+1, bNomi[0].r);
+        abilitaTastiera();
+        scanf("%19s", nuovoNome1.data);
+        abilitaMouse();
+        Set_nomeGiocatore1(nuovoNome1, impostazioni);
+      } else if (areaCliccata(bNomi[1], riga, colonna)) {
+        Stringa nuovoNome2;
+        goTo(bNomi[1].c1+1, bNomi[1].r);
+        abilitaTastiera();
+        scanf("%19s", nuovoNome2.data);
+        abilitaMouse();
+        Set_nomeGiocatore2(nuovoNome2, impostazioni);
+      } else if (areaCliccata(bNomi[2], riga, colonna)) {
         pagina = 0;
       }
       break;
 
     case 2: // --------- ModalitaDiGioco ---------
-      if (areaCliccata((AreaCliccabile){13, 19, 27}, r, c)) {
+      if (areaCliccata(bModo[0], riga, colonna)) {
         Set_modoPartita(0, impostazioni);
-        printf("MODALIÀ PERSONA\n");
         pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){13, 49, 53}, r, c)) {
+      } else if (areaCliccata(bModo[1], riga, colonna)) {
         Set_modoPartita(1, impostazioni);
-        printf("MODALIÀ CPU\n");
         pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){16, 38, 44}, r, c)) {
+      } else if (areaCliccata(bModo[2], riga, colonna)) {
         pagina = 0;
       }
       break;
 
     case 3: // --------- CaricaPartita ---------
-      if (areaCliccata((AreaCliccabile){12, 40, 42}, r, c)) {
-        char buf[20];
-        inputTastiera("Nome partita da caricare: ", buf, 20);
-        if (buf[0] != '\0') {
-          Stringa nome;
-          strncpy(nome.data, buf, sizeof(nome.data) - 1);
-          nome.data[sizeof(nome.data) - 1] = '\0';
-          Set_partitaPrecedente(nome, impostazioni);
-        }
-        pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){14, 38, 44}, r, c)) {
+      if (areaCliccata(bCarica[0], riga, colonna)) {
+        Stringa vecchiaPartita;
+        goTo(bCarica[0].c1+1, bCarica[0].r);
+        abilitaTastiera();
+        scanf("%s", vecchiaPartita.data);
+        abilitaMouse();
+        Set_partitaPrecedente(vecchiaPartita, impostazioni);
+      } else if (areaCliccata(bCarica[1], riga, colonna)) {
         pagina = 0;
       }
       break;
 
     case 4: // --------- SimboliGiocatori ---------
-      if (areaCliccata((AreaCliccabile){12, 39, 42}, r, c)) {
-        char buf[4];
-        inputTastiera("Simbolo Giocatore 1 (1 carattere): ", buf, 4);
-        if (buf[0] != '\0') {
-          Set_simboloGiocatore1(buf[0], impostazioni);
-        }
-        pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){16, 39, 42}, r, c)) {
-        char buf[4];
-        inputTastiera("Simbolo Giocatore 2 (1 carattere): ", buf, 4);
-        if (buf[0] != '\0') {
-          Set_simboloGiocatore2(buf[0], impostazioni);
-        }
-        pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){18, 38, 44}, r, c)) {
+      if (areaCliccata(bSimb[0], riga, colonna)) {
+        char simboloNuovo1;
+        goTo(bSimb[0].c1+1, bSimb[0].r);
+        abilitaTastiera();
+        scanf("%c", &simboloNuovo1);
+        abilitaMouse();
+        Set_simboloGiocatore1(simboloNuovo1, impostazioni);
+      } else if (areaCliccata(bSimb[1], riga, colonna)) {
+        char simboloNuovo2;
+        goTo(bSimb[1].c1+1, bSimb[1].r);
+        abilitaTastiera();
+        scanf("%c", &simboloNuovo2);
+        abilitaMouse();
+        Set_simboloGiocatore2(simboloNuovo2, impostazioni);
+      } else if (areaCliccata(bSimb[2], riga, colonna)) {
         pagina = 0;
       }
       break;
 
     case 5: // --------- AnnullaImpostazioni ---------
-      if (areaCliccata((AreaCliccabile){13, 29, 33}, r, c)) {
+      if (areaCliccata(bAnnulla[0], riga, colonna)) {
         resetImpostazioni(impostazioni);
         pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){13, 49, 52}, r, c)) {
+      } else if (areaCliccata(bAnnulla[1], riga, colonna)) {
         pagina = 0;
       }
       break;
 
     case 6: // --------- PartitaERound ---------
-      if (areaCliccata((AreaCliccabile){12, 37, 46}, r, c)) {
-        char buf[20];
-        inputTastiera("Nome partita: ", buf, 20);
-        if (buf[0] != '\0') {
-          Stringa nome;
-          strncpy(nome.data, buf, sizeof(nome.data) - 1);
-          nome.data[sizeof(nome.data) - 1] = '\0';
-          Set_nomePartita(nome, impostazioni);
-        }
-        pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){16, 40, 43}, r, c)) {
-        char buf[4];
-        inputTastiera("Numero round: ", buf, 4);
-        if (buf[0] != '\0')
-          Set_numeroRound(atoi(buf), impostazioni);
-        pagina = 0;
-      } else if (areaCliccata((AreaCliccabile){18, 38, 44}, r, c)) {
+      if (areaCliccata(bRound[0], riga, colonna)) {
+        Stringa nuovaPartita;
+        goTo(bRound[0].c1+1, bRound[0].r);
+        abilitaTastiera();
+        scanf("%19s", nuovaPartita.data);
+        abilitaMouse();
+        Set_nomePartita(nuovaPartita, impostazioni);
+      } else if (areaCliccata(bRound[1], riga, colonna)) {
+        Stringa nuovoRound;
+        goTo(bRound[1].c1+1, bRound[1].r);
+        abilitaTastiera();
+        scanf("%3s", nuovoRound.data);
+        abilitaMouse();
+        Set_numeroRound(atoi(nuovoRound.data), impostazioni);
+      } else if (areaCliccata(bRound[2], riga, colonna)) {
         pagina = 0;
       }
       break;
@@ -463,12 +473,12 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
 
   // ripristina il terminale
 #ifdef _WIN32
-  SetConsoleMode(hIn, modeOld);
+  SetConsoleMode(handleInput, modalitaPrecedente);
   system("cls");
 #else
-  printf("\033[?1006l\033[?1000l");
+  printf("\033[?1000l\033[?1006l");
   fflush(stdout);
-  tcsetattr(STDIN_FILENO, TCSANOW, &orig);
+  tcsetattr(STDIN_FILENO, TCSANOW, &originale);
   system("clear");
 #endif
   printf("Impostazioni chiuse.\n");

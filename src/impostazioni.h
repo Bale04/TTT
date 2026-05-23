@@ -3,6 +3,9 @@
 
 #include "areeCliccabili.h"
 
+// numero massimo di round da giocare
+int const MAX_ROUND = 99;
+
 // Definizione della stringa di caratteri
 typedef struct {
   char data[20];
@@ -22,18 +25,23 @@ typedef struct {
 } Impostazioni;
 
 // bottoni per ogni schermata
-AreaCliccabile bMenu[] = {{9, 26, 51},  {11, 27, 49}, {13, 30, 45},
-                          {15, 28, 47}, {17, 26, 49}, {19, 26, 50},
-                          {20, 65, 70}};
-AreaCliccabile bNomi[] = {{12, 31, 44}, {16, 31, 44}, {18, 38, 44}};
-AreaCliccabile bModo[] = {{13, 19, 27}, {13, 49, 53}, {16, 38, 44}};
+// NOME - MODE - CARICA - SIMBOLO - ANNULLA - ROUND - ESCI
+AreaCliccabile bMenu[] = {{9, 30, 53},  {11, 31, 50}, {13, 34, 49}, {15, 32, 50}, {17, 30, 51}, {19, 30, 50}, {20, 69, 74}};
+// G1 - G2 - ESCI
+AreaCliccabile bNomi[] = {{12, 35, 46}, {16, 35, 46}, {18, 38, 44}};
+// PERSONA - CPU - ESCI
+AreaCliccabile bModo[] = {{13, 23, 32}, {13, 54, 58}, {16, 38, 44}};
+// NOME - ESCI
 AreaCliccabile bCarica[] = {{12, 40, 42}, {14, 38, 44}};
+// G1 - G2 - ESCI
 AreaCliccabile bSimb[] = {{12, 39, 42}, {16, 39, 42}, {18, 38, 44}};
-AreaCliccabile bAnnulla[] = {{13, 29, 33}, {13, 49, 52}};
+// SI - NO
+AreaCliccabile bAnnulla[] = {{13, 29, 33}, {13, 49, 53}};
+// NOME - ROUND - ESCI
 AreaCliccabile bRound[] = {{12, 37, 46}, {16, 40, 43}, {18, 38, 44}};
 
 // costante per il percorso delle interfacce delle impostazioni
-const char PERCORSO_FILE[50] =
-    "D:\\GitHub\\TTT\\Interfacce\\Impostazioni\\%s.txt";
+const char PERCORSO_FILE[70] =
+    "/home/Bale/GitHub/TTT/Interfacce/Impostazioni/%s.txt";
 
 #endif
