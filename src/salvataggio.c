@@ -2,7 +2,8 @@
  ============================================================================
  Name        : salvataggio.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 0.0 Copyright   : Your copyright notice
+ Version     : V 0.0 
+ Copyright   : Your copyright notice
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
@@ -21,17 +22,17 @@
 #include <unistd.h>
 #endif
 
-#pragma region definizione funzioni di accesso
-void Set_griglia(Partita* partita, char grigliaDiGioco[3][3]);
-char Get_griglia(Partita partita);
-void Set_impostazioni(Partita* partita, Impostazioni impostazioni);
-Impostazioni Get_impostazioni(Partita partita);
-void Set_turno(Partita* partita, int turnoCorrente);
-int Get_turno(Partita partita);
-void Set_round(Partita* partita, int roundCorrente);
-int Get_round(Partita partita);
+// #pragma region definizione funzioni di accesso
+// void Set_griglia(Partita* partita, char grigliaDiGioco[3][3]);
+// char Get_griglia(Partita partita);
+// void Set_impostazioni(Partita* partita, Impostazioni impostazioni);
+// Impostazioni Get_impostazioni(Partita partita);
+// void Set_turno(Partita* partita, int turnoCorrente);
+// int Get_turno(Partita partita);
+// void Set_round(Partita* partita, int roundCorrente);
+// int Get_round(Partita partita);
 
-#pragma endregion
+// #pragma endregion
 
 
 

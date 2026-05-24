@@ -60,22 +60,21 @@ int areaCliccata(AreaCliccabile a, int r, int c);
 #pragma endregion
 
 #pragma region main
+#ifndef IMPOSTAZIONI_NO_MAIN
 int main() {
   // appena si avvia il codice si impostano le impostazioni di default.
   Impostazioni impostazioni;
   resetImpostazioni(&impostazioni);
 
   // vettore che carica i nomi delle schermate da visualizzare alla selezione
-  Stringa schermate[7] = {{"Impostazioni"},     {"NomiGiocatori"},
-                          {"ModalitaDiGioco"},  {"CaricaPartita"},
-                          {"SimboliGiocatori"}, {"AnnullaImpostazioni"},
-                          {"PartitaERound"}};
+  Stringa schermate[7] = {{"Impostazioni"}, {"NomiGiocatori"}, {"ModalitaDiGioco"},  {"CaricaPartita"}, {"SimboliGiocatori"}, {"AnnullaImpostazioni"}, {"PartitaERound"}};
   stampaSchermata(schermate[0], impostazioni);
   // avvia la navigazione con il mouse nelle schermate impostazioni
   navigaImpostazioni(&impostazioni, schermate);
 
   return EXIT_SUCCESS;
 }
+#endif // IMPOSTAZIONI_NO_MAIN
 #pragma endregion
 
 // ------------------------------ FUNZIONI DI ACCESSO ------------------------------------
