@@ -2,43 +2,25 @@
  ============================================================================
  Name        : gioco.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 0.1
+ Version     : V 0.2
  Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Description : file di gestione del gioco
  ============================================================================
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// gestione delle strutture per il gioco 
+// gestione delle strutture per il gioco (include anche mouse.h e impostazioni.h)
 #include "gioco.h"
-// gestione del mouse e del terminale
-#ifdef _WIN32
-#include <conio.h>
-#include <windows.h>
-#else
-#include <termios.h>
-#include <unistd.h>
-#endif
 
 
 // ----------------- DICHIARAZIONI ---------------------
 #pragma region dichiarazioni funzioni di accesso
 
-// funzioni di accesso alla Partita
-void Set_griglia(Partita* partita, int r, int c, char simbolo);
-char Get_griglia(Partita partita, int r, int c);
-void Set_impostazioni(Partita* partita, Impostazioni impostazioni);
-Impostazioni Get_impostazioni(Partita partita);
-void Set_turno(Partita* partita, int turnoCorrente);
-int Get_turno(Partita partita);
-void Set_round(Partita* partita, int roundCorrente);
-int Get_round(Partita partita);
-
 // funzioni di gioco
 void stampaSchermataGioco(Stringa s);
-void stampaGioco(Partita partita);
+void stampaGioco(Partita partita, Impostazioni impostazioni);
 void navigaPartita(Partita *partita, Impostazioni impostazioni);
 
 #pragma endregion
@@ -51,7 +33,7 @@ int main() {
     Impostazioni impostazioni;
     resetImpostazioni(&impostazioni);
 
-    Stringa schermate[1] = {{"Gioco"}};
+    Stringa schermate[3] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}};
     navigaImpostazioni(&impostazioni, schermate);
 
     // 2. Inizializzazione della partita con le impostazioni raccolte
@@ -62,7 +44,6 @@ int main() {
             partita.griglia[r][c] = ' ';
     partita.turno = 1;
     partita.round = 1;
-    Set_impostazioni(&partita, impostazioni);
 
     // 3. Avvio schermata di gioco
     navigaPartita(&partita, impostazioni);
@@ -95,27 +76,30 @@ void stampaSchermataGioco(Stringa s) {
 }
 
 
-void stampaGioco(Partita partita) {
-    Impostazioni imp = Get_impostazioni(partita);
-    int turno  = Get_turno(partita);
-    int round  = Get_round(partita);
-    char *nomeCorrente = (turno == 1)
-        ? imp.nomeGiocatore1.data
-        : imp.nomeGiocatore2.data;
+// sovrascrive i dati dinamici sulla schermata: nome partita, round, turno, griglia
+void stampaGioco(Partita partita, Impostazioni impostazioni) {
+    int turno = partita.turno;
+    int round = partita.round;
 
-    goTo(13, 9);
-    printf("%2d", round);
-    goTo(28, 9);
-    printf("%-18s", nomeCorrente);
+    // stampa il nome della partita centrato nella barra del titolo (riga 6)
+    goTo(GIOCO_TITOLO_COL, GIOCO_TITOLO_RIG);
+    printf("%-5s", Get_nomePartita(impostazioni).data);
+
+    // stampa il numero del round (riga 8, dopo "ROUND: ")
+    goTo(GIOCO_ROUND_COL, GIOCO_ROUND_RIG);
+    printf("%d", round);
+
+    // stampa il turno (numero del giocatore) (riga 8, dopo "TURNO: ")
+    goTo(GIOCO_TURNO_COL, GIOCO_TURNO_RIG);
+    printf("%d", turno);
+
     fflush(stdout);
 
-    int righeGriglia[3] = {13, 17, 21};
-    int colonneGriglia[3] = {20, 40, 60};
-
+    // stampa i simboli al centro di ogni cella della griglia
     for (int r = 0; r < 3; r++) {
         for (int c = 0; c < 3; c++) {
-            char simbolo = Get_griglia(partita, r, c);
-            goTo(colonneGriglia[c], righeGriglia[r]);
+            char simbolo = partita.griglia[r][c];
+            goTo(GRIGLIA_CENTRO_COL[c], GRIGLIA_CENTRO_RIG[r]);
             printf("%c", (simbolo == ' ' || simbolo == '\0') ? ' ' : simbolo);
         }
     }
@@ -124,27 +108,15 @@ void stampaGioco(Partita partita) {
 
 #pragma endregion
 
-// ===================== NAVIGAZIONE PARTITA =====================
+
+// --------------------- NAVIGAZIONE PARTITA -----------------------------
 #pragma region navigazione
 
 void navigaPartita(Partita *partita, Impostazioni impostazioni) {
     int esci = 0;
 
-    // abilita mouse
-#ifdef _WIN32
-    HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
-    DWORD modalitaPrecedente;
-    GetConsoleMode(handleInput, &modalitaPrecedente);
-    SetConsoleMode(handleInput, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
-#else
-    struct termios originale, grezza;
-    tcgetattr(STDIN_FILENO, &originale);
-    grezza = originale;
-    grezza.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &grezza);
-    printf("\033[?1000h\033[?1006h");
-    fflush(stdout);
-#endif
+    // abilita il mouse tramite la libreria mouse.h
+    abilitaMouse();
 
     while (!esci) {
         // pulisce il terminale
@@ -159,7 +131,7 @@ void navigaPartita(Partita *partita, Impostazioni impostazioni) {
         stampaSchermataGioco(schermataGioco);
 
         // sovrascrive i dati dinamici (round, turno, griglia)
-        stampaGioco(*partita);
+        stampaGioco(*partita, impostazioni);
 
         // legge il click del giocatore
         int riga, colonna;
@@ -167,24 +139,16 @@ void navigaPartita(Partita *partita, Impostazioni impostazioni) {
             continue;
 
         // --- rilevamento cella cliccata ---
-        // limiti delle colonne nelle celle della griglia (approssimativi)
-        // cella 0: col 11-29, cella 1: col 31-49, cella 2: col 51-69
-        int colonnaInizio[3] = {11, 31, 51};
-        int colonnaFine[3]   = {29, 49, 69};
-        // limiti delle righe nelle celle della griglia
-        // cella 0: riga 11-14, cella 1: riga 15-18, cella 2: riga 19-22
-        int rigaInizio[3] = {11, 15, 19};
-        int rigaFine[3]   = {14, 18, 22};
-
+        // usa le costanti definite in gioco.h (GRIGLIA_COL_INI/FIN, GRIGLIA_RIG_INI/FIN)
         int cellaR = -1, cellaC = -1;
         for (int r = 0; r < 3; r++) {
-            if (riga >= rigaInizio[r] && riga <= rigaFine[r]) {
+            if (riga >= GRIGLIA_RIG_INI[r] && riga <= GRIGLIA_RIG_FIN[r]) {
                 cellaR = r;
                 break;
             }
         }
         for (int c = 0; c < 3; c++) {
-            if (colonna >= colonnaInizio[c] && colonna <= colonnaFine[c]) {
+            if (colonna >= GRIGLIA_COL_INI[c] && colonna <= GRIGLIA_COL_FIN[c]) {
                 cellaC = c;
                 break;
             }
@@ -192,13 +156,15 @@ void navigaPartita(Partita *partita, Impostazioni impostazioni) {
 
         // se è stata cliccata una cella valida e ancora libera
         if (cellaR != -1 && cellaC != -1) {
+            // simbolo del giocatore corrente letto dalle impostazioni
             char simboloCorrente = (partita->turno == 1)
-                ? Get_simboloGiocatore1(impostazioni)
-                : Get_simboloGiocatore2(impostazioni);
+                ? impostazioni.simboloGiocatore1
+                : impostazioni.simboloGiocatore2;
 
             if (partita->griglia[cellaR][cellaC] == ' ' ||
                 partita->griglia[cellaR][cellaC] == '\0') {
-                Set_griglia(partita, cellaR, cellaC, simboloCorrente);
+                // piazza il simbolo nella cella
+                partita->griglia[cellaR][cellaC] = simboloCorrente;
 
                 // alterna il turno
                 partita->turno = (partita->turno == 1) ? 2 : 1;
@@ -209,13 +175,10 @@ void navigaPartita(Partita *partita, Impostazioni impostazioni) {
     }
 
     // ripristina terminale
+    abilitaTastiera();
 #ifdef _WIN32
-    SetConsoleMode(handleInput, modalitaPrecedente);
     system("cls");
 #else
-    printf("\033[?1000l\033[?1006l");
-    fflush(stdout);
-    tcsetattr(STDIN_FILENO, TCSANOW, &originale);
     system("clear");
 #endif
     printf("Partita terminata.\n");

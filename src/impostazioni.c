@@ -1,9 +1,9 @@
 /*
  ============================================================================
  Name        : impostazioni.c
- Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia,
- Ruggiero Dicorato Version     : V 1.0 Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
+ Version     : V 1.1 Copyright   : Your copyright notice
+ Description : file di gestione delle impostazioni di gioco
  ============================================================================
  */
 
@@ -12,13 +12,8 @@
 #include <string.h>
 // struttura della gestione delle stringhe, impostazioni e aree cliccabili
 #include "impostazioni.h"
-// gestione del mouse e del terminale
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <termios.h>
-#include <unistd.h>
-#endif
+// libreria condivisa per mouse e cursore
+#include "mouse.h"
 
 void resetImpostazioni(Impostazioni *impostazioni);
 
@@ -49,17 +44,15 @@ Stringa Get_nomePartita(Impostazioni impostazioni);
 void stampaSchermata(Stringa s, Impostazioni impostazioni);
 #pragma endregion
 
+// dichiarazioni funzioni navigazione
 #pragma region input
-// dichiarazioni funzioni cursore
-int leggiClick(int *r, int *c);
 void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]);
-void abilitaTastiera();
-void abilitaMouse();
-void goTo(int x, int y);
-int areaCliccata(AreaCliccabile a, int r, int c);
+// goTo, leggiClick, abilitaMouse, abilitaTastiera, areaCliccata
+// sono definite in mouse.h e non vanno ridichiarate
 #pragma endregion
 
 #pragma region main
+// avvia il main per non entrare in conflitto con gli altri main dei file .c
 #ifndef IMPOSTAZIONI_NO_MAIN
 int main() {
   // appena si avvia il codice si impostano le impostazioni di default.
@@ -74,7 +67,7 @@ int main() {
 
   return EXIT_SUCCESS;
 }
-#endif // IMPOSTAZIONI_NO_MAIN
+#endif
 #pragma endregion
 
 // ------------------------------ FUNZIONI DI ACCESSO ------------------------------------
@@ -88,8 +81,7 @@ int Get_modoPartita(Impostazioni impostazioni) {
 }
 // ---------------------NOMI GIOCATORI---------------------------
 void Set_nomeGiocatore1(Stringa n1, Impostazioni *impostazioni) {
-  strncpy(impostazioni->nomeGiocatore1.data, n1.data,
-          sizeof(impostazioni->nomeGiocatore1.data) - 1);
+  strncpy(impostazioni->nomeGiocatore1.data, n1.data, sizeof(impostazioni->nomeGiocatore1.data) - 1);
   // la funzione copia una stringa di caratteri (n1) in un'altra stringa
   // (nomeGiocatore1) dando come limite la dimensione massima dell'array di
   // destinazione.
@@ -121,8 +113,7 @@ char Get_simboloGiocatore2(Impostazioni impostazioni) {
 }
 // ------------------PARTITA PRECEDENTE------------------------------
 void Set_partitaPrecedente(Stringa p, Impostazioni *impostazioni) {
-  strncpy(impostazioni->partitaPrecedente.data, p.data,
-          sizeof(impostazioni->partitaPrecedente.data) - 1);
+  strncpy(impostazioni->partitaPrecedente.data, p.data, sizeof(impostazioni->partitaPrecedente.data) - 1);
 }
 Stringa Get_partitaPrecedente(Impostazioni impostazioni) {
   return impostazioni.partitaPrecedente;
@@ -158,8 +149,7 @@ int Get_numeroRound(Impostazioni impostazioni) {
 }
 // ---------------------NOME PARTITA---------------------------
 void Set_nomePartita(Stringa n, Impostazioni *impostazioni) {
-  strncpy(impostazioni->nomePartita.data, n.data,
-          sizeof(impostazioni->nomePartita.data) - 1);
+  strncpy(impostazioni->nomePartita.data, n.data, sizeof(impostazioni->nomePartita.data) - 1);
 }
 Stringa Get_nomePartita(Impostazioni impostazioni) {
   return impostazioni.nomePartita;
@@ -208,94 +198,8 @@ void stampaSchermata(Stringa s, Impostazioni Impostazioni) {
 
 // FUNZIONI CURSORE E NAVIGAZIONE
 #pragma region funzioni cursore
-// ---------------------LETTURA CLICK MOUSE---------------------------
-#ifdef _WIN32
-int leggiClick(int *riga, int *colonna) {
-  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
-  INPUT_RECORD evento;
-  DWORD contatore;
-  while (1) {
-    ReadConsoleInput(handleInput, &evento, 1, &contatore);
-    if (evento.EventType == MOUSE_EVENT &&
-        evento.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-      *colonna = evento.Event.MouseEvent.dwMousePosition.X + 1;
-      *riga = evento.Event.MouseEvent.dwMousePosition.Y + 1;
-      goTo(*colonna, *riga);
-      return 1;
-    }
-  }
-}
-#else
-int leggiClick(int *riga, int *colonna) {
-  char sequenza[32];
-  int indice;
-  while (1) {
-    // essendo il click passato per codice cerca l'inizio della sequenza del codice \033 e controlla che i simboli del click siano presenti fino a trovare la pressione M e il rilascio m estraendo poi i dati di bottone, colonna e riga
-    if (read(STDIN_FILENO, sequenza, 1) != 1) return 0;
-    if (sequenza[0] != '\033') continue;
-    if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '[') continue;
-    if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '<') continue;
-    for (indice = 0; indice < 30; indice++) {
-      if (read(STDIN_FILENO, &sequenza[indice], 1) != 1) break;
-      if (sequenza[indice] == 'M' || sequenza[indice] == 'm') { sequenza[indice+1] = '\0'; break; }
-    }
-    if (sequenza[indice] == 'M') {
-      int bottone, col, rig;
-      if (sscanf(sequenza, "%d;%d;%d", &bottone, &col, &rig) == 3 && bottone == 0) {
-        *colonna = col;
-        *riga = rig;
-        goTo(*colonna, *riga);
-        return 1;
-      }
-    }
-  }
-}
-#endif
-// ---------------------FUNZIONI SUPPORTO CURSORE E AREE---------------------------
-void goTo(int x, int y) {
-#ifdef _WIN32
-  HANDLE handleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-  COORD posizione = {x - 1, y - 1};
-  SetConsoleCursorPosition(handleOutput, posizione);
-#else
-  printf("\033[%d;%dH", y, x);
-  fflush(stdout);
-#endif
-}
-
-int areaCliccata(AreaCliccabile area, int riga, int colonna) {
-  return (riga == area.r && colonna >= area.c1 && colonna <= area.c2);
-}
-
-// disabilita il mouse e riabilita echo + modalità canonica per permettere scanf
-void abilitaTastiera() {
-#ifdef _WIN32
-  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
-  SetConsoleMode(handleInput, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
-#else
-  printf("\033[?1000l\033[?1006l");
-  fflush(stdout);
-  struct termios modalita;
-  tcgetattr(STDIN_FILENO, &modalita);
-  modalita.c_lflag |= (ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &modalita);
-#endif
-}
-
-// riabilita il mouse e disabilita echo per tornare alla navigazione
-void abilitaMouse() {
-#ifdef _WIN32
-  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
-  SetConsoleMode(handleInput, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
-#else
-  struct termios modalita;
-  tcgetattr(STDIN_FILENO, &modalita);
-  modalita.c_lflag &= ~(ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &modalita);
-  printf("\033[?1000h\033[?1006h");
-  fflush(stdout);
-#endif
-}
+// goTo, leggiClick, abilitaMouse, abilitaTastiera, areaCliccata
+// sono definite come static inline in mouse.h
 // ---------------------NAVIGAZIONE IMPOSTAZIONI---------------------------
 // loop principale: stampa schermata, leggi click, esegui azione
 void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {

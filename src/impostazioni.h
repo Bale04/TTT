@@ -41,7 +41,6 @@ AreaCliccabile bAnnulla[] = {{13, 29, 33}, {13, 49, 53}};
 AreaCliccabile bRound[] = {{12, 37, 46}, {16, 40, 43}, {18, 38, 44}};
 
 // costante per il percorso delle interfacce delle impostazioni
-const char PERCORSO_FILE[70] =
-    "/home/Bale/GitHub/TTT/Interfacce/Impostazioni/%s.txt";
+const char PERCORSO_FILE[70] = "/home/Bale/GitHub/TTT/Interfacce/Impostazioni/%s.txt";
 
 #endif
