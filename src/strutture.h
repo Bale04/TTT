@@ -19,12 +19,14 @@ typedef struct {
   Stringa nomePartita;       // nome della partita da giocare
 } Impostazioni;
 
+// struttura delle zone cliccabili dello schermo
 typedef struct {
   int r;  // riga del pulsante
   int c1; // colonna di inizio
   int c2; // colonna di fine
 } AreaCliccabile;
 
+// struttura della partita
 typedef struct {
     char griglia[3][3]; // griglia di gioco
     int turno;          // turno del giocatore che deve muovere (1 o 2)
