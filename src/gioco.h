@@ -1,34 +1,15 @@
 #ifndef gioco_H
 #define gioco_H
 
+#include "strutture.h"
+
 #include "mouse.h"
-
-// Definizione delle strutture per evitare inclusioni multiple di variabili globali
-// da impostazioni.h
-typedef struct {
-  char data[20];
-} Stringa;
-
-typedef struct {
-  Stringa nomeGiocatore1;
-  Stringa nomeGiocatore2;
-  int modoPartita;
-  Stringa partitaPrecedente;
-  char simboloGiocatore1;
-  char simboloGiocatore2;
-  int annullaImpostazioni;
-  int numeroRound;
-  Stringa nomePartita;
-} Impostazioni;
+#include "impostazioni.h"
 
 // --------------- PERCORSO INTERFACCIA GIOCO ---------------
 const char PERCORSO_GIOCO[70] = "/home/Bale/GitHub/TTT/Interfacce/Gioco/%s.txt";
 
-typedef struct {
-    char griglia[3][3]; // griglia di gioco
-    int turno;          // turno del giocatore che deve muovere (1 o 2)
-    int round;          // round corrente
-} Partita;
+
 
 // ----------------------------------------------------------------
 // AREE CLICCABILI DELLA GRIGLIA DI GIOCO
@@ -66,15 +47,27 @@ static const int GRIGLIA_CENTRO_RIG[3] = {11, 15, 19};
 #define GIOCO_TURNO_RIG    8
 
 // ----------------------------------------------------------------
+// AREE CLICCABILI DEI BOTTONI DELLA SCHERMATA DI GIOCO
+// [SALVA PARTITA]  riga 22, colonne 5-19
+// [SUPPORTO]       riga 22, colonne 66-75
+// ----------------------------------------------------------------
+AreaCliccabile bGiocoMenu[] = {
+    {22, 5, 19},   // [SALVA PARTITA]
+    {22, 66, 75}   // [SUPPORTO]
+};
+
+// ----------------------------------------------------------------
 // Funzioni esterne definite in impostazioni.c
 // (le funzioni goTo, leggiClick, abilitaMouse, abilitaTastiera,
 //  areaCliccata sono ora fornite da mouse.h)
 // ----------------------------------------------------------------
-extern void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]);
-extern void resetImpostazioni(Impostazioni *impostazioni);
-extern Stringa Get_nomeGiocatore1(Impostazioni impostazioni);
-extern Stringa Get_nomeGiocatore2(Impostazioni impostazioni);
-extern Stringa Get_nomePartita(Impostazioni impostazioni);
-extern int    Get_numeroRound(Impostazioni impostazioni);
+// extern void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]);
+// extern void resetImpostazioni(Impostazioni *impostazioni);
+// extern Stringa Get_nomeGiocatore1(Impostazioni impostazioni);
+// extern Stringa Get_nomeGiocatore2(Impostazioni impostazioni);
+// extern Stringa Get_nomePartita(Impostazioni impostazioni);
+// extern int    Get_numeroRound(Impostazioni impostazioni);
+// extern char   Get_simboloGiocatore1(Impostazioni impostazioni);
+// extern char   Get_simboloGiocatore2(Impostazioni impostazioni);
 
 #endif /* gioco_H */

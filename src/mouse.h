@@ -10,7 +10,7 @@
 #ifndef mouse_H
 #define mouse_H
 
-#include "areeCliccabili.h"
+#include "strutture.h"
 
 
 #ifdef _WIN32

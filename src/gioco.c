@@ -2,7 +2,7 @@
  ============================================================================
  Name        : gioco.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 0.2
+ Version     : V 0.3
  Copyright   : Your copyright notice
  Description : file di gestione del gioco
  ============================================================================
@@ -11,17 +11,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// gestione delle strutture per il gioco (include anche mouse.h e impostazioni.h)
+// gestione delle strutture per il gioco (include anche mouse.h e areeCliccabili.h)
 #include "gioco.h"
+#include "impostazioni.h"
 
 
 // ----------------- DICHIARAZIONI ---------------------
-#pragma region dichiarazioni funzioni di accesso
+#pragma region dichiarazioni funzioni
 
-// funzioni di gioco
-void stampaSchermataGioco(Stringa s);
-void stampaGioco(Partita partita, Impostazioni impostazioni);
+// funzioni di stampa
+void stampaSchermata(Stringa s);
+// void stampaGioco(Partita partita, Impostazioni impostazioni);
+
+// funzione di navigazione
 void navigaPartita(Partita *partita, Impostazioni impostazioni);
+
+// funzioni di accesso Partita
+void Set_griglia(Partita *partita, int riga, int colonna, char simbolo);
+char Get_griglia(Partita partita, int riga, int colonna);
+void Set_turno(Partita *partita, int turno);
+int  Get_turno(Partita partita);
+void Set_round(Partita *partita, int round);
+int  Get_round(Partita partita);
 
 #pragma endregion
 
@@ -30,20 +41,23 @@ void navigaPartita(Partita *partita, Impostazioni impostazioni);
 
 int main() {
     // 1. Raccolta delle impostazioni tramite la schermata di impostazioni
+    //    Le impostazioni NON vengono resettate qui: il reset avviene
+    //    internamente in navigaImpostazioni tramite impostazioni.c
     Impostazioni impostazioni;
-    resetImpostazioni(&impostazioni);
+    // resetImpostazioni(&impostazioni);
 
-    Stringa schermate[3] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}};
-    navigaImpostazioni(&impostazioni, schermate);
+    // le 7 schermate delle impostazioni (definite come in impostazioni.c)
+    Stringa schermatePartita[3] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}};
+    stampaSchermata(schermatePartita[0]);
 
     // 2. Inizializzazione della partita con le impostazioni raccolte
     Partita partita;
     // griglia vuota
-    for (int r = 0; r < 3; r++)
-        for (int c = 0; c < 3; c++)
-            partita.griglia[r][c] = ' ';
-    partita.turno = 1;
-    partita.round = 1;
+    // for (int r = 0; r < 3; r++)
+    //     for (int c = 0; c < 3; c++)
+    //         Set_griglia(&partita, r, c, ' ');
+    // Set_turno(&partita, 1);
+    // Set_round(&partita, 1);
 
     // 3. Avvio schermata di gioco
     navigaPartita(&partita, impostazioni);
@@ -54,11 +68,39 @@ int main() {
 #pragma endregion
 
 
+// ------------------------------ FUNZIONI DI ACCESSO PARTITA ------------------------------------
+#pragma region funzioni di accesso
+
+// ---------------------GRIGLIA---------------------------
+void Set_griglia(Partita *partita, int riga, int colonna, char simbolo) {
+    partita->griglia[riga][colonna] = simbolo;
+}
+char Get_griglia(Partita partita, int riga, int colonna) {
+    return partita.griglia[riga][colonna];
+}
+// ---------------------TURNO---------------------------
+void Set_turno(Partita *partita, int turno) {
+    partita->turno = turno;
+}
+int Get_turno(Partita partita) {
+    return partita.turno;
+}
+// ---------------------ROUND---------------------------
+void Set_round(Partita *partita, int round) {
+    partita->round = round;
+}
+int Get_round(Partita partita) {
+    return partita.round;
+}
+
+#pragma endregion
+
+
 // ----------------- STAMPA SCHERMATA ------------------
 #pragma region stampa
 
 // stampa il file .txt della schermata di gioco
-void stampaSchermataGioco(Stringa s) {
+void stampaSchermata(Stringa s) {
     FILE *fp;
     int c;
     char nomeCompleto[256];
@@ -77,34 +119,34 @@ void stampaSchermataGioco(Stringa s) {
 
 
 // sovrascrive i dati dinamici sulla schermata: nome partita, round, turno, griglia
-void stampaGioco(Partita partita, Impostazioni impostazioni) {
-    int turno = partita.turno;
-    int round = partita.round;
+// void stampaGioco(Partita partita, Impostazioni impostazioni) {
+//     int turno = Get_turno(partita);
+//     int round = Get_round(partita);
 
-    // stampa il nome della partita centrato nella barra del titolo (riga 6)
-    goTo(GIOCO_TITOLO_COL, GIOCO_TITOLO_RIG);
-    printf("%-5s", Get_nomePartita(impostazioni).data);
+//     // stampa il nome della partita centrato nella barra del titolo (riga 6)
+//     goTo(GIOCO_TITOLO_COL, GIOCO_TITOLO_RIG);
+//     printf("%-5s", Get_nomePartita(impostazioni).data);
 
-    // stampa il numero del round (riga 8, dopo "ROUND: ")
-    goTo(GIOCO_ROUND_COL, GIOCO_ROUND_RIG);
-    printf("%d", round);
+//     // stampa il numero del round (riga 8, dopo "ROUND: ")
+//     goTo(GIOCO_ROUND_COL, GIOCO_ROUND_RIG);
+//     printf("%d", round);
 
-    // stampa il turno (numero del giocatore) (riga 8, dopo "TURNO: ")
-    goTo(GIOCO_TURNO_COL, GIOCO_TURNO_RIG);
-    printf("%d", turno);
+//     // stampa il turno (numero del giocatore: 1 o 2) (riga 8, dopo "TURNO: ")
+//     goTo(GIOCO_TURNO_COL, GIOCO_TURNO_RIG);
+//     printf("%d", turno);
 
-    fflush(stdout);
+//     fflush(stdout);
 
-    // stampa i simboli al centro di ogni cella della griglia
-    for (int r = 0; r < 3; r++) {
-        for (int c = 0; c < 3; c++) {
-            char simbolo = partita.griglia[r][c];
-            goTo(GRIGLIA_CENTRO_COL[c], GRIGLIA_CENTRO_RIG[r]);
-            printf("%c", (simbolo == ' ' || simbolo == '\0') ? ' ' : simbolo);
-        }
-    }
-    fflush(stdout);
-}
+//     // stampa i simboli al centro di ogni cella della griglia
+//     for (int r = 0; r < 3; r++) {
+//         for (int c = 0; c < 3; c++) {
+//             char simbolo = Get_griglia(partita, r, c);
+//             goTo(GRIGLIA_CENTRO_COL[c], GRIGLIA_CENTRO_RIG[r]);
+//             printf("%c", (simbolo == ' ' || simbolo == '\0') ? ' ' : simbolo);
+//         }
+//     }
+//     fflush(stdout);
+// }
 
 #pragma endregion
 
@@ -128,10 +170,10 @@ void navigaPartita(Partita *partita, Impostazioni impostazioni) {
 
         // stampa la schermata base del gioco
         Stringa schermataGioco = {"Gioco"};
-        stampaSchermataGioco(schermataGioco);
+        stampaSchermata(schermataGioco);
 
         // sovrascrive i dati dinamici (round, turno, griglia)
-        stampaGioco(*partita, impostazioni);
+        // stampaGioco(*partita, impostazioni);
 
         // legge il click del giocatore
         int riga, colonna;
@@ -157,17 +199,17 @@ void navigaPartita(Partita *partita, Impostazioni impostazioni) {
         // se è stata cliccata una cella valida e ancora libera
         if (cellaR != -1 && cellaC != -1) {
             // simbolo del giocatore corrente letto dalle impostazioni
-            char simboloCorrente = (partita->turno == 1)
-                ? impostazioni.simboloGiocatore1
-                : impostazioni.simboloGiocatore2;
+            // char simboloCorrente = (Get_turno(*partita) == 1)
+            //     ? Get_simboloGiocatore1(impostazioni)
+            //     : Get_simboloGiocatore2(impostazioni);
 
-            if (partita->griglia[cellaR][cellaC] == ' ' ||
-                partita->griglia[cellaR][cellaC] == '\0') {
+            if (Get_griglia(*partita, cellaR, cellaC) == ' ' ||
+                Get_griglia(*partita, cellaR, cellaC) == '\0') {
                 // piazza il simbolo nella cella
-                partita->griglia[cellaR][cellaC] = simboloCorrente;
+                // Set_griglia(partita, cellaR, cellaC, simboloCorrente);
 
                 // alterna il turno
-                partita->turno = (partita->turno == 1) ? 2 : 1;
+                Set_turno(partita, (Get_turno(*partita) == 1) ? 2 : 1);
             }
         }
 

@@ -41,7 +41,7 @@ Stringa Get_nomePartita(Impostazioni impostazioni);
 
 // DEFINIZIONE ALTRE FUNZIONI
 #pragma region dichiarazione altre funzioni
-void stampaSchermata(Stringa s, Impostazioni impostazioni);
+void stampaSchermata(Stringa s);
 #pragma endregion
 
 // dichiarazioni funzioni navigazione
@@ -53,7 +53,7 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]);
 
 #pragma region main
 // avvia il main per non entrare in conflitto con gli altri main dei file .c
-#ifndef IMPOSTAZIONI_NO_MAIN
+// #ifndef IMPOSTAZIONI_NO_MAIN
 int main() {
   // appena si avvia il codice si impostano le impostazioni di default.
   Impostazioni impostazioni;
@@ -61,13 +61,13 @@ int main() {
 
   // vettore che carica i nomi delle schermate da visualizzare alla selezione
   Stringa schermate[7] = {{"Impostazioni"}, {"NomiGiocatori"}, {"ModalitaDiGioco"},  {"CaricaPartita"}, {"SimboliGiocatori"}, {"AnnullaImpostazioni"}, {"PartitaERound"}};
-  stampaSchermata(schermate[0], impostazioni);
+  stampaSchermata(schermate[0]);
   // avvia la navigazione con il mouse nelle schermate impostazioni
   navigaImpostazioni(&impostazioni, schermate);
 
   return EXIT_SUCCESS;
 }
-#endif
+// #endif
 #pragma endregion
 
 // ------------------------------ FUNZIONI DI ACCESSO ------------------------------------
@@ -174,7 +174,7 @@ void resetImpostazioni(Impostazioni *impostazioni) {
   Set_nomePartita((Stringa){"partita"}, impostazioni);
 }
 
-void stampaSchermata(Stringa s, Impostazioni Impostazioni) {
+void stampaSchermata(Stringa s) {
   FILE *fpImpostazioni;
   int c;
   char nomeCompleto[256];
@@ -227,7 +227,7 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
 #else
     system("clear");
 #endif
-    stampaSchermata(schermate[pagina], *impostazioni);
+    stampaSchermata(schermate[pagina]);
     // gestione dei dati nelle schermate stampate
     switch (pagina){
       case 1:
