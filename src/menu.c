@@ -1,9 +1,10 @@
 /*
  ============================================================================
- Name        : impostazioni.c
+ Name        : menu.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 1.1 Copyright   : Your copyright notice
- Description : file di gestione delle impostazioni di gioco
+ Version     : V 0.1 
+ Copyright   : Your copyright notice
+ Description : file di gestione del menu principale
  ============================================================================
  */
 
