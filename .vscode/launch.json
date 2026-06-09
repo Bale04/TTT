@@ -2,15 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Avvia TTT Gioco",
+            "name": "Avvia TTT Menu",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/TTT_gioco",
+            "program": "${fileDirname}/menu",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${fileDirname}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -19,7 +19,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build gioco (con impostazioni)",
+            "preLaunchTask": "Build TTT (menu + impostazioni + gioco)",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

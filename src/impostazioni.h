@@ -4,7 +4,7 @@
 #include "strutture.h"
 
 // numero massimo di round da giocare
-int const MAX_ROUND = 99;
+static const int MAX_ROUND = 99;
 
 
 
@@ -23,6 +23,11 @@ AreaCliccabile bSimb[] = {{12, 39, 42}, {16, 39, 42}, {18, 38, 44}};
 AreaCliccabile bAnnulla[] = {{13, 29, 33}, {13, 49, 53}};
 // NOME - ROUND - ESCI
 AreaCliccabile bRound[] = {{12, 37, 46}, {16, 40, 43}, {18, 38, 44}};
+
+
+// vettore che carica i nomi delle schermate da visualizzare alla selezione
+Stringa schermateImpostazioni[7] = {{"Impostazioni"}, {"NomiGiocatori"}, {"ModalitaDiGioco"},  {"CaricaPartita"}, {"SimboliGiocatori"}, {"AnnullaImpostazioni"}, {"PartitaERound"}};
+  
 
 // costante per il percorso delle interfacce delle impostazioni
 const char PERCORSO_FILE[70] = "/home/Bale/GitHub/TTT/Interfacce/Impostazioni/%s.txt";

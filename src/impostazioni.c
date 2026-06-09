@@ -41,33 +41,14 @@ Stringa Get_nomePartita(Impostazioni impostazioni);
 
 // DEFINIZIONE ALTRE FUNZIONI
 #pragma region dichiarazione altre funzioni
-void stampaSchermata(Stringa s);
+void stampaSchermataImpostazioni(Stringa s);
 #pragma endregion
 
 // dichiarazioni funzioni navigazione
 #pragma region input
-void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]);
+void navigaImpostazioni(Impostazioni *impostazioni);
 // goTo, leggiClick, abilitaMouse, abilitaTastiera, areaCliccata
 // sono definite in mouse.h e non vanno ridichiarate
-#pragma endregion
-
-#pragma region main
-// avvia il main per non entrare in conflitto con gli altri main dei file .c
-// #ifndef IMPOSTAZIONI_NO_MAIN
-int main() {
-  // appena si avvia il codice si impostano le impostazioni di default.
-  Impostazioni impostazioni;
-  resetImpostazioni(&impostazioni);
-
-  // vettore che carica i nomi delle schermate da visualizzare alla selezione
-  Stringa schermate[7] = {{"Impostazioni"}, {"NomiGiocatori"}, {"ModalitaDiGioco"},  {"CaricaPartita"}, {"SimboliGiocatori"}, {"AnnullaImpostazioni"}, {"PartitaERound"}};
-  stampaSchermata(schermate[0]);
-  // avvia la navigazione con il mouse nelle schermate impostazioni
-  navigaImpostazioni(&impostazioni, schermate);
-
-  return EXIT_SUCCESS;
-}
-// #endif
 #pragma endregion
 
 // ------------------------------ FUNZIONI DI ACCESSO ------------------------------------
@@ -174,7 +155,7 @@ void resetImpostazioni(Impostazioni *impostazioni) {
   Set_nomePartita((Stringa){"partita"}, impostazioni);
 }
 
-void stampaSchermata(Stringa s) {
+void stampaSchermataImpostazioni(Stringa s) {
   FILE *fpImpostazioni;
   int c;
   char nomeCompleto[256];
@@ -199,27 +180,14 @@ void stampaSchermata(Stringa s) {
 // FUNZIONI CURSORE E NAVIGAZIONE
 #pragma region funzioni cursore
 // goTo, leggiClick, abilitaMouse, abilitaTastiera, areaCliccata
-// sono definite come static inline in mouse.h
+
 // ---------------------NAVIGAZIONE IMPOSTAZIONI---------------------------
 // loop principale: stampa schermata, leggi click, esegui azione
-void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
+// Quando si preme ESCI dalla schermata 0 (Impostazioni), si torna al menu principale
+void navigaImpostazioni(Impostazioni *impostazioni) {
   int riga, colonna, pagina = 0, esci = 0;
 
-  // rende il terminale cliccabile
-#ifdef _WIN32
-  HANDLE handleInput = GetStdHandle(STD_INPUT_HANDLE);
-  DWORD modalitaPrecedente;
-  GetConsoleMode(handleInput, &modalitaPrecedente);
-  SetConsoleMode(handleInput, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
-#else
-  struct termios originale, grezza;
-  tcgetattr(STDIN_FILENO, &originale);
-  grezza = originale;
-  grezza.c_lflag &= ~(ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &grezza);
-  printf("\033[?1000h\033[?1006h");
-  fflush(stdout);
-#endif
+  abilitaMouse();
 
   while (!esci) {
 #ifdef _WIN32
@@ -227,41 +195,43 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
 #else
     system("clear");
 #endif
-    stampaSchermata(schermate[pagina]);
+    stampaSchermataImpostazioni(schermateImpostazioni[pagina]);
     // gestione dei dati nelle schermate stampate
-    switch (pagina){
-      case 1:
-        goTo(bNomi[0].c1+1, bNomi[0].r);
-        printf("%s]", Get_nomeGiocatore1(*impostazioni).data);
-        goTo(bNomi[1].c1+1, bNomi[1].r);
-        printf("%s]", Get_nomeGiocatore2(*impostazioni).data);
-        fflush(stdout);
-        break;
-      case 3:
-        goTo(bCarica[0].c1+1, bCarica[0].r);
-        printf("%s]", Get_partitaPrecedente(*impostazioni).data);
-        fflush(stdout);
-        break;
-      case 4:
-        goTo(bSimb[0].c1+1, bSimb[0].r);
-        printf("%c", Get_simboloGiocatore1(*impostazioni));
-        goTo(bSimb[1].c1+1, bSimb[1].r);
-        printf("%c", Get_simboloGiocatore2(*impostazioni));
-        fflush(stdout);
-      case 6:
-        goTo(bRound[0].c1+1, bRound[0].r);
-        printf("%s]", Get_nomePartita(*impostazioni).data);
-        goTo(bRound[1].c1+1, bRound[1].r);
-        printf("%d]", Get_numeroRound(*impostazioni));
-        fflush(stdout);
+    if (pagina == 1) {
+      goTo(bNomi[0].c1+1, bNomi[0].r);
+      printf("%s]", Get_nomeGiocatore1(*impostazioni).data);
+      goTo(bNomi[1].c1+1, bNomi[1].r);
+      printf("%s]", Get_nomeGiocatore2(*impostazioni).data);
+      fflush(stdout);
+    } else if (pagina == 3) {
+      goTo(bCarica[0].c1+1, bCarica[0].r);
+      printf("%s]", Get_partitaPrecedente(*impostazioni).data);
+      fflush(stdout);
+    } else if (pagina == 4) {
+      goTo(bSimb[0].c1+1, bSimb[0].r);
+      printf("%c", Get_simboloGiocatore1(*impostazioni));
+      goTo(bSimb[1].c1+1, bSimb[1].r);
+      printf("%c", Get_simboloGiocatore2(*impostazioni));
+      fflush(stdout);
+      // fall-through: esegue anche la logica di pagina 6
+      goTo(bRound[0].c1+1, bRound[0].r);
+      printf("%s]", Get_nomePartita(*impostazioni).data);
+      goTo(bRound[1].c1+1, bRound[1].r);
+      printf("%d]", Get_numeroRound(*impostazioni));
+      fflush(stdout);
+    } else if (pagina == 6) {
+      goTo(bRound[0].c1+1, bRound[0].r);
+      printf("%s]", Get_nomePartita(*impostazioni).data);
+      goTo(bRound[1].c1+1, bRound[1].r);
+      printf("%d]", Get_numeroRound(*impostazioni));
+      fflush(stdout);
     }
 
     // gestione del click nelle pagine
     if (!leggiClick(&riga, &colonna))
       continue;
 
-    switch (pagina) {
-    case 0: // --------- Impostazioni ---------
+    if (pagina == 0) { // --------- Impostazioni ---------
       if (areaCliccata(bMenu[0], riga, colonna))
         pagina = 1;
       else if (areaCliccata(bMenu[1], riga, colonna))
@@ -275,10 +245,8 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
       else if (areaCliccata(bMenu[5], riga, colonna))
         pagina = 6;
       else if (areaCliccata(bMenu[6], riga, colonna))
-        esci = 1;
-      break;
-
-    case 1: // --------- NomiGiocatori ---------
+        esci = 1;  // torna al menu principale
+    } else if (pagina == 1) { // --------- NomiGiocatori ---------
       if (areaCliccata(bNomi[0], riga, colonna)) {
         Stringa nuovoNome1;
         goTo(bNomi[0].c1+1, bNomi[0].r);
@@ -296,9 +264,7 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
       } else if (areaCliccata(bNomi[2], riga, colonna)) {
         pagina = 0;
       }
-      break;
-
-    case 2: // --------- ModalitaDiGioco ---------
+    } else if (pagina == 2) { // --------- ModalitaDiGioco ---------
       if (areaCliccata(bModo[0], riga, colonna)) {
         Set_modoPartita(0, impostazioni);
         pagina = 0;
@@ -308,9 +274,7 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
       } else if (areaCliccata(bModo[2], riga, colonna)) {
         pagina = 0;
       }
-      break;
-
-    case 3: // --------- CaricaPartita ---------
+    } else if (pagina == 3) { // --------- CaricaPartita ---------
       if (areaCliccata(bCarica[0], riga, colonna)) {
         Stringa vecchiaPartita;
         goTo(bCarica[0].c1+1, bCarica[0].r);
@@ -321,9 +285,7 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
       } else if (areaCliccata(bCarica[1], riga, colonna)) {
         pagina = 0;
       }
-      break;
-
-    case 4: // --------- SimboliGiocatori ---------
+    } else if (pagina == 4) { // --------- SimboliGiocatori ---------
       if (areaCliccata(bSimb[0], riga, colonna)) {
         char simboloNuovo1;
         goTo(bSimb[0].c1+1, bSimb[0].r);
@@ -341,18 +303,14 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
       } else if (areaCliccata(bSimb[2], riga, colonna)) {
         pagina = 0;
       }
-      break;
-
-    case 5: // --------- AnnullaImpostazioni ---------
+    } else if (pagina == 5) { // --------- AnnullaImpostazioni ---------
       if (areaCliccata(bAnnulla[0], riga, colonna)) {
         resetImpostazioni(impostazioni);
         pagina = 0;
       } else if (areaCliccata(bAnnulla[1], riga, colonna)) {
         pagina = 0;
       }
-      break;
-
-    case 6: // --------- PartitaERound ---------
+    } else if (pagina == 6) { // --------- PartitaERound ---------
       if (areaCliccata(bRound[0], riga, colonna)) {
         Stringa nuovaPartita;
         goTo(bRound[0].c1+1, bRound[0].r);
@@ -370,20 +328,15 @@ void navigaImpostazioni(Impostazioni *impostazioni, Stringa schermate[]) {
       } else if (areaCliccata(bRound[2], riga, colonna)) {
         pagina = 0;
       }
-      break;
     }
   }
 
   // ripristina il terminale
+  abilitaTastiera();
 #ifdef _WIN32
-  SetConsoleMode(handleInput, modalitaPrecedente);
   system("cls");
 #else
-  printf("\033[?1000l\033[?1006l");
-  fflush(stdout);
-  tcsetattr(STDIN_FILENO, TCSANOW, &originale);
   system("clear");
 #endif
-  printf("Impostazioni chiuse.\n");
 }
 #pragma endregion

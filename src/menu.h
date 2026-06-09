@@ -3,12 +3,15 @@
 
 #include "strutture.h"
 
-// bottoni per ogni schermata
-// NOME - MODE - CARICA - SIMBOLO - ANNULLA - ROUND - ESCI
-AreaCliccabile bMainMenu[] = {{9, 30, 53},  {11, 31, 50}, {13, 34, 49}, {15, 32, 50}, {17, 30, 51}, {19, 30, 50}, {20, 69, 74}};
+// bottoni del menu principale (riga, colonna inizio, colonna fine)
+// GIOCA - IMPOSTAZIONI - SUPPORTO - STATISTICHE - ESCI
+AreaCliccabile bMainMenu[] = {{10, 37, 43},{12, 34, 47},{14, 36, 45},{16, 35, 47},{18, 38, 43}};
 
 
-// costante per il percorso delle interfacce delle impostazioni
+// vettore delle schermate del menu principale
+Stringa schermateMenu[1] = {{"MenuPrincipale"}};
+
+// costante per il percorso delle interfacce del menu
 const char PERCORSO_MENU[70] = "/home/Bale/GitHub/TTT/Interfacce/MainMenu/%s.txt";
 
 #endif

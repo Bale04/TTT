@@ -2,19 +2,19 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "Build gioco (con impostazioni)",
+            "label": "Build TTT (menu + impostazioni + gioco)",
             "command": "/usr/bin/gcc",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "-DIMPOSTAZIONI_NO_MAIN",
-                "${workspaceFolder}/src/gioco.c",
-                "${workspaceFolder}/src/impostazioni.c",
+                "${fileDirname}/menu.c",
+                "${fileDirname}/impostazioni.c",
+                "${fileDirname}/gioco.c",
                 "-o",
-                "${workspaceFolder}/TTT_gioco"
+                "${fileDirname}/menu"
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": [
                 "$gcc"
@@ -23,7 +23,23 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Compila gioco.c + impostazioni.c (senza il main di impostazioni)."
+            "detail": "Compila menu.c + impostazioni.c + gioco.c in un unico eseguibile."
+        },
+        {
+            "label": "Esegui TTT Menu",
+            "type": "shell",
+            "command": "${fileDirname}/menu",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "dependsOn": "Build TTT (menu + impostazioni + gioco)",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true
+            },
+            "detail": "Compila e avvia il menu nel terminale integrato."
         }
     ],
     "version": "2.0.0"

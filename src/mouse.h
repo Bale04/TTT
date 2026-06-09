@@ -60,12 +60,14 @@ static inline int leggiClick(int *riga, int *colonna) {
         if (sequenza[0] != '\033') continue;
         if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '[') continue;
         if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '<') continue;
-        for (indice = 0; indice < 30; indice++) {
+        indice = 0;
+        while (indice < 30) {
             if (read(STDIN_FILENO, &sequenza[indice], 1) != 1) break;
             if (sequenza[indice] == 'M' || sequenza[indice] == 'm') {
                 sequenza[indice + 1] = '\0';
                 break;
             }
+            indice= indice +1;
         }
         if (sequenza[indice] == 'M') {
             int bottone, col, rig;
