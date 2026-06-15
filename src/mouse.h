@@ -22,6 +22,9 @@
 #endif
 
 
+// posizione base del cursore nel terminale (dopo ogni input)
+const Cursore CURSORE_BASE = {1, 25};
+
 // gestisce lo spostamento del cursore al click
 static inline void goTo(int x, int y) {
 #ifdef _WIN32

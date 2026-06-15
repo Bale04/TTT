@@ -12,7 +12,8 @@
                 "${workspaceFolder}/src/gioco.c",
                 "${workspaceFolder}/src/supporto.c",
                 "${workspaceFolder}/src/salvataggio.c",
-                "${workspaceFolder}/TTT/src/statistiche.c",
+                "${workspaceFolder}/src/statistiche.c",
+                "-Wl,--allow-multiple-definition",
                 "-o",
                 "${workspaceFolder}/TTT"
             ],

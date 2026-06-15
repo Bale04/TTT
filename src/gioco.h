@@ -11,17 +11,17 @@ int GRIGLIA_CENTRO_COL[3] = {32, 40, 48};
 int GRIGLIA_CENTRO_RIG[3] = {11, 15, 19};
 
 // Posizioni dell'intefaccia su cui scrivere le informazioni
-#define GIOCO_TITOLO_COL   38   // colonna del nome partita (riga 6)
-#define GIOCO_TITOLO_RIG    6
-#define GIOCO_ROUND_COL    13   // colonna del numero round  (riga 8)
-#define GIOCO_ROUND_RIG     8
-#define GIOCO_TURNO_COL    75   // colonna del turno/nome giocatore (riga 8)
-#define GIOCO_TURNO_RIG     8
-#define VITTORIA_G1_RIG    12
-#define VITTORIA_G2_RIG    13
-#define VITTORIA_COL       11   // colonna del numero di vittorie del giocatore
-#define NOME_VINCITORE_COL 41
-#define NOME_VINCITORE_RIG 14
+const int GIOCO_TITOLO_COL   = 38;   // colonna del nome partita (riga 6)
+const int GIOCO_TITOLO_RIG    = 6;
+const int GIOCO_ROUND_COL    = 13;   // colonna del numero round  (riga 8)
+const int GIOCO_ROUND_RIG     = 8;
+const int GIOCO_TURNO_COL    = 75;   // colonna del turno/nome giocatore (riga 8)
+const int GIOCO_TURNO_RIG     = 8;
+const int VITTORIA_G1_RIG    = 12;
+const int VITTORIA_G2_RIG    = 13;
+const int VITTORIA_COL       = 11;   // colonna del numero di vittorie del giocatore
+const int NOME_VINCITORE_COL = 41;
+const int NOME_VINCITORE_RIG = 14;
 
 // le celle sono defined a partire da sinistra a destra partendo dall'alto
 /*  1-2-3

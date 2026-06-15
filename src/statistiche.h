@@ -3,6 +3,9 @@
 
 #include "strutture.h"
 
+// numero massimo di avversari per pagina nella schermata StatisticheLista
+const int AVVERSARI_PER_PAGINA = 5;
+
 // Record avversario: associa un nome avversario alla struttura Statistiche
 typedef struct {
     char nomeAvversario[20];

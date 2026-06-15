@@ -2,7 +2,7 @@
  ============================================================================
  Name        : gioco.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 0.4
+ Version     : V 1.0
  Copyright   : Your copyright notice
  Description : file di gestione del gioco
  ============================================================================
@@ -13,7 +13,11 @@
 #include <string.h>
 #include "gioco.h"
 #include "supporto.h"
-#include "salvataggio.h"
+
+#pragma region funzioni esterne
+// funzioni esterne da salvataggio.c
+extern int salvaPartita(const Impostazioni *impostazioni, const Partita *partita);
+extern int caricaPartita(Impostazioni *impostazioni, Partita *partita);
 
 // funzione esterna da statistiche.c
 extern void salvaStatistichePartita(const char *nomeG1, const char *nomeG2, int risultato);
@@ -25,14 +29,10 @@ extern Stringa Get_nomeGiocatore2(Impostazioni impostazioni);
 extern int    Get_numeroRound(Impostazioni impostazioni);
 extern char   Get_simboloGiocatore1(Impostazioni impostazioni);
 extern char   Get_simboloGiocatore2(Impostazioni impostazioni);
+extern int    Get_modoPartita(Impostazioni impostazioni);
+#pragma endregion
 
 #pragma region dichiarazioni funzioni
-void stampaSchermataGioco(Stringa s);
-void stampaGioco(Partita partita, Impostazioni impostazioni);
-
-// funzione di navigazione
-void navigaPartita(Partita *partita, Impostazioni *impostazioni);
-
 // funzioni di accesso Partita
 void Set_griglia(Partita *partita, int riga, int colonna, char simbolo);
 char Get_griglia(Partita partita, int riga, int colonna);
@@ -40,15 +40,42 @@ void Set_turno(Partita *partita, int turno);
 int  Get_turno(Partita partita);
 void Set_round(Partita *partita, int round);
 int  Get_round(Partita partita);
+// funzioni di accesso Partita - statisticheG1
+int  Get_vittorieG1(Partita partita);
+void Set_vittorieG1(Partita *partita, int v);
+int  Get_sconfitteG1(Partita partita);
+void Set_sconfitteG1(Partita *partita, int v);
+int  Get_pareggiG1(Partita partita);
+void Set_pareggiG1(Partita *partita, int v);
+// funzioni di accesso Partita - statisticheG2
+int  Get_vittorieG2(Partita partita);
+void Set_vittorieG2(Partita *partita, int v);
+int  Get_sconfitteG2(Partita partita);
+void Set_sconfitteG2(Partita *partita, int v);
+int  Get_pareggiG2(Partita partita);
+void Set_pareggiG2(Partita *partita, int v);
+
+// funzioni di stampa
+void stampaSchermataGioco(Stringa s);
+void stampaGioco(Partita partita, Impostazioni impostazioni);
+
+// funzione di navigazione
+void navigaPartita(Partita *partita, Impostazioni *impostazioni);
 
 // funzioni di verifica stato round
 char controllaVincitoreRound(Partita partita);
 int grigliaPiena(Partita partita);
 
+// funzioni bot CPU
+char controllaVincitoreGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]);
+int  controlloGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]);
+int  calcolaPunteggio(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA], char simboloBot, char simboloAvversario, int isMaximizing);
+int  mossaBot(Partita partita, char simboloBot, char simboloAvversario);
+
 #pragma endregion
 
 
-// ------------------------------ FUNZIONI DI ACCESSO PARTITA ------------------------------------
+// ------------------------- FUNZIONI DI ACCESSO PARTITA -------------------------------
 #pragma region funzioni di accesso
 
 // ---------------------GRIGLIA---------------------------
@@ -71,6 +98,183 @@ void Set_round(Partita *partita, int round) {
 }
 int Get_round(Partita partita) {
     return partita.round;
+}
+// ---------------------STATISTICHE G1---------------------------
+int  Get_vittorieG1(Partita partita){ 
+    return partita.statisticheG1.numeroVittorie; 
+}
+void Set_vittorieG1(Partita *partita, int v){ 
+    partita->statisticheG1.numeroVittorie = v;
+}
+int  Get_sconfitteG1(Partita partita){ 
+    return partita.statisticheG1.numeroSconfitte; 
+}
+void Set_sconfitteG1(Partita *partita, int v){ 
+    partita->statisticheG1.numeroSconfitte = v; 
+}
+int  Get_pareggiG1(Partita partita){ 
+    return partita.statisticheG1.numeroPareggi; 
+}
+void Set_pareggiG1(Partita *partita, int v){ 
+    partita->statisticheG1.numeroPareggi = v; 
+}
+// ---------------------STATISTICHE G2---------------------------
+int  Get_vittorieG2(Partita partita){ 
+    return partita.statisticheG2.numeroVittorie; 
+}
+void Set_vittorieG2(Partita *partita, int v){ 
+    partita->statisticheG2.numeroVittorie = v; 
+}
+int  Get_sconfitteG2(Partita partita){ 
+    return partita.statisticheG2.numeroSconfitte; 
+}
+void Set_sconfitteG2(Partita *partita, int v){ 
+    partita->statisticheG2.numeroSconfitte = v; 
+}
+int  Get_pareggiG2(Partita partita){ 
+    return partita.statisticheG2.numeroPareggi; 
+}
+void Set_pareggiG2(Partita *partita, int v){ 
+    partita->statisticheG2.numeroPareggi = v; 
+}
+
+#pragma endregion
+
+
+// ----------------------------- BOT CPU --------------------------------
+#pragma region bot
+
+// controlla il vincitore sulla copia della griglia usata dal bot
+char controllaVincitoreGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]) {
+    int i = 0;
+    while (i < DIMENSIONE_GRIGLIA) {
+        if (g[i][0] != ' ' && g[i][0] != '\0' && g[i][0] == g[i][1] && g[i][1] == g[i][2]) {
+            return g[i][0];
+        }
+        if (g[0][i] != ' ' && g[0][i] != '\0' && g[0][i] == g[1][i] && g[1][i] == g[2][i]) {
+            return g[0][i];
+        }
+        i = i + 1;
+    }
+    if (g[0][0] != ' ' && g[0][0] != '\0' && g[0][0] == g[1][1] && g[1][1] == g[2][2]) {
+        return g[0][0];
+    }
+    if (g[0][2] != ' ' && g[0][2] != '\0' && g[0][2] == g[1][1] && g[1][1] == g[2][0]) {
+        return g[0][2];
+    }
+    return '\0';
+}
+
+// controlla se la griglia è piena
+int controlloGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]) {
+    int r = 0;
+    while (r < DIMENSIONE_GRIGLIA) {
+        int c = 0;
+        while (c < DIMENSIONE_GRIGLIA) {
+            if (g[r][c] == ' ' || g[r][c] == '\0') {
+                return 0;
+            }
+            c = c + 1;
+        }
+        r = r + 1;
+    }
+    return 1;
+}
+
+// algoritmo ricorsivo per il calcolo del punteggio della posizione
+// isMaximizing == 1: turno del bot (massimizza)
+// isMaximizing == 0: turno del giocatore (minimizza)
+int calcolaPunteggio(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA], char simboloBot, char simboloAvversario, int isMaximizing) {
+    char vinc = controllaVincitoreGriglia(g);
+    if (vinc == simboloBot) {
+        return PUNTEGGIO_VITTORIA;
+    }
+    if (vinc == simboloAvversario) {
+        return PUNTEGGIO_SCONFITTA;
+    }
+    if (controlloGriglia(g)) {
+        return RISULTATO_PAREGGIO;
+    }
+
+    if (isMaximizing) {
+        int best = PUNTEGGIO_MINIMO;
+        int r = 0;
+        while (r < DIMENSIONE_GRIGLIA) {
+            int c = 0;
+            while (c < DIMENSIONE_GRIGLIA) {
+                if (g[r][c] == ' ' || g[r][c] == '\0') {
+                    g[r][c] = simboloBot;
+                    int p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
+                    g[r][c] = ' ';
+                    if (p > best) {
+                        best = p;
+                    }
+                }
+                c = c + 1;
+            }
+            r = r + 1;
+        }
+        return best;
+    } else {
+        int best = PUNTEGGIO_MASSIMO;
+        int r = 0;
+        while (r < DIMENSIONE_GRIGLIA) {
+            int c = 0;
+            while (c < DIMENSIONE_GRIGLIA) {
+                if (g[r][c] == ' ' || g[r][c] == '\0') {
+                    g[r][c] = simboloAvversario;
+                    int p = calcolaPunteggio(g, simboloBot, simboloAvversario, 1);
+                    g[r][c] = ' ';
+                    if (p < best) {
+                        best = p;
+                    }
+                }
+                c = c + 1;
+            }
+            r = r + 1;
+        }
+        return best;
+    }
+}
+
+// restituisce la cella migliore (0-8) per il bot, o -1 se nessuna mossa disponibile
+int mossaBot(Partita partita, char simboloBot, char simboloAvversario) {
+    char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA];
+    int r = 0;
+    while (r < 3) {
+        int c = 0;
+        while (c < 3) {
+            g[r][c] = Get_griglia(partita, r, c);
+            c = c + 1;
+        }
+        r = r + 1;
+    }
+
+    int best = PUNTEGGIO_MINIMO;
+    int migRiga = CELLA_NON_VALIDA;
+    int migCol  = CELLA_NON_VALIDA;
+    r = 0;
+    while (r < DIMENSIONE_GRIGLIA) {
+        int c = 0;
+        while (c < DIMENSIONE_GRIGLIA) {
+            if (g[r][c] == ' ' || g[r][c] == '\0') {
+                g[r][c] = simboloBot;
+                int p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
+                g[r][c] = ' ';
+                if (p > best) {
+                    best    = p;
+                    migRiga = r;
+                    migCol  = c;
+                }
+            }
+            c = c + 1;
+        }
+        r = r + 1;
+    }
+    if (migRiga == CELLA_NON_VALIDA) {
+        return CELLA_NON_VALIDA;
+    }
+    return migRiga * DIMENSIONE_GRIGLIA + migCol;
 }
 
 #pragma endregion
@@ -98,28 +302,28 @@ void stampaSchermataGioco(Stringa s) {
 }
 
 
-// sovrascrive i dati dinamici sulla schermata: nome partita, round, turno, griglia, vittorie
+// mostra a schermo i dati della partita in corso
 void stampaGioco(Partita partita, Impostazioni impostazioni) {
     int turno = Get_turno(partita);
     int round = Get_round(partita);
 
-    // stampa il nome della partita centrato nella barra del titolo (riga 6)
+    // stampa il nome della partita
     goTo(GIOCO_TITOLO_COL, GIOCO_TITOLO_RIG);
     printf("%s", Get_nomePartita(impostazioni).data);
 
-    // stampa il numero del round (riga 8, dopo "ROUND: ")
+    // stampa il numero del round
     goTo(GIOCO_ROUND_COL, GIOCO_ROUND_RIG);
     printf("%d", round);
 
-    // stampa il turno (numero del giocatore: 1 o 2) (riga 8, dopo "TURNO: ")
+    // stampa il turno del giocatore
     goTo(GIOCO_TURNO_COL, GIOCO_TURNO_RIG);
     printf("%d", turno);
 
-    // stampa le vittorie a sinistra (riga 12 per G1, riga 13 per G2, colonna 11)
+    // stampa il numero di vittorie correnti per giocatori in base ai round giocati
     goTo(VITTORIA_COL, VITTORIA_G1_RIG);
-    printf("%d", partita.statisticheG1.numeroVittorie);
+    printf("%d", Get_vittorieG1(partita));
     goTo(VITTORIA_COL, VITTORIA_G2_RIG);
-    printf("%d", partita.statisticheG2.numeroVittorie);
+    printf("%d", Get_vittorieG2(partita));
 
     fflush(stdout);
 
@@ -151,21 +355,21 @@ void stampaGioco(Partita partita, Impostazioni impostazioni) {
 void navigaPartita(Partita *partita, Impostazioni *impostazioni) {
     int esci = 0;
 
-    // Se c'è una partita precedente specificata, caricala
+    // Se c'è una partita precedente specificata la carica
     if (strlen(impostazioni->partitaPrecedente.data) > 0) {
         if (caricaPartita(impostazioni, partita)) {
-            // Dopo il caricamento con successo, puliamo partitaPrecedente per evitare ricaricamenti futuri
-            memset(impostazioni->partitaPrecedente.data, 0, sizeof(impostazioni->partitaPrecedente.data));
+            // dopo aver caricato la partita pulisce il campo partitaPrecedente in modo che non venga caricata di nuovo ad ogni ciclo di while
+            impostazioni->partitaPrecedente.data[0] = '\0';
         } else {
-            // Se fallisce il caricamento, inizializza normalmente
+            // Se fallisce il caricamento inizializza normalmente
             Set_turno(partita, 1);
             Set_round(partita, 1);
-            partita->statisticheG1.numeroVittorie = 0;
-            partita->statisticheG1.numeroSconfitte = 0;
-            partita->statisticheG1.numeroPareggi = 0;
-            partita->statisticheG2.numeroVittorie = 0;
-            partita->statisticheG2.numeroSconfitte = 0;
-            partita->statisticheG2.numeroPareggi = 0;
+            Set_vittorieG1(partita, 0);
+            Set_sconfitteG1(partita, 0);
+            Set_pareggiG1(partita, 0);
+            Set_vittorieG2(partita, 0);
+            Set_sconfitteG2(partita, 0);
+            Set_pareggiG2(partita, 0);
             int ri = 0;
             while (ri < 3) {
                 int ci = 0;
@@ -177,15 +381,15 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni) {
             }
         }
     } else {
-        // Inizializza una nuova partita normalmente
+        // Inizializza una nuova partita
         Set_turno(partita, 1);
         Set_round(partita, 1);
-        partita->statisticheG1.numeroVittorie = 0;
-        partita->statisticheG1.numeroSconfitte = 0;
-        partita->statisticheG1.numeroPareggi = 0;
-        partita->statisticheG2.numeroVittorie = 0;
-        partita->statisticheG2.numeroSconfitte = 0;
-        partita->statisticheG2.numeroPareggi = 0;
+        Set_vittorieG1(partita, 0);
+        Set_sconfitteG1(partita, 0);
+        Set_pareggiG1(partita, 0);
+        Set_vittorieG2(partita, 0);
+        Set_sconfitteG2(partita, 0);
+        Set_pareggiG2(partita, 0);
         // inizializza la griglia vuota
         int ri = 0;
         while (ri < 3) {
@@ -203,38 +407,138 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni) {
 
     while (!esci) {
         // pulisce il terminale
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
 
         // stampa la schermata base del gioco
         stampaSchermataGioco(schermatePartita[0]);
 
-        // sovrascrive i dati dinamici (nome partita, round, turno, griglia, vittorie)
+        // stampa a schermo i dati della partita
         stampaGioco(*partita, *impostazioni);
-        goTo(1, 25);
+        goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
         fflush(stdout);
 
-        // legge il click del giocatore
         int riga, colonna;
-        if (!leggiClick(&riga, &colonna))
-            continue;
 
-        // --- rilevamento cella cliccata tramite la funzione di gioco.h ---
+        // se modalità CPU e turno del bot (giocatore 2), muove automaticamente
+        if (Get_modoPartita(*impostazioni) == MODO_CPU && Get_turno(*partita) == TURNO_GIOCATORE2) {
+            char simboloBot = Get_simboloGiocatore2(*impostazioni);
+            char simboloAvv = Get_simboloGiocatore1(*impostazioni);
+            int  cellaBot    = mossaBot(*partita, simboloBot, simboloAvv);
+            if (cellaBot != CELLA_NON_VALIDA) {
+                Set_griglia(partita, cellaBot / DIMENSIONE_GRIGLIA, cellaBot % DIMENSIONE_GRIGLIA, simboloBot);
+                // controllo fine round
+                char vincBt = controllaVincitoreRound(*partita);
+                int  pienaBt = grigliaPiena(*partita);
+                if (vincBt != '\0' || pienaBt) {
+                    if (vincBt != '\0') {
+                        if (vincBt == Get_simboloGiocatore1(*impostazioni)) {
+                            Set_vittorieG1(partita, Get_vittorieG1(*partita) + 1);
+                            Set_sconfitteG2(partita, Get_sconfitteG2(*partita) + 1);
+                        } else {
+                            Set_vittorieG2(partita, Get_vittorieG2(*partita) + 1);
+                            Set_sconfitteG1(partita, Get_sconfitteG1(*partita) + 1);
+                        }
+                    } else {
+                        Set_pareggiG1(partita, Get_pareggiG1(*partita) + 1);
+                        Set_pareggiG2(partita, Get_pareggiG2(*partita) + 1);
+                    }
+                    // aggiorna schermo con lo stato finale del round
+                    #ifdef _WIN32
+                        system("cls");
+                    #else
+                        system("clear");
+                    #endif
+                    stampaSchermataGioco(schermatePartita[0]);
+                    stampaGioco(*partita, *impostazioni);
+                    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+                    fflush(stdout);
+
+                    if (Get_round(*partita) >= Get_numeroRound(*impostazioni)) {
+                        // fine partita
+                        int risultato;
+                        if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)) {
+                            risultato = RISULTATO_VITTORIA_G1;
+                        } else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)) {
+                            risultato = RISULTATO_VITTORIA_G2;
+                        } else {
+                            risultato = RISULTATO_PAREGGIO;
+                        }
+                        salvaStatistichePartita(Get_nomeGiocatore1(*impostazioni).data, Get_nomeGiocatore2(*impostazioni).data, risultato);
+
+                        int tornaAlMenuBt = 0;
+                        while (!tornaAlMenuBt) {
+                            #ifdef _WIN32
+                                system("cls");
+                            #else
+                                system("clear");
+                            #endif
+                            stampaSchermataGioco(schermatePartita[3]);
+                            if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)) {
+                                Stringa nomeG1 = Get_nomeGiocatore1(*impostazioni);
+                                goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
+                                printf("                    ");
+                                goTo(NOME_VINCITORE_COL - (int)strlen(nomeG1.data) / 2, NOME_VINCITORE_RIG);
+                                printf("%s", nomeG1.data);
+                            } else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)) {
+                                Stringa nomeG2 = Get_nomeGiocatore2(*impostazioni);
+                                goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
+                                printf("                    ");
+                                goTo(NOME_VINCITORE_COL - (int)strlen(nomeG2.data) / 2, NOME_VINCITORE_RIG);
+                                printf("%s", nomeG2.data);
+                            }
+                            fflush(stdout);
+                            goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+                            int rigaVt, colonnaVt;
+                            if (!leggiClick(&rigaVt, &colonnaVt)) {
+                                continue;
+                            }
+                            if (areaCliccata(bVittoria[0], rigaVt, colonnaVt)) {
+                                tornaAlMenuBt = 1;
+                                esci = 1;
+                            }
+                        }
+                    } else {
+                        // round successivo
+                        fflush(stdout);
+                        while (!leggiClick(&riga, &colonna));
+                        Set_round(partita, Get_round(*partita) + 1);
+                        Set_turno(partita, TURNO_GIOCATORE1);
+                        int ri = 0;
+                        while (ri < DIMENSIONE_GRIGLIA) {
+                            int ci = 0;
+                            while (ci < DIMENSIONE_GRIGLIA) { Set_griglia(partita, ri, ci, ' '); ci = ci + 1; }
+                            ri = ri + 1;
+                        }
+                    }
+                } else {
+                    // round non terminato: torna al turno del giocatore
+                    Set_turno(partita, TURNO_GIOCATORE1);
+                }
+            }
+            continue;
+        }
+
+        // legge il click del giocatore
+        if (!leggiClick(&riga, &colonna)) {
+            continue;
+        }
+
+        // rilevamento della cella cliccata tramite la funzione cellaCliccata di gioco.h
         int cella = cellaCliccata(riga, colonna);
 
-        if (cella != -1) {
-            int cellaR = cella / 3;
-            int cellaC = cella % 3;
+        if (cella != CELLA_NON_VALIDA) {
+            int cellaR = cella / DIMENSIONE_GRIGLIA;
+            int cellaC = cella % DIMENSIONE_GRIGLIA;
 
             // se la cella è ancora libera
-            if (Get_griglia(*partita, cellaR, cellaC) == ' ' ||
-                Get_griglia(*partita, cellaR, cellaC) == '\0') {
+            if (Get_griglia(*partita, cellaR, cellaC) == ' ' || Get_griglia(*partita, cellaR, cellaC) == '\0') {
                 // simbolo del giocatore corrente letto dalle impostazioni
                 char simboloCorrente;
-                if (Get_turno(*partita) == 1) {
+                if (Get_turno(*partita) == TURNO_GIOCATORE1) {
                     simboloCorrente = Get_simboloGiocatore1(*impostazioni);
                 } else {
                     simboloCorrente = Get_simboloGiocatore2(*impostazioni);
@@ -243,7 +547,7 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni) {
                 // piazza il simbolo nella cella
                 Set_griglia(partita, cellaR, cellaC, simboloCorrente);
 
-                // --- CONTROLLO FINE ROUND ---
+                // controllo fine round
                 char vincitoreSimbolo = controllaVincitoreRound(*partita);
                 int piena = grigliaPiena(*partita);
 
@@ -251,103 +555,95 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni) {
                     // Aggiorna punteggio se c'è un vincitore del round
                     if (vincitoreSimbolo != '\0') {
                         if (vincitoreSimbolo == Get_simboloGiocatore1(*impostazioni)) {
-                            partita->statisticheG1.numeroVittorie = partita->statisticheG1.numeroVittorie + 1;
-                            partita->statisticheG2.numeroSconfitte = partita->statisticheG2.numeroSconfitte + 1;
+                            Set_vittorieG1(partita, Get_vittorieG1(*partita) + 1);
+                            Set_sconfitteG2(partita, Get_sconfitteG2(*partita) + 1);
                         } else {
-                            partita->statisticheG2.numeroVittorie = partita->statisticheG2.numeroVittorie + 1;
-                            partita->statisticheG1.numeroSconfitte = partita->statisticheG1.numeroSconfitte + 1;
+                            Set_vittorieG2(partita, Get_vittorieG2(*partita) + 1);
+                            Set_sconfitteG1(partita, Get_sconfitteG1(*partita) + 1);
                         }
                     } else {
                         // Pareggio round
-                        partita->statisticheG1.numeroPareggi = partita->statisticheG1.numeroPareggi + 1;
-                        partita->statisticheG2.numeroPareggi = partita->statisticheG2.numeroPareggi + 1;
+                        Set_pareggiG1(partita, Get_pareggiG1(*partita) + 1);
+                        Set_pareggiG2(partita, Get_pareggiG2(*partita) + 1);
                     }
 
                     // Stampa l'ultimo stato grafico prima di procedere
-#ifdef _WIN32
-                    system("cls");
-#else
-                    system("clear");
-#endif
+                    #ifdef _WIN32
+                        system("cls");
+                    #else
+                        system("clear");
+                    #endif
                     stampaSchermataGioco(schermatePartita[0]);
                     stampaGioco(*partita, *impostazioni);
-                    goTo(1, 25);
+                    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
                     fflush(stdout);
 
                     // Se siamo all'ultimo round, termina la partita e vai alla schermata vittoria
-                    if (partita->round >= Get_numeroRound(*impostazioni)) {
+                    if (Get_round(*partita) >= Get_numeroRound(*impostazioni)) {
                         // Determina il risultato finale e salva le statistiche per-avversario
                         int risultato;
-                        if (partita->statisticheG1.numeroVittorie > partita->statisticheG2.numeroVittorie) {
-                            risultato = 1; // vittoria G1
-                        } else if (partita->statisticheG2.numeroVittorie > partita->statisticheG1.numeroVittorie) {
-                            risultato = 2; // vittoria G2
+                        if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)) {
+                            risultato = RISULTATO_VITTORIA_G1; // vittoria G1
+                        } else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)) {
+                            risultato = RISULTATO_VITTORIA_G2; // vittoria G2
                         } else {
-                            risultato = 0; // pareggio
+                            risultato = RISULTATO_PAREGGIO; // pareggio
                         }
                         salvaStatistichePartita(Get_nomeGiocatore1(*impostazioni).data, Get_nomeGiocatore2(*impostazioni).data, risultato);
 
                         int tornaAlMenuCliccato = 0;
                         while (!tornaAlMenuCliccato) {
-#ifdef _WIN32
-                            system("cls");
-#else
-                            system("clear");
-#endif
-                            stampaSchermataGioco(schermatePartita[3]); // Vittoria.txt
+                            #ifdef _WIN32
+                                system("cls");
+                            #else
+                                system("clear");
+                            #endif
+                            stampaSchermataGioco(schermatePartita[3]);
 
                             // Calcola e scrivi il vincitore finale
-                            if (partita->statisticheG1.numeroVittorie > partita->statisticheG2.numeroVittorie) {
+                            if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)) {
+                                // vittoria G1
                                 Stringa nomeG1 = Get_nomeGiocatore1(*impostazioni);
                                 goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
                                 printf("                    "); // ripulisce il puntino
                                 int startCol = NOME_VINCITORE_COL - (int)strlen(nomeG1.data) / 2;
                                 goTo(startCol, NOME_VINCITORE_RIG);
                                 printf("%s", nomeG1.data);
-                            } else if (partita->statisticheG2.numeroVittorie > partita->statisticheG1.numeroVittorie) {
+                            } else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)) {
+                                // vittoria G2
                                 Stringa nomeG2 = Get_nomeGiocatore2(*impostazioni);
                                 goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
                                 printf("                    "); // ripulisce il punto
                                 int startCol = NOME_VINCITORE_COL - (int)strlen(nomeG2.data) / 2;
                                 goTo(startCol, NOME_VINCITORE_RIG);
                                 printf("%s", nomeG2.data);
-                            } else {
-                                // Pareggio finale: non stampa nulla al vincitore
-                                goTo(32, 12);
-                                printf("                   "); // Cancella "VINCE IL GIOCATORE:"
-                                goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
-                                printf("                    "); // Cancella il punto
                             }
                             fflush(stdout);
-                            goTo(1, 25);
+                            goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
 
                             int rigaConf, colonnaConf;
-                            if (!leggiClick(&rigaConf, &colonnaConf))
+                            if (!leggiClick(&rigaConf, &colonnaConf)) {
                                 continue;
+                            }
 
-                            // Verifica click su bVittoria[0] (TORNA AL MENU)
+                            // Verifica click su bVittoria[0]
                             if (areaCliccata(bVittoria[0], rigaConf, colonnaConf)) {
                                 tornaAlMenuCliccato = 1;
                                 esci = 1;
                             }
                         }
                     } else {
-                        // Se non è l'ultimo round, mostra messaggio e passa al round successivo
-                        goTo(22, 22);
-                        printf("ROUND TERMINATO! Clicca per continuare...");
-                        goTo(1, 25);
                         fflush(stdout);
 
-                        int rTemp, cTemp;
-                        while (!leggiClick(&rTemp, &cTemp));
+                        while (!leggiClick(&riga, &colonna));
 
-                        partita->round = partita->round + 1;
-                        Set_turno(partita, 1);
+                        Set_round(partita, Get_round(*partita) + 1);
+                        Set_turno(partita, TURNO_GIOCATORE1);
                         // resetta la griglia per il prossimo round
                         int ri = 0;
-                        while (ri < 3) {
+                        while (ri < DIMENSIONE_GRIGLIA) {
                             int ci = 0;
-                            while (ci < 3) {
+                            while (ci < DIMENSIONE_GRIGLIA) {
                                 Set_griglia(partita, ri, ci, ' ');
                                 ci = ci + 1;
                             }
@@ -356,46 +652,46 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni) {
                     }
                 } else {
                     // Alterna il turno solo se il round non è terminato
-                    if (Get_turno(*partita) == 1) {
-                        Set_turno(partita, 2);
+                    if (Get_turno(*partita) == TURNO_GIOCATORE1) {
+                        Set_turno(partita, TURNO_GIOCATORE2);
                     } else {
-                        Set_turno(partita, 1);
+                        Set_turno(partita, TURNO_GIOCATORE1);
                     }
                 }
             }
         } else if (areaCliccata(bGiocoMenu[0], riga, colonna)) {
-            // [ESCI] - esce direttamente al menu principale
+            // esce al menu principale
             esci = 1;
         } else if (areaCliccata(bGiocoMenu[1], riga, colonna)) {
-            // [SALVA PARTITA] - mostra la schermata di salvataggio e conferma
+            // mostra la schermata di salvataggio e conferma
             int confermato = 0;
             while (!confermato) {
-#ifdef _WIN32
-                system("cls");
-#else
-                system("clear");
-#endif
-                stampaSchermataGioco(schermatePartita[1]); // SalvaPartita.txt
-                goTo(1, 25);
+                #ifdef _WIN32
+                    system("cls");
+                #else
+                    system("clear");
+                #endif
+                stampaSchermataGioco(schermatePartita[1]);
+                goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
                 fflush(stdout);
 
                 int rigaConf, colonnaConf;
-                if (!leggiClick(&rigaConf, &colonnaConf))
+                if (!leggiClick(&rigaConf, &colonnaConf)) {
                     continue;
+                }
 
                 if (areaCliccata(bSalvaConferma[0], rigaConf, colonnaConf)) {
-                    // Cliccato SI: salva la partita ed esci al menu principale
+                    // salva la partita ed esci al menu principale
                     salvaPartita(impostazioni, partita);
                     confermato = 1;
                     esci = 1;
-                } else if (areaCliccata(bSalvaConferma[1], rigaConf, colonnaConf) ||
-                           areaCliccata(bSalvaConferma[2], rigaConf, colonnaConf)) {
-                    // Cliccato NO o ESCI: ritorna al gioco
+                } else if (areaCliccata(bSalvaConferma[1], rigaConf, colonnaConf) || areaCliccata(bSalvaConferma[2], rigaConf, colonnaConf)) {
+                    // ritorna al gioco
                     confermato = 1;
                 }
             }
         } else if (areaCliccata(bGiocoMenu[2], riga, colonna)) {
-            // [SUPPORTO] - apre il supporto dal gioco
+            // apre il supporto del gioco
             abilitaTastiera();
             navigaSupporto();
             abilitaMouse();
@@ -404,12 +700,11 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni) {
 
     // ripristina terminale
     abilitaTastiera();
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-    printf("Partita terminata.\n");
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
 }
 
 

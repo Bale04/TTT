@@ -11,4 +11,6 @@ int salvaPartita(const Impostazioni *impostazioni, const Partita *partita);
 // Ritorna 1 in caso di successo, 0 altrimenti.
 int caricaPartita(Impostazioni *impostazioni, Partita *partita);
 
+const char PERCORSO_SALVATAGGIO_FILE[70] = "/home/Bale/GitHub/TTT/Salvataggio/%s";
+
 #endif

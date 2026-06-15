@@ -4,7 +4,7 @@
 #include "strutture.h"
 
 // numero massimo di round da giocare
-static const int MAX_ROUND = 99;
+const int MAX_ROUND = 99;
 
 
 

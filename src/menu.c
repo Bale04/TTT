@@ -2,7 +2,7 @@
  ============================================================================
  Name        : menu.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 0.1 
+ Version     : V 1.0
  Copyright   : Your copyright notice
  Description : file di gestione del menu principale
  ============================================================================
@@ -33,112 +33,109 @@ extern void navigaStatistiche(void);
 void stampaSchermataMenu(Stringa s);
 void navigaMenu(Impostazioni *impostazioni);
 
-
 #pragma region main
 
 int main() {
-    // le impostazioni vengono create una sola volta e persistono per tutto il programma
-    Impostazioni impostazioni;
-    resetImpostazioni(&impostazioni);
+  // le impostazioni vengono create una sola volta e persistono per tutto il programma
+  Impostazioni impostazioni;
+  resetImpostazioni(&impostazioni);
 
+  // avvia la navigazione del menu principale
+  navigaMenu(&impostazioni);
 
-    // avvia la navigazione del menu principale
-    navigaMenu(&impostazioni);
-
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 #pragma endregion
-
 
 // ----------------- STAMPA SCHERMATA MENU ------------------
 #pragma region stampa
 
 void stampaSchermataMenu(Stringa s) {
-    FILE *fp;
-    int c;
-    char nomeCompleto[256];
+  FILE *fp;
+  int c;
+  char nomeCompleto[256];
 
-    sprintf(nomeCompleto, PERCORSO_MENU, s.data);
-    fp = fopen(nomeCompleto, "r");
-    if (fp == NULL) {
-        printf("Errore caricamento schermata menu: %s\n", nomeCompleto);
-    } else {
-        while ((c = fgetc(fp)) != EOF) {
-            putchar(c);
-        }
-        fclose(fp);
+  sprintf(nomeCompleto, PERCORSO_MENU, s.data);
+  fp = fopen(nomeCompleto, "r");
+  if (fp == NULL) {
+    printf("Errore caricamento schermata menu: %s\n", nomeCompleto);
+  } else {
+    while ((c = fgetc(fp)) != EOF) {
+      putchar(c);
     }
+    fclose(fp);
+  }
 }
 
 #pragma endregion
-
 
 // --------------------- NAVIGAZIONE MENU PRINCIPALE -----------------------------
 #pragma region navigazione
 
 void navigaMenu(Impostazioni *impostazioni) {
-    int esci = 0;
+  int esci = 0;
 
-    // abilita il mouse tramite la libreria mouse.h
-    abilitaMouse();
+  // abilita il mouse tramite la libreria mouse.h
+  abilitaMouse();
 
-    while (!esci) {
-        // pulisce il terminale
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
+  while (!esci) {
+    // pulisce il terminale
+    #ifdef _WIN32
+      system("cls");
+    #else
+      system("clear");
+    #endif
 
-        // stampa la schermata del menu principale
-        stampaSchermataMenu(schermateMenu[0]);
-        goTo(1, 25);
-        fflush(stdout);
+    // stampa la schermata del menu principale
+    stampaSchermataMenu(schermateMenu[INDICE_MENU_PRINCIPALE]);
+    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+    fflush(stdout);
 
-        // legge il click dell'utente
-        int riga, colonna;
-        if (!leggiClick(&riga, &colonna))
-            continue;
-
-        // gestione click sui bottoni del menu
-        if (areaCliccata(bMainMenu[0], riga, colonna)) {
-            // [GIOCA]
-            abilitaTastiera();
-            Partita partita;
-            navigaPartita(&partita, impostazioni);
-            // quando il gioco termina si torna al menu
-            abilitaMouse();
-        } else if (areaCliccata(bMainMenu[1], riga, colonna)) {
-            // [IMPOSTAZIONI] - apre le impostazioni
-            abilitaTastiera();
-            navigaImpostazioni(impostazioni);
-            // quando si preme ESCI dalla schermata 0 delle impostazioni si torna qui
-            abilitaMouse();
-        } else if (areaCliccata(bMainMenu[2], riga, colonna)) {
-            // [SUPPORTO] - apre il supporto
-            abilitaTastiera();
-            navigaSupporto();
-            abilitaMouse();
-        } else if (areaCliccata(bMainMenu[3], riga, colonna)) {
-            // [STATISTICHE]
-            abilitaTastiera();
-            navigaStatistiche();
-            abilitaMouse();
-        } else if (areaCliccata(bMainMenu[4], riga, colonna)) {
-            // [ESCI] - esce dal programma
-            esci = 1;
-        }
+    // legge il click dell'utente
+    int riga, colonna;
+    if (!leggiClick(&riga, &colonna)) {
+      continue;
     }
 
-    // ripristina il terminale
-    abilitaTastiera();
-#ifdef _WIN32
+    // gestione click sui bottoni del menu
+    if (areaCliccata(bMainMenu[0], riga, colonna)) {
+      // [GIOCA]
+      abilitaTastiera();
+      Partita partita;
+      navigaPartita(&partita, impostazioni);
+      // quando il gioco termina si torna al menu
+      abilitaMouse();
+    } else if (areaCliccata(bMainMenu[1], riga, colonna)) {
+      // [IMPOSTAZIONI] - apre le impostazioni
+      abilitaTastiera();
+      navigaImpostazioni(impostazioni);
+      // quando si preme ESCI dalla schermata 0 delle impostazioni si torna qui
+      abilitaMouse();
+    } else if (areaCliccata(bMainMenu[2], riga, colonna)) {
+      // [SUPPORTO] - apre il supporto
+      abilitaTastiera();
+      navigaSupporto();
+      abilitaMouse();
+    } else if (areaCliccata(bMainMenu[3], riga, colonna)) {
+      // [STATISTICHE]
+      abilitaTastiera();
+      navigaStatistiche();
+      abilitaMouse();
+    } else if (areaCliccata(bMainMenu[4], riga, colonna)) {
+      // [ESCI] - esce dal programma
+      esci = 1;
+    }
+  }
+
+  // ripristina il terminale
+  abilitaTastiera();
+  #ifdef _WIN32
     system("cls");
-#else
+  #else
     system("clear");
-#endif
-    printf("Arrivederci!\n");
+  #endif
+  printf("Arrivederci!\n");
 }
 
 #pragma endregion

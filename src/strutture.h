@@ -1,6 +1,8 @@
 #ifndef strutture_H
 #define strutture_H
 
+#include "costanti.h"
+
 // Definizione della stringa di caratteri
 typedef struct {
   char data[20];
@@ -27,7 +29,7 @@ typedef struct {
 } AreaCliccabile;
 
 typedef struct {
-  Stringa nomeAvversario; // nome dell'avversario affrontato
+  char nomeAvversario[20]; // nome dell'avversario affrontato
   int numeroVittorie;     // numero di vittorie di un giocatore
   int numeroSconfitte;    // numero di sconfitte di un giocatore
   int numeroPareggi;      // numero di pareggi di un giocatore
@@ -41,5 +43,11 @@ typedef struct {
   Statistiche statisticheG1;
   Statistiche statisticheG2;
 } Partita;
+
+// struttura per la posizione del cursore nel terminale
+typedef struct {
+  int col; // colonna
+  int rig; // riga
+} Cursore;
 
 #endif

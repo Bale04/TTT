@@ -4,7 +4,7 @@
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
  Version     : V 1.0
  Copyright   : Your copyright notice
- Description : Gestione del salvataggio e caricamento dello stato del gioco
+ Description : file di gestione salvataggio e recupero delle partite
  ============================================================================
  */
 
@@ -13,32 +13,36 @@
 #include <string.h>
 #include "salvataggio.h"
 
+// funzioni esterne da impostazioni.c
+extern Stringa Get_nomePartita(Impostazioni impostazioni);
+extern Stringa Get_partitaPrecedente(Impostazioni impostazioni);
+
 int salvaPartita(const Impostazioni *impostazioni, const Partita *partita) {
-    char percorso[256];
-    // Il nome del file è il nome della partita
-    sprintf(percorso, "/home/Bale/GitHub/TTT/Salvataggio/%s", impostazioni->nomePartita.data);
-    FILE *fp = fopen(percorso, "wb");
-    if (fp == NULL) {
-        printf("Errore apertura file per il salvataggio: %s\n", percorso);
-        return 0;
-    }
-    fwrite(impostazioni, sizeof(Impostazioni), 1, fp);
-    fwrite(partita, sizeof(Partita), 1, fp);
-    fclose(fp);
-    return 1;
+  char percorso[LUNGHEZZA_PERCORSO];
+  // Il nome del file è il nome della partita
+  sprintf(percorso, PERCORSO_SALVATAGGIO_FILE, Get_nomePartita(*impostazioni).data);
+  FILE *fp = fopen(percorso, "wb");
+  if (fp == NULL) {
+    printf("Errore apertura file per il salvataggio: %s\n", percorso);
+    return ESITO_ERRORE;
+  }
+  fwrite(impostazioni, sizeof(Impostazioni), 1, fp);
+  fwrite(partita, sizeof(Partita), 1, fp);
+  fclose(fp);
+  return ESITO_SUCCESSO;
 }
 
 int caricaPartita(Impostazioni *impostazioni, Partita *partita) {
-    char percorso[256];
-    // Il file da caricare è specificato in partitaPrecedente
-    sprintf(percorso, "/home/Bale/GitHub/TTT/Salvataggio/%s", impostazioni->partitaPrecedente.data);
-    FILE *fp = fopen(percorso, "rb");
-    if (fp == NULL) {
-        printf("Errore apertura file per il caricamento: %s\n", percorso);
-        return 0;
-    }
-    fread(impostazioni, sizeof(Impostazioni), 1, fp);
-    fread(partita, sizeof(Partita), 1, fp);
-    fclose(fp);
-    return 1;
+  char percorso[LUNGHEZZA_PERCORSO];
+  // Il file da caricare è specificato in partitaPrecedente
+  sprintf(percorso, PERCORSO_SALVATAGGIO_FILE, Get_partitaPrecedente(*impostazioni).data);
+  FILE *fp = fopen(percorso, "rb");
+  if (fp == NULL) {
+    printf("Errore apertura file per il caricamento: %s\n", percorso);
+    return ESITO_ERRORE;
+  }
+  fread(impostazioni, sizeof(Impostazioni), 1, fp);
+  fread(partita, sizeof(Partita), 1, fp);
+  fclose(fp);
+  return ESITO_SUCCESSO;
 }
