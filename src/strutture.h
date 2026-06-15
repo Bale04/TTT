@@ -26,11 +26,20 @@ typedef struct {
   int c2; // colonna di fine
 } AreaCliccabile;
 
+typedef struct {
+  Stringa nomeAvversario; // nome dell'avversario affrontato
+  int numeroVittorie;     // numero di vittorie di un giocatore
+  int numeroSconfitte;    // numero di sconfitte di un giocatore
+  int numeroPareggi;      // numero di pareggi di un giocatore
+} Statistiche;
+
 // struttura della partita
 typedef struct {
-    char griglia[3][3]; // griglia di gioco
-    int turno;          // turno del giocatore che deve muovere (1 o 2)
-    int round;          // round corrente
+  char griglia[3][3]; // griglia di gioco
+  int turno;          // turno del giocatore che deve muovere (1 o 2)
+  int round;          // round corrente
+  Statistiche statisticheG1;
+  Statistiche statisticheG2;
 } Partita;
 
 #endif

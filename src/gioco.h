@@ -6,27 +6,24 @@
 #include "mouse.h"
 
 
-// // Limiti colonne delle celle (1-indexed)
-// static const int GRIGLIA_COL_INI[3] = {5,  37, 45};
-// static const int GRIGLIA_COL_FIN[3] = {35, 43, 76};
-
-// // Limiti righe delle celle (1-indexed)
-// static const int GRIGLIA_RIG_INI[3] = {10, 14, 18};
-// static const int GRIGLIA_RIG_FIN[3] = {12, 16, 20};
-
 // i centri delle celle per posizionare i simboli
-static const int GRIGLIA_CENTRO_COL[3] = {32, 40, 38};
-static const int GRIGLIA_CENTRO_RIG[3] = {11, 15, 19};
+int GRIGLIA_CENTRO_COL[3] = {32, 40, 48};
+int GRIGLIA_CENTRO_RIG[3] = {11, 15, 19};
 
 // Posizioni dell'intefaccia su cui scrivere le informazioni
-#define GIOCO_TITOLO_COL  38   // colonna del nome partita (riga 6)
-#define GIOCO_TITOLO_RIG   6
-#define GIOCO_ROUND_COL   13   // colonna del numero round  (riga 8)
-#define GIOCO_ROUND_RIG    8
-#define GIOCO_TURNO_COL   75   // colonna del turno/nome giocatore (riga 8)
-#define GIOCO_TURNO_RIG    8
+#define GIOCO_TITOLO_COL   38   // colonna del nome partita (riga 6)
+#define GIOCO_TITOLO_RIG    6
+#define GIOCO_ROUND_COL    13   // colonna del numero round  (riga 8)
+#define GIOCO_ROUND_RIG     8
+#define GIOCO_TURNO_COL    75   // colonna del turno/nome giocatore (riga 8)
+#define GIOCO_TURNO_RIG     8
+#define VITTORIA_G1_RIG    12
+#define VITTORIA_G2_RIG    13
+#define VITTORIA_COL       11   // colonna del numero di vittorie del giocatore
+#define NOME_VINCITORE_COL 41
+#define NOME_VINCITORE_RIG 14
 
-// le celle sono definite a partire da sinistra a destra partendo dall'alto
+// le celle sono defined a partire da sinistra a destra partendo dall'alto
 /*  1-2-3
     4-5-6
     7-8-9
@@ -42,10 +39,14 @@ AreaCliccabile cella8[] = {{18, 37, 44}, {19, 37, 44}, {20, 37, 44}};
 AreaCliccabile cella9[] = {{18, 45, 52}, {19, 45, 52}, {20, 45, 52}};
 
 
-// SALVA - SUPPORTO
-AreaCliccabile bGiocoMenu[] = { {22, 5, 19}, {22, 66, 75}};
+// ESCI - SALVA - SUPPORTO
+AreaCliccabile bGiocoMenu[] = { {22, 5, 10}, {22, 33, 47}, {22, 66, 75}};
 
+// SI - NO - ESCI per la conferma salvataggio
+AreaCliccabile bSalvaConferma[] = {{13, 29, 33}, {13, 49, 53}, {16, 38, 43}};
 
+// TORNA AL MENU
+AreaCliccabile bVittoria[] = {{20, 33, 47}};
 
 // Puntatori alle celle per gestione click iterativa
 AreaCliccabile *tutteLeCelle[9] = {
@@ -72,7 +73,7 @@ static inline int cellaCliccata(int riga, int colonna) {
 }
 
 // vettore delle schermate della partita
-Stringa schermatePartita[3] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}};
+Stringa schermatePartita[4] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}, {"Vittoria"}};
 const char PERCORSO_GIOCO[70] = "/home/Bale/GitHub/TTT/Interfacce/Gioco/%s.txt";
 
 #endif /* gioco_H */

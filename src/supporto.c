@@ -64,6 +64,9 @@ void navigaSupporto(void) {
             stampaSchermataSupporto(nomeSuggerimento);
         }
 
+        goTo(1, 25);
+        fflush(stdout);
+
         // attende ed acquisisce il click del mouse
         if (!leggiClick(&riga, &colonna))
             continue;
@@ -96,11 +99,11 @@ void navigaSupporto(void) {
             if (areaCliccata(bSuggEsci, riga, colonna)) {
                 schermata = 0;
             } else if (pagSuggerimento > 1 && areaCliccata(bSuggIndietro, riga, colonna)) {
-                pagSuggerimento--;
+                pagSuggerimento = pagSuggerimento - 1;
             } else if (pagSuggerimento == 1 && areaCliccata(bSuggAvantiP1, riga, colonna)) {
-                pagSuggerimento++;
+                pagSuggerimento = pagSuggerimento + 1;
             } else if (pagSuggerimento > 1 && pagSuggerimento < 5 && areaCliccata(bSuggAvanti, riga, colonna)) {
-                pagSuggerimento++;
+                pagSuggerimento = pagSuggerimento + 1;
             }
         }
     }

@@ -2,38 +2,43 @@
  ============================================================================
  Name        : salvataggio.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 0.0 
+ Version     : V 1.0
  Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Description : Gestione del salvataggio e caricamento dello stato del gioco
  ============================================================================
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// gestione delle strutture per il salvataggio dati
 #include "salvataggio.h"
-// gestione del mouse e del terminale
-#ifdef _WIN32
-#include <conio.h>
-#include <windows.h>
-#else
-#include <termios.h>
-#include <unistd.h>
-#endif
 
-// #pragma region definizione funzioni di accesso
-// void Set_griglia(Partita* partita, char grigliaDiGioco[3][3]);
-// char Get_griglia(Partita partita);
-// void Set_impostazioni(Partita* partita, Impostazioni impostazioni);
-// Impostazioni Get_impostazioni(Partita partita);
-// void Set_turno(Partita* partita, int turnoCorrente);
-// int Get_turno(Partita partita);
-// void Set_round(Partita* partita, int roundCorrente);
-// int Get_round(Partita partita);
+int salvaPartita(const Impostazioni *impostazioni, const Partita *partita) {
+    char percorso[256];
+    // Il nome del file è il nome della partita
+    sprintf(percorso, "/home/Bale/GitHub/TTT/Salvataggio/%s", impostazioni->nomePartita.data);
+    FILE *fp = fopen(percorso, "wb");
+    if (fp == NULL) {
+        printf("Errore apertura file per il salvataggio: %s\n", percorso);
+        return 0;
+    }
+    fwrite(impostazioni, sizeof(Impostazioni), 1, fp);
+    fwrite(partita, sizeof(Partita), 1, fp);
+    fclose(fp);
+    return 1;
+}
 
-// #pragma endregion
-
-
-
-
+int caricaPartita(Impostazioni *impostazioni, Partita *partita) {
+    char percorso[256];
+    // Il file da caricare è specificato in partitaPrecedente
+    sprintf(percorso, "/home/Bale/GitHub/TTT/Salvataggio/%s", impostazioni->partitaPrecedente.data);
+    FILE *fp = fopen(percorso, "rb");
+    if (fp == NULL) {
+        printf("Errore apertura file per il caricamento: %s\n", percorso);
+        return 0;
+    }
+    fread(impostazioni, sizeof(Impostazioni), 1, fp);
+    fread(partita, sizeof(Partita), 1, fp);
+    fclose(fp);
+    return 1;
+}

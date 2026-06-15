@@ -24,7 +24,10 @@ extern void resetImpostazioni(Impostazioni *impostazioni);
 extern Stringa Get_nomePartita(Impostazioni impostazioni);
 
 // funzioni esterne da gioco.c
-extern void navigaPartita(Partita *partita, Impostazioni impostazioni);
+extern void navigaPartita(Partita *partita, Impostazioni *impostazioni);
+
+// funzioni esterne da statistiche.c
+extern void navigaStatistiche(void);
 
 // funzioni locali
 void stampaSchermataMenu(Stringa s);
@@ -90,6 +93,8 @@ void navigaMenu(Impostazioni *impostazioni) {
 
         // stampa la schermata del menu principale
         stampaSchermataMenu(schermateMenu[0]);
+        goTo(1, 25);
+        fflush(stdout);
 
         // legge il click dell'utente
         int riga, colonna;
@@ -101,7 +106,7 @@ void navigaMenu(Impostazioni *impostazioni) {
             // [GIOCA]
             abilitaTastiera();
             Partita partita;
-            navigaPartita(&partita, *impostazioni);
+            navigaPartita(&partita, impostazioni);
             // quando il gioco termina si torna al menu
             abilitaMouse();
         } else if (areaCliccata(bMainMenu[1], riga, colonna)) {
@@ -116,7 +121,10 @@ void navigaMenu(Impostazioni *impostazioni) {
             navigaSupporto();
             abilitaMouse();
         } else if (areaCliccata(bMainMenu[3], riga, colonna)) {
-            // [STATISTICHE] - TODO
+            // [STATISTICHE]
+            abilitaTastiera();
+            navigaStatistiche();
+            abilitaMouse();
         } else if (areaCliccata(bMainMenu[4], riga, colonna)) {
             // [ESCI] - esce dal programma
             esci = 1;

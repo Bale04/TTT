@@ -227,6 +227,9 @@ void navigaImpostazioni(Impostazioni *impostazioni) {
       fflush(stdout);
     }
 
+    goTo(1, 25);
+    fflush(stdout);
+
     // gestione del click nelle pagine
     if (!leggiClick(&riga, &colonna))
       continue;
