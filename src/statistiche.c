@@ -3,6 +3,7 @@
  Name        : statistiche.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
  Version     : V 1.0
+ Copyright   : Your copyright notice
  Description : file di gestione di salvataggio e recupero delle statistiche di gioco per giocatore
  ============================================================================
  */
@@ -114,7 +115,8 @@ static void aggiornaFileGiocatore(const char *nomeGiocatore, const char *nomeAvv
   if (!trovato) {
     numAvversari = numAvversari + 1;
     lista = (RecordAvversario *)realloc(lista, numAvversari * sizeof(RecordAvversario));
-    memset(&lista[numAvversari - 1], 0, sizeof(RecordAvversario));
+    RecordAvversario recordVuoto = {0};
+    lista[numAvversari - 1] = recordVuoto;
     Set_nomeAvversario(&lista[numAvversari - 1], nomeAvversario);
     if (tipo == RISULTATO_VITTORIA_G1) {
       Set_vittorie(&lista[numAvversari - 1].stats, 1);
@@ -142,13 +144,18 @@ static void aggiornaFileGiocatore(const char *nomeGiocatore, const char *nomeAvv
 // risultato: 1 = vittoria G1, 2 = vittoria G2, 0 = pareggio
 void salvaStatistichePartita(const char *nomeG1, const char *nomeG2, int risultato) {
   if (risultato == RISULTATO_VITTORIA_G1) {
-    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_VITTORIA_G1);  // G1 vittoria vs G2
-    aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_VITTORIA_G2);  // G2 sconfitta vs G1
+    // G1 vittoria vs G2
+    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_VITTORIA_G1);
+    // G2 sconfitta vs G1
+    aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_VITTORIA_G2);
   } else if (risultato == RISULTATO_VITTORIA_G2) {
-    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_VITTORIA_G2);  // G1 sconfitta vs G2
-    aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_VITTORIA_G1);  // G2 vittoria vs G1
+    // G1 sconfitta vs G2
+    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_VITTORIA_G2);
+    // G2 vittoria vs G1
+    aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_VITTORIA_G1);
   } else {
-    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_PAREGGIO);  // pareggio per entrambi
+    // pareggio per entrambi
+    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_PAREGGIO);
     aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_PAREGGIO);
   }
 }
@@ -160,7 +167,8 @@ void salvaStatistichePartita(const char *nomeG1, const char *nomeG2, int risulta
 
 void navigaStatistiche(void) {
   int esci = 0;
-  int schermata = SCHERMATA_STAT_MENU;  // SCHERMATA_STAT_MENU = StatisticheMenu, SCHERMATA_STAT_LISTA = StatisticheLista
+  // schermata: SCHERMATA_STAT_MENU = StatisticheMenu, SCHERMATA_STAT_LISTA = StatisticheLista
+  int schermata = SCHERMATA_STAT_MENU;
   int pagina = 0;
   RecordAvversario *lista = NULL;
   int numAvversari = 0;
@@ -234,12 +242,24 @@ void navigaStatistiche(void) {
       int i = 0;
       while (i < AVVERSARI_PER_PAGINA && (inizio + i) < numAvversari) {
         int indice = inizio + i;
-        goTo(TABELLA_COL_INIZIO, TABELLA_RIG_INIZIO + i);
-        printf("%-19s %10d %18d %18d",
-          Get_nomeAvversario(&lista[indice]),
-          Get_vittorie(lista[indice].stats),
-          Get_pareggi(lista[indice].stats),
-          Get_sconfitte(lista[indice].stats));
+        int rigaCorr = TABELLA_RIG_INIZIO + i;
+        
+        // Stampa il nome dell'avversario
+        goTo(TABELLA_COL_INIZIO, rigaCorr);
+        printf("%s", Get_nomeAvversario(&lista[indice]));
+        
+        // Stampa il numero di vittorie a colonna 31
+        goTo(31, rigaCorr);
+        printf("%d", Get_vittorie(lista[indice].stats));
+        
+        // Stampa i pareggi a colonna 50
+        goTo(50, rigaCorr);
+        printf("%d", Get_pareggi(lista[indice].stats));
+        
+        // Stampa le sconfitte a colonna 69
+        goTo(69, rigaCorr);
+        printf("%d", Get_sconfitte(lista[indice].stats));
+        
         i = i + 1;
       }
       goTo(CURSORE_BASE.col, CURSORE_BASE.rig);

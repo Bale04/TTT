@@ -5,7 +5,7 @@
 
 // Definizione della stringa di caratteri
 typedef struct {
-  char data[20];
+  char data[LUNGHEZZA_STRINGA];
 } Stringa;
 
 // struttura delle impostazioni della partita
@@ -28,8 +28,9 @@ typedef struct {
   int c2; // colonna di fine
 } AreaCliccabile;
 
+// struttura delle statistiche per giocatore
 typedef struct {
-  char nomeAvversario[20]; // nome dell'avversario affrontato
+  char nomeAvversario[LUNGHEZZA_STRINGA]; // nome dell'avversario affrontato
   int numeroVittorie;     // numero di vittorie di un giocatore
   int numeroSconfitte;    // numero di sconfitte di un giocatore
   int numeroPareggi;      // numero di pareggi di un giocatore
@@ -37,7 +38,7 @@ typedef struct {
 
 // struttura della partita
 typedef struct {
-  char griglia[3][3]; // griglia di gioco
+  char griglia[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]; // griglia di gioco
   int turno;          // turno del giocatore che deve muovere (1 o 2)
   int round;          // round corrente
   Statistiche statisticheG1;

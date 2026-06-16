@@ -3,6 +3,7 @@
  Name        : supporto.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
  Version     : V 1.0
+ Copyright   : Your copyright notice
  Description : file di gestione delle schermate con il manuale di supporto sul gioco 
  ============================================================================
  */
@@ -12,6 +13,9 @@
 #include <string.h>
 #include "supporto.h"
 #include "mouse.h"
+
+// ----------------- STAMPA SCHERMATA ------------------
+#pragma region stampa
 
 // Funzione interna per stampare un file di interfaccia (.txt)
 void stampaSchermataSupporto(const char *nomeSchermata) {
@@ -31,6 +35,11 @@ void stampaSchermataSupporto(const char *nomeSchermata) {
     printf("\n");
   }
 }
+
+#pragma endregion
+
+// --------------------- NAVIGAZIONE SUPPORTO -----------------------------
+#pragma region navigazione
 
 // Funzione principale di navigazione del supporto
 void navigaSupporto(void) {
@@ -75,35 +84,33 @@ void navigaSupporto(void) {
     // gestione della navigazione in base alla schermata corrente
     if (schermata == PAGINA_SUPPORTO_MAIN) {
       // Menu Principale del Supporto
-      if (areaCliccata(bSupRegole, riga, colonna)) {
+      if (areaCliccata(bSupporto[0], riga, colonna)) {
         schermata = PAGINA_SUPPORTO_REGOLAMENTO;
-      } else if (areaCliccata(bSupManuale, riga, colonna)) {
+      } else if (areaCliccata(bSupporto[1], riga, colonna)) {
         schermata = PAGINA_SUPPORTO_MANUALE;
-      } else if (areaCliccata(bSupSuggerimenti, riga, colonna)) {
+      } else if (areaCliccata(bSupporto[2], riga, colonna)) {
         schermata = PAGINA_SUPPORTO_SUGGERIMENTI;
         pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE;
-      } else if (areaCliccata(bSupEsci, riga, colonna)) {
+      } else if (areaCliccata(bSupporto[3], riga, colonna)) {
         esciSupporto = 1;
       }
     } else if (schermata == PAGINA_SUPPORTO_REGOLAMENTO) {
       // Regolamento
-      if (areaCliccata(bSubEsci, riga, colonna)) {
+      if (areaCliccata(bManuale, riga, colonna)) {
         schermata = PAGINA_SUPPORTO_MAIN;
       }
     } else if (schermata == PAGINA_SUPPORTO_MANUALE) {
       // Manuale
-      if (areaCliccata(bSubEsci, riga, colonna)) {
+      if (areaCliccata(bManuale, riga, colonna)) {
         schermata = PAGINA_SUPPORTO_MAIN;
       }
     } else if (schermata == PAGINA_SUPPORTO_SUGGERIMENTI) {
       // Suggerimenti (pagine 1 a 5)
-      if (areaCliccata(bSuggEsci, riga, colonna)) {
+      if (areaCliccata(bSuggerimenti[0], riga, colonna)) {
         schermata = PAGINA_SUPPORTO_MAIN;
-      } else if (pagSuggerimento > PAGINA_SUGGERIMENTO_INIZIALE && areaCliccata(bSuggIndietro, riga, colonna)) {
+      } else if (pagSuggerimento > PAGINA_SUGGERIMENTO_INIZIALE && areaCliccata(bSuggerimenti[1], riga, colonna)) {
         pagSuggerimento = pagSuggerimento - 1;
-      } else if (pagSuggerimento == PAGINA_SUGGERIMENTO_INIZIALE && areaCliccata(bSuggAvantiP1, riga, colonna)) {
-        pagSuggerimento = pagSuggerimento + 1;
-      } else if (pagSuggerimento > PAGINA_SUGGERIMENTO_INIZIALE && pagSuggerimento < PAGINA_SUGGERIMENTO_FINALE && areaCliccata(bSuggAvanti, riga, colonna)) {
+      } else if (pagSuggerimento < PAGINA_SUGGERIMENTO_FINALE && areaCliccata(bSuggerimenti[2], riga, colonna)) {
         pagSuggerimento = pagSuggerimento + 1;
       }
     }
@@ -117,3 +124,5 @@ void navigaSupporto(void) {
     system("clear");
   #endif
 }
+
+#pragma endregion

@@ -146,135 +146,152 @@ void Set_pareggiG2(Partita *partita, int v){
 
 // controlla il vincitore sulla copia della griglia usata dal bot
 char controllaVincitoreGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]) {
+    char vincitore = '\0';
     int i = 0;
-    while (i < DIMENSIONE_GRIGLIA) {
+
+    // Controlla righe e colonne
+    while (i < DIMENSIONE_GRIGLIA && vincitore == '\0') {
         if (g[i][0] != ' ' && g[i][0] != '\0' && g[i][0] == g[i][1] && g[i][1] == g[i][2]) {
-            return g[i][0];
-        }
-        if (g[0][i] != ' ' && g[0][i] != '\0' && g[0][i] == g[1][i] && g[1][i] == g[2][i]) {
-            return g[0][i];
+            vincitore = g[i][0];
+        } else if (g[0][i] != ' ' && g[0][i] != '\0' && g[0][i] == g[1][i] && g[1][i] == g[2][i]) {
+            vincitore = g[0][i];
         }
         i = i + 1;
     }
-    if (g[0][0] != ' ' && g[0][0] != '\0' && g[0][0] == g[1][1] && g[1][1] == g[2][2]) {
-        return g[0][0];
+
+    // Controlla diagonale principale e secondaria
+    if (vincitore == '\0') {
+        if (g[0][0] != ' ' && g[0][0] != '\0' && g[0][0] == g[1][1] && g[1][1] == g[2][2]) {
+            vincitore = g[0][0];
+        } else if (g[0][2] != ' ' && g[0][2] != '\0' && g[0][2] == g[1][1] && g[1][1] == g[2][0]) {
+            vincitore = g[0][2];
+        }
     }
-    if (g[0][2] != ' ' && g[0][2] != '\0' && g[0][2] == g[1][1] && g[1][1] == g[2][0]) {
-        return g[0][2];
-    }
-    return '\0';
+
+    return vincitore;
 }
 
 // controlla se la griglia è piena
 int controlloGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]) {
-    int r = 0;
-    while (r < DIMENSIONE_GRIGLIA) {
-        int c = 0;
-        while (c < DIMENSIONE_GRIGLIA) {
-            if (g[r][c] == ' ' || g[r][c] == '\0') {
-                return 0;
-            }
-            c = c + 1;
+    int piena = 1;
+    int i = 0;
+    int r;
+    int c;
+
+    // Scansiona le 9 celle
+    while (i < 9 && piena == 1) {
+        r = i / DIMENSIONE_GRIGLIA;
+        c = i % DIMENSIONE_GRIGLIA;
+        if (g[r][c] == ' ' || g[r][c] == '\0') {
+            piena = 0;
         }
-        r = r + 1;
+        i = i + 1;
     }
-    return 1;
+
+    return piena;
 }
 
 // algoritmo ricorsivo per il calcolo del punteggio della posizione
 // isMaximizing == 1: turno del bot (massimizza)
 // isMaximizing == 0: turno del giocatore (minimizza)
 int calcolaPunteggio(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA], char simboloBot, char simboloAvversario, int isMaximizing) {
+    int punteggio = 0;
+    int i;
+    int r;
+    int c;
+    int p;
     char vinc = controllaVincitoreGriglia(g);
-    if (vinc == simboloBot) {
-        return PUNTEGGIO_VITTORIA;
-    }
-    if (vinc == simboloAvversario) {
-        return PUNTEGGIO_SCONFITTA;
-    }
-    if (controlloGriglia(g)) {
-        return RISULTATO_PAREGGIO;
-    }
 
-    if (isMaximizing) {
-        int best = PUNTEGGIO_MINIMO;
-        int r = 0;
-        while (r < DIMENSIONE_GRIGLIA) {
-            int c = 0;
-            while (c < DIMENSIONE_GRIGLIA) {
+    if (vinc == simboloBot) {
+        punteggio = PUNTEGGIO_VITTORIA;
+    } else if (vinc == simboloAvversario) {
+        punteggio = PUNTEGGIO_SCONFITTA;
+    } else if (controlloGriglia(g)) {
+        punteggio = RISULTATO_PAREGGIO;
+    } else {
+        if (isMaximizing) {
+            int best = PUNTEGGIO_MINIMO;
+            i = 0;
+            while (i < 9) {
+                r = i / DIMENSIONE_GRIGLIA;
+                c = i % DIMENSIONE_GRIGLIA;
                 if (g[r][c] == ' ' || g[r][c] == '\0') {
                     g[r][c] = simboloBot;
-                    int p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
+                    p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
                     g[r][c] = ' ';
                     if (p > best) {
                         best = p;
                     }
                 }
-                c = c + 1;
+                i = i + 1;
             }
-            r = r + 1;
-        }
-        return best;
-    } else {
-        int best = PUNTEGGIO_MASSIMO;
-        int r = 0;
-        while (r < DIMENSIONE_GRIGLIA) {
-            int c = 0;
-            while (c < DIMENSIONE_GRIGLIA) {
+            punteggio = best;
+        } else {
+            int best = PUNTEGGIO_MASSIMO;
+            i = 0;
+            while (i < 9) {
+                r = i / DIMENSIONE_GRIGLIA;
+                c = i % DIMENSIONE_GRIGLIA;
                 if (g[r][c] == ' ' || g[r][c] == '\0') {
                     g[r][c] = simboloAvversario;
-                    int p = calcolaPunteggio(g, simboloBot, simboloAvversario, 1);
+                    p = calcolaPunteggio(g, simboloBot, simboloAvversario, 1);
                     g[r][c] = ' ';
                     if (p < best) {
                         best = p;
                     }
                 }
-                c = c + 1;
+                i = i + 1;
             }
-            r = r + 1;
+            punteggio = best;
         }
-        return best;
     }
+
+    return punteggio;
 }
 
 // restituisce la cella migliore (0-8) per il bot, o -1 se nessuna mossa disponibile
 int mossaBot(Partita partita, char simboloBot, char simboloAvversario) {
     char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA];
-    int r = 0;
-    while (r < 3) {
-        int c = 0;
-        while (c < 3) {
-            g[r][c] = Get_griglia(partita, r, c);
-            c = c + 1;
-        }
-        r = r + 1;
-    }
-
     int best = PUNTEGGIO_MINIMO;
     int migRiga = CELLA_NON_VALIDA;
-    int migCol  = CELLA_NON_VALIDA;
-    r = 0;
-    while (r < DIMENSIONE_GRIGLIA) {
-        int c = 0;
-        while (c < DIMENSIONE_GRIGLIA) {
-            if (g[r][c] == ' ' || g[r][c] == '\0') {
-                g[r][c] = simboloBot;
-                int p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
-                g[r][c] = ' ';
-                if (p > best) {
-                    best    = p;
-                    migRiga = r;
-                    migCol  = c;
-                }
+    int migCol = CELLA_NON_VALIDA;
+    int i = 0;
+    int r;
+    int c;
+    int p;
+    int cellaMossa = CELLA_NON_VALIDA;
+
+    // Copia lo stato della griglia
+    while (i < 9) {
+        r = i / DIMENSIONE_GRIGLIA;
+        c = i % DIMENSIONE_GRIGLIA;
+        g[r][c] = Get_griglia(partita, r, c);
+        i = i + 1;
+    }
+
+    // Ricerca la mossa migliore
+    i = 0;
+    while (i < 9) {
+        r = i / DIMENSIONE_GRIGLIA;
+        c = i % DIMENSIONE_GRIGLIA;
+        if (g[r][c] == ' ' || g[r][c] == '\0') {
+            g[r][c] = simboloBot;
+            p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
+            g[r][c] = ' ';
+            if (p > best) {
+                best = p;
+                migRiga = r;
+                migCol = c;
             }
-            c = c + 1;
         }
-        r = r + 1;
+        i = i + 1;
     }
-    if (migRiga == CELLA_NON_VALIDA) {
-        return CELLA_NON_VALIDA;
+
+    if (migRiga != CELLA_NON_VALIDA) {
+        cellaMossa = migRiga * DIMENSIONE_GRIGLIA + migCol;
     }
-    return migRiga * DIMENSIONE_GRIGLIA + migCol;
+
+    return cellaMossa;
 }
 
 #pragma endregion

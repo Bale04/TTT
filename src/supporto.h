@@ -3,23 +3,17 @@
 
 #include "strutture.h"
 
-// bottoni del menu principale di supporto
-const AreaCliccabile bSupRegole = {10, 37, 44};
-const AreaCliccabile bSupManuale = {13, 36, 44};
-const AreaCliccabile bSupSuggerimenti = {16, 34, 47};
-const AreaCliccabile bSupEsci = {19, 38, 43};
+// REGOLE - MANUALE - SUGGERIMENTI - ESCI
+static AreaCliccabile bSupporto[] = {{10, 37, 44}, {13, 36, 44}, {16, 34, 47}, {19, 38, 43}};
 
-// bottone ESCI per Regolamento e Manuale
-const AreaCliccabile bSubEsci = {18, 38, 43};
+// ESCI
+static AreaCliccabile bManuale = {18, 38, 43};
 
-// bottoni per la navigazione dei suggerimenti
-const AreaCliccabile bSuggEsci = {22, 5, 10};
-const AreaCliccabile bSuggIndietro = {22, 30, 34};
-const AreaCliccabile bSuggAvantiP1 = {22, 46, 50};
-const AreaCliccabile bSuggAvanti = {22, 47, 51};
+// ESCI - INDIETRO - AVANTI
+static AreaCliccabile bSuggerimenti[] = {{22, 5, 10}, {22, 30, 34}, {22, 46, 50}};
 
 // percorso per i file d'interfaccia di supporto
-const char PERCORSO_SUPPORTO[70] = "/home/Bale/GitHub/TTT/Interfacce/Supporto/%s.txt";
+static const char PERCORSO_SUPPORTO[70] = "/home/Bale/GitHub/TTT/Interfacce/Supporto/%s.txt";
 
 // Dichiarazione funzione navigazione supporto
 void navigaSupporto(void);

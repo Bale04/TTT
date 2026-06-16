@@ -13,9 +13,14 @@
 #include <string.h>
 #include "salvataggio.h"
 
+#pragma region funzioni esterne
 // funzioni esterne da impostazioni.c
 extern Stringa Get_nomePartita(Impostazioni impostazioni);
 extern Stringa Get_partitaPrecedente(Impostazioni impostazioni);
+#pragma endregion
+
+// ----------------- GESTIONE FILE SALVATAGGI ------------------
+#pragma region gestione file
 
 int salvaPartita(const Impostazioni *impostazioni, const Partita *partita) {
   char percorso[LUNGHEZZA_PERCORSO];
@@ -46,3 +51,6 @@ int caricaPartita(Impostazioni *impostazioni, Partita *partita) {
   fclose(fp);
   return ESITO_SUCCESSO;
 }
+
+#pragma endregion
+

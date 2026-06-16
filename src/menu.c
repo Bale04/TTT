@@ -18,6 +18,7 @@
 #include "menu.h"
 #include "supporto.h"
 
+#pragma region funzioni esterne
 // funzioni esterne da impostazioni.c
 extern void navigaImpostazioni(Impostazioni *impostazioni);
 extern void resetImpostazioni(Impostazioni *impostazioni);
@@ -28,10 +29,13 @@ extern void navigaPartita(Partita *partita, Impostazioni *impostazioni);
 
 // funzioni esterne da statistiche.c
 extern void navigaStatistiche(void);
+#pragma endregion
 
+#pragma region dichiarazioni funzioni
 // funzioni locali
 void stampaSchermataMenu(Stringa s);
 void navigaMenu(Impostazioni *impostazioni);
+#pragma endregion
 
 #pragma region main
 
@@ -100,30 +104,30 @@ void navigaMenu(Impostazioni *impostazioni) {
 
     // gestione click sui bottoni del menu
     if (areaCliccata(bMainMenu[0], riga, colonna)) {
-      // [GIOCA]
+      // tasto gioca
       abilitaTastiera();
       Partita partita;
       navigaPartita(&partita, impostazioni);
       // quando il gioco termina si torna al menu
       abilitaMouse();
     } else if (areaCliccata(bMainMenu[1], riga, colonna)) {
-      // [IMPOSTAZIONI] - apre le impostazioni
+      // apre le impostazioni
       abilitaTastiera();
       navigaImpostazioni(impostazioni);
-      // quando si preme ESCI dalla schermata 0 delle impostazioni si torna qui
+      // quando si preme ESCI dalla schermata principale delle impostazioni si torna qui
       abilitaMouse();
     } else if (areaCliccata(bMainMenu[2], riga, colonna)) {
-      // [SUPPORTO] - apre il supporto
+      // apre il supporto
       abilitaTastiera();
       navigaSupporto();
       abilitaMouse();
     } else if (areaCliccata(bMainMenu[3], riga, colonna)) {
-      // [STATISTICHE]
+      // apre le statistiche
       abilitaTastiera();
       navigaStatistiche();
       abilitaMouse();
     } else if (areaCliccata(bMainMenu[4], riga, colonna)) {
-      // [ESCI] - esce dal programma
+      // esce dal programma
       esci = 1;
     }
   }
