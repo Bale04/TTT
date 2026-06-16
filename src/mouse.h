@@ -37,6 +37,25 @@ static inline void goTo(int x, int y) {
 #endif
 }
 
+// funzione di abilitazione del mouse
+static inline void abilitaMouse(void) {
+#ifdef _WIN32
+    HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD mode;
+    if (GetConsoleMode(h, &mode)) {
+        mode = (mode | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS) & ~ENABLE_QUICK_EDIT_MODE;
+        SetConsoleMode(h, mode);
+    }
+#else
+    struct termios t;
+    tcgetattr(STDIN_FILENO, &t);
+    t.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &t);
+    printf("\033[?1000h\033[?1006h");
+    fflush(stdout);
+#endif
+}
+
 // blocca finché non riceve un click sinistro del mouse. Restituisce 1 se il click è valido, 0 in caso di errore.
 #ifdef _WIN32
 static inline int leggiClick(int *riga, int *colonna) {
@@ -86,25 +105,6 @@ static inline int leggiClick(int *riga, int *colonna) {
     }
 }
 #endif
-
-// funzione di abilitazione del mouse
-static inline void abilitaMouse(void) {
-#ifdef _WIN32
-    HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
-    DWORD mode;
-    if (GetConsoleMode(h, &mode)) {
-        mode = (mode | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS) & ~ENABLE_QUICK_EDIT_MODE;
-        SetConsoleMode(h, mode);
-    }
-#else
-    struct termios t;
-    tcgetattr(STDIN_FILENO, &t);
-    t.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &t);
-    printf("\033[?1000h\033[?1006h");
-    fflush(stdout);
-#endif
-}
 
 // abilita l'input da tastiera
 static inline void abilitaTastiera(void) {

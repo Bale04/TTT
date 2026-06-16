@@ -12,6 +12,6 @@ int salvaPartita(const Impostazioni *impostazioni, const Partita *partita);
 int caricaPartita(Impostazioni *impostazioni, Partita *partita);
 
 // costante per il percorso delle interfacce del salvataggio
-const char PERCORSO_SALVATAGGIO_FILE[70] = "/home/Bale/GitHub/TTT/Salvataggio/%s";
+const char PERCORSO_SALVATAGGIO_FILE[70] = "C:/Users/Bale/Desktop/git/TTT/Salvataggio/%s";
 
 #endif

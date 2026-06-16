@@ -74,6 +74,6 @@ static inline int cellaCliccata(int riga, int colonna) {
 
 // vettore delle schermate della partita
 Stringa schermatePartita[4] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}, {"Vittoria"}};
-const char PERCORSO_GIOCO[70] = "/home/Bale/GitHub/TTT/Interfacce/Gioco/%s.txt";
+const char PERCORSO_GIOCO[70] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/Gioco/%s.txt";
 
 #endif /* gioco_H */

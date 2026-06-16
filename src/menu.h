@@ -12,6 +12,6 @@ AreaCliccabile bMainMenu[] = {{10, 37, 43},{12, 34, 47},{14, 36, 45},{16, 35, 47
 Stringa schermateMenu[1] = {{"MenuPrincipale"}};
 
 // costante per il percorso delle interfacce del menu
-const char PERCORSO_MENU[70] = "/home/Bale/GitHub/TTT/Interfacce/MainMenu/%s.txt";
+const char PERCORSO_MENU[70] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/MainMenu/%s.txt";
 
 #endif

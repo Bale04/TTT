@@ -13,7 +13,7 @@ AreaCliccabile bManuale = {18, 38, 43};
 AreaCliccabile bSuggerimenti[] = {{22, 5, 10}, {22, 30, 34}, {22, 46, 50}};
 
 // percorso per i file d'interfaccia di supporto
-const char PERCORSO_SUPPORTO[70] = "/home/Bale/GitHub/TTT/Interfacce/Supporto/%s.txt";
+const char PERCORSO_SUPPORTO[70] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/Supporto/%s.txt";
 
 // Dichiarazione funzione navigazione supporto
 void navigaSupporto(void);

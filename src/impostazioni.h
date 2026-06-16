@@ -30,6 +30,6 @@ Stringa schermateImpostazioni[7] = {{"Impostazioni"}, {"NomiGiocatori"}, {"Modal
   
 
 // costante per il percorso delle interfacce delle impostazioni
-const char PERCORSO_FILE[70] = "/home/Bale/GitHub/TTT/Interfacce/Impostazioni/%s.txt";
+const char PERCORSO_FILE[70] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/Impostazioni/%s.txt";
 
 #endif

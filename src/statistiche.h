@@ -23,10 +23,10 @@ AreaCliccabile bLista[] = {{18, 38, 43}, {20, 5, 9}, {20, 73, 76}};
 Stringa schermateStatistiche[2] = {{"StatisticheMenu"}, {"StatisticheLista"}};
 
 // percorso interfacce statistiche
-const char PERCORSO_STATISTICHE[80] = "/home/Bale/GitHub/TTT/Interfacce/Statistiche/%s.txt";
+const char PERCORSO_STATISTICHE[80] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/Statistiche/%s.txt";
 
 // percorso file statistiche salvate
-const char PERCORSO_STATS_SALVATE[80] = "/home/Bale/GitHub/TTT/StatisticheSalvate/%s";
+const char PERCORSO_STATS_SALVATE[80] = "C:/Users/Bale/Desktop/git/TTT/StatisticheSalvate/%s";
 
 // Dichiarazione funzioni
 void navigaStatistiche(void);
