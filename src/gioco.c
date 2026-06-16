@@ -12,9 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gioco.h"
-#include "supporto.h"
 
 #pragma region funzioni esterne
+// funzioni esterne da supporto.c
+extern void navigaSupporto(void);
+
 // funzioni esterne da salvataggio.c
 extern int salvaPartita(const Impostazioni *impostazioni, const Partita *partita);
 extern int caricaPartita(Impostazioni *impostazioni, Partita *partita);

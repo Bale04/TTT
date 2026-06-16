@@ -7,49 +7,49 @@
 
 
 // i centri delle celle per posizionare i simboli
-static int GRIGLIA_CENTRO_COL[3] = {32, 40, 48};
-static int GRIGLIA_CENTRO_RIG[3] = {11, 15, 19};
+int GRIGLIA_CENTRO_COL[3] = {32, 40, 48};
+int GRIGLIA_CENTRO_RIG[3] = {11, 15, 19};
 
 // Posizioni dell'intefaccia su cui scrivere le informazioni
-static const int GIOCO_TITOLO_COL   = 38;   
-static const int GIOCO_TITOLO_RIG    = 6;
-static const int GIOCO_ROUND_COL    = 13;   
-static const int GIOCO_ROUND_RIG     = 8;
-static const int GIOCO_TURNO_COL    = 75;   
-static const int GIOCO_TURNO_RIG     = 8;
-static const int VITTORIA_G1_RIG    = 12;
-static const int VITTORIA_G2_RIG    = 13;
-static const int VITTORIA_COL       = 11;   
-static const int NOME_VINCITORE_COL = 41;
-static const int NOME_VINCITORE_RIG = 14;
+const int GIOCO_TITOLO_COL   = 38;   
+const int GIOCO_TITOLO_RIG    = 6;
+const int GIOCO_ROUND_COL    = 13;   
+const int GIOCO_ROUND_RIG     = 8;
+const int GIOCO_TURNO_COL    = 75;   
+const int GIOCO_TURNO_RIG     = 8;
+const int VITTORIA_G1_RIG    = 12;
+const int VITTORIA_G2_RIG    = 13;
+const int VITTORIA_COL       = 11;   
+const int NOME_VINCITORE_COL = 41;
+const int NOME_VINCITORE_RIG = 14;
 
 // le celle sono defined a partire da sinistra a destra partendo dall'alto
 /*  1-2-3
     4-5-6
     7-8-9
 */
-static AreaCliccabile cella1[] = {{10, 29, 36}, {11, 29, 36}, {12, 29, 36}};
-static AreaCliccabile cella2[] = {{10, 37, 44}, {11, 37, 44}, {12, 37, 44}};
-static AreaCliccabile cella3[] = {{10, 45, 52}, {11, 45, 52}, {12, 45, 52}};
-static AreaCliccabile cella4[] = {{14, 29, 36}, {15, 29, 36}, {16, 29, 36}};
-static AreaCliccabile cella6[] = {{14, 45, 52}, {15, 45, 52}, {16, 45, 52}};
-static AreaCliccabile cella5[] = {{14, 37, 44}, {15, 37, 44}, {16, 37, 44}};
-static AreaCliccabile cella7[] = {{18, 29, 36}, {19, 29, 36}, {20, 29, 36}};
-static AreaCliccabile cella8[] = {{18, 37, 44}, {19, 37, 44}, {20, 37, 44}};
-static AreaCliccabile cella9[] = {{18, 45, 52}, {19, 45, 52}, {20, 45, 52}};
+AreaCliccabile cella1[] = {{10, 29, 36}, {11, 29, 36}, {12, 29, 36}};
+AreaCliccabile cella2[] = {{10, 37, 44}, {11, 37, 44}, {12, 37, 44}};
+AreaCliccabile cella3[] = {{10, 45, 52}, {11, 45, 52}, {12, 45, 52}};
+AreaCliccabile cella4[] = {{14, 29, 36}, {15, 29, 36}, {16, 29, 36}};
+AreaCliccabile cella6[] = {{14, 45, 52}, {15, 45, 52}, {16, 45, 52}};
+AreaCliccabile cella5[] = {{14, 37, 44}, {15, 37, 44}, {16, 37, 44}};
+AreaCliccabile cella7[] = {{18, 29, 36}, {19, 29, 36}, {20, 29, 36}};
+AreaCliccabile cella8[] = {{18, 37, 44}, {19, 37, 44}, {20, 37, 44}};
+AreaCliccabile cella9[] = {{18, 45, 52}, {19, 45, 52}, {20, 45, 52}};
 
 
 // ESCI - SALVA - SUPPORTO
-static AreaCliccabile bGiocoMenu[] = { {22, 5, 10}, {22, 33, 47}, {22, 66, 75}};
+AreaCliccabile bGiocoMenu[] = { {22, 5, 10}, {22, 33, 47}, {22, 66, 75}};
 
 // SI - NO - ESCI per la conferma salvataggio
-static AreaCliccabile bSalvaConferma[] = {{13, 29, 33}, {13, 49, 53}, {16, 38, 43}};
+AreaCliccabile bSalvaConferma[] = {{13, 29, 33}, {13, 49, 53}, {16, 38, 43}};
 
 // TORNA AL MENU
-static AreaCliccabile bVittoria[] = {{20, 33, 47}};
+AreaCliccabile bVittoria[] = {{20, 33, 47}};
 
 // Puntatori alle celle per gestione click iterativa
-static AreaCliccabile *tutteLeCelle[9] = {
+AreaCliccabile *tutteLeCelle[9] = {
     cella1, cella2, cella3,
     cella4, cella5, cella6,
     cella7, cella8, cella9
@@ -73,7 +73,7 @@ static inline int cellaCliccata(int riga, int colonna) {
 }
 
 // vettore delle schermate della partita
-static Stringa schermatePartita[4] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}, {"Vittoria"}};
-static const char PERCORSO_GIOCO[70] = "/home/Bale/GitHub/TTT/Interfacce/Gioco/%s.txt";
+Stringa schermatePartita[4] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}, {"Vittoria"}};
+const char PERCORSO_GIOCO[70] = "/home/Bale/GitHub/TTT/Interfacce/Gioco/%s.txt";
 
 #endif /* gioco_H */

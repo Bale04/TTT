@@ -16,9 +16,11 @@
 // libreria condivisa per mouse e cursore
 #include "mouse.h"
 #include "menu.h"
-#include "supporto.h"
 
 #pragma region funzioni esterne
+// funzioni esterne da supporto.c
+extern void navigaSupporto(void);
+
 // funzioni esterne da impostazioni.c
 extern void navigaImpostazioni(Impostazioni *impostazioni);
 extern void resetImpostazioni(Impostazioni *impostazioni);
