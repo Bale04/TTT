@@ -40,6 +40,7 @@ static inline void goTo(int x, int y) {
 // blocca finché non riceve un click sinistro del mouse. Restituisce 1 se il click è valido, 0 in caso di errore.
 #ifdef _WIN32
 static inline int leggiClick(int *riga, int *colonna) {
+    abilitaMouse();
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
     INPUT_RECORD ev;
     DWORD cnt;
@@ -90,7 +91,11 @@ static inline int leggiClick(int *riga, int *colonna) {
 static inline void abilitaMouse(void) {
 #ifdef _WIN32
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
-    SetConsoleMode(h, ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT);
+    DWORD mode;
+    if (GetConsoleMode(h, &mode)) {
+        mode = (mode | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS) & ~ENABLE_QUICK_EDIT_MODE;
+        SetConsoleMode(h, mode);
+    }
 #else
     struct termios t;
     tcgetattr(STDIN_FILENO, &t);
@@ -105,8 +110,12 @@ static inline void abilitaMouse(void) {
 static inline void abilitaTastiera(void) {
 #ifdef _WIN32
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
-    SetConsoleMode(h, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT |
-                      ENABLE_PROCESSED_INPUT);
+    DWORD mode;
+    if (GetConsoleMode(h, &mode)) {
+        mode &= ~ENABLE_MOUSE_INPUT;
+        mode |= ENABLE_QUICK_EDIT_MODE;
+        SetConsoleMode(h, mode);
+    }
 #else
     printf("\033[?1000l\033[?1006l");
     fflush(stdout);
