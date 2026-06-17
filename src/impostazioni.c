@@ -180,7 +180,17 @@ void stampaSchermataImpostazioni(Stringa s) {
 
 // ---------------------NAVIGAZIONE IMPOSTAZIONI---------------------------
 void navigaImpostazioni(Impostazioni *impostazioni) {
-  int riga, colonna, pagina = PAGINA_IMPOSTAZIONI_MAIN, esci = 0;
+  int riga;
+  int colonna;
+  int pagina;
+  int esci;
+  Stringa stringaInput;
+  char simboloNuovo;
+
+  riga = 0;
+  colonna = 0;
+  pagina = PAGINA_IMPOSTAZIONI_MAIN;
+  esci = 0;
 
   abilitaMouse();
 
@@ -233,8 +243,7 @@ void navigaImpostazioni(Impostazioni *impostazioni) {
       if (areaCliccata(bMenu[0], riga, colonna)){
         // pagina dei nomi
         pagina = PAGINA_IMPOSTAZIONI_NOMI;
-      }
-      else if (areaCliccata(bMenu[1], riga, colonna)){
+      }else if (areaCliccata(bMenu[1], riga, colonna)){
         // pagina modalità partita
         pagina = PAGINA_IMPOSTAZIONI_MODALITA;
       }else if (areaCliccata(bMenu[2], riga, colonna)){
@@ -257,20 +266,18 @@ void navigaImpostazioni(Impostazioni *impostazioni) {
         // pagina dei nomi giocatori
       if (areaCliccata(bNomi[0], riga, colonna)) {
         // nome del primo giocatore
-        Stringa nuovoNome1;
         goTo(bNomi[0].c1+1, bNomi[0].r);
         abilitaTastiera();
-        scanf("%19s", nuovoNome1.data);
+        scanf("%19s", stringaInput.data);
         abilitaMouse();
-        Set_nomeGiocatore1(nuovoNome1, impostazioni);
+        Set_nomeGiocatore1(stringaInput, impostazioni);
       } else if (areaCliccata(bNomi[1], riga, colonna)) {
         // nome del secondo giocatore
-        Stringa nuovoNome2;
         goTo(bNomi[1].c1+1, bNomi[1].r);
         abilitaTastiera();
-        scanf("%19s", nuovoNome2.data);
+        scanf("%19s", stringaInput.data);
         abilitaMouse();
-        Set_nomeGiocatore2(nuovoNome2, impostazioni);
+        Set_nomeGiocatore2(stringaInput, impostazioni);
       } else if (areaCliccata(bNomi[2], riga, colonna)) {
         // esci dalla pagina dei nomi
         pagina = PAGINA_IMPOSTAZIONI_MAIN;
@@ -293,12 +300,11 @@ void navigaImpostazioni(Impostazioni *impostazioni) {
       // pagina di caricamento partita
       if (areaCliccata(bCarica[0], riga, colonna)) {
         // nome della partita
-        Stringa vecchiaPartita;
         goTo(bCarica[0].c1+1, bCarica[0].r);
         abilitaTastiera();
-        scanf("%s", vecchiaPartita.data);
+        scanf("%s", stringaInput.data);
         abilitaMouse();
-        Set_partitaPrecedente(vecchiaPartita, impostazioni);
+        Set_partitaPrecedente(stringaInput, impostazioni);
       } else if (areaCliccata(bCarica[1], riga, colonna)) {
         // esci
         pagina = PAGINA_IMPOSTAZIONI_MAIN;
@@ -307,20 +313,18 @@ void navigaImpostazioni(Impostazioni *impostazioni) {
       // pagina dei simboli
       if (areaCliccata(bSimb[0], riga, colonna)) {
         // simbolo del primo giocatore
-        char simboloNuovo1;
         goTo(bSimb[0].c1+1, bSimb[0].r);
         abilitaTastiera();
-        scanf("%c", &simboloNuovo1);
+        scanf("%c", &simboloNuovo);
         abilitaMouse();
-        Set_simboloGiocatore1(simboloNuovo1, impostazioni);
+        Set_simboloGiocatore1(simboloNuovo, impostazioni);
       } else if (areaCliccata(bSimb[1], riga, colonna)) {
         // simbolo del secondo giocatore
-        char simboloNuovo2;
         goTo(bSimb[1].c1+1, bSimb[1].r);
         abilitaTastiera();
-        scanf("%c", &simboloNuovo2);
+        scanf("%c", &simboloNuovo);
         abilitaMouse();
-        Set_simboloGiocatore2(simboloNuovo2, impostazioni);
+        Set_simboloGiocatore2(simboloNuovo, impostazioni);
       } else if (areaCliccata(bSimb[2], riga, colonna)) {
         // esci
         pagina = PAGINA_IMPOSTAZIONI_MAIN;
@@ -339,20 +343,18 @@ void navigaImpostazioni(Impostazioni *impostazioni) {
       // pagina nome e round
       if (areaCliccata(bRound[0], riga, colonna)) {
         // nome della partita
-        Stringa nuovaPartita;
         goTo(bRound[0].c1+1, bRound[0].r);
         abilitaTastiera();
-        scanf("%19s", nuovaPartita.data);
+        scanf("%19s", stringaInput.data);
         abilitaMouse();
-        Set_nomePartita(nuovaPartita, impostazioni);
+        Set_nomePartita(stringaInput, impostazioni);
       } else if (areaCliccata(bRound[1], riga, colonna)) {
         // numero di round
-        Stringa nuovoRound;
         goTo(bRound[1].c1+1, bRound[1].r);
         abilitaTastiera();
-        scanf("%3s", nuovoRound.data);
+        scanf("%3s", stringaInput.data);
         abilitaMouse();
-        Set_numeroRound(atoi(nuovoRound.data), impostazioni);
+        Set_numeroRound(atoi(stringaInput.data), impostazioni);
       } else if (areaCliccata(bRound[2], riga, colonna)) {
         // esci
         pagina = PAGINA_IMPOSTAZIONI_MAIN;

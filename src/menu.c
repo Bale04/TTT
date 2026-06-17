@@ -80,7 +80,12 @@ void stampaSchermataMenu(Stringa s) {
 #pragma region navigazione
 
 void navigaMenu(Impostazioni *impostazioni) {
-  int esci = 0;
+  int esci;
+  int riga;
+  int colonna;
+  Partita partita;
+
+  esci = 0;
 
   // abilita il mouse tramite la libreria mouse.h
   abilitaMouse();
@@ -99,7 +104,6 @@ void navigaMenu(Impostazioni *impostazioni) {
     fflush(stdout);
 
     // legge il click dell'utente
-    int riga, colonna;
     if (!leggiClick(&riga, &colonna)) {
       continue;
     }
@@ -108,7 +112,6 @@ void navigaMenu(Impostazioni *impostazioni) {
     if (areaCliccata(bMainMenu[0], riga, colonna)) {
       // tasto gioca
       abilitaTastiera();
-      Partita partita;
       navigaPartita(&partita, impostazioni);
       // quando il gioco termina si torna al menu
       abilitaMouse();

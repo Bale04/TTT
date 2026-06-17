@@ -43,11 +43,16 @@ void stampaSchermataSupporto(const char *nomeSchermata) {
 
 // Funzione principale di navigazione del supporto
 void navigaSupporto(void) {
-  int riga, colonna;
-  int esciSupporto = 0;
-  // schermata: PAGINA_SUPPORTO_MAIN = Supporto principale, PAGINA_SUPPORTO_REGOLAMENTO = Regolamento, PAGINA_SUPPORTO_MANUALE = Manuale, PAGINA_SUPPORTO_SUGGERIMENTI = Suggerimenti
-  int schermata = PAGINA_SUPPORTO_MAIN;
-  int pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE;
+  int riga;
+  int colonna;
+  int esciSupporto;
+  int schermata;
+  int pagSuggerimento;
+  char nomeSuggerimento[LUNGHEZZA_NOME_SUGGERIMENTO];
+
+  esciSupporto = 0;
+  schermata = PAGINA_SUPPORTO_MAIN;
+  pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE;
 
   // abilita il mouse per la navigazione interattiva
   abilitaMouse();
@@ -68,7 +73,6 @@ void navigaSupporto(void) {
     } else if (schermata == PAGINA_SUPPORTO_MANUALE) {
       stampaSchermataSupporto("Manuale");
     } else if (schermata == PAGINA_SUPPORTO_SUGGERIMENTI) {
-      char nomeSuggerimento[LUNGHEZZA_NOME_SUGGERIMENTO];
       sprintf(nomeSuggerimento, "Suggerimenti%d", pagSuggerimento);
       stampaSchermataSupporto(nomeSuggerimento);
     }
