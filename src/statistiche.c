@@ -104,7 +104,7 @@ static void aggiornaFileGiocatore(const char *nomeGiocatore, const char *nomeAvv
     // Cerca il record dell'avversario nella lista
     i = 0;
     while (i < numAvversari){
-        if (strcmp(Get_nomeAvversario(&lista[i]), nomeAvversario) == 0){
+      if (strcmp(Get_nomeAvversario(&lista[i]), nomeAvversario) == 0){
       trovato = 1;
       if (tipo == RISULTATO_VITTORIA_G1) {
         Set_vittorie(&lista[i].stats, Get_vittorie(lista[i].stats) + 1);
@@ -113,7 +113,6 @@ static void aggiornaFileGiocatore(const char *nomeGiocatore, const char *nomeAvv
       } else {
         Set_pareggi(&lista[i].stats, Get_pareggi(lista[i].stats) + 1);
       }
-      break;
     }
     i = i + 1;
   }
