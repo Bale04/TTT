@@ -1,0 +1,300 @@
+Pseudocodice - modulo statistiche
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Funzioni di accesso al tipo Statistiche
+
+
+Funzione Get_vittorie
+INPUT
+S, record di statistiche di un giocatore, Statistiche
+OUTPUT
+V, numero di vittorie, intero
+V = campo numeroVittorie di S
+
+Funzione Set_vittorie
+INPUT
+S, record di statistiche di un giocatore, Statistiche
+V, nuovo numero di vittorie, intero
+OUTPUT
+S, record con numero vittorie aggiornato, Statistiche
+campo numeroVittorie di S = V
+
+Funzione Get_sconfitte
+INPUT
+S, record di statistiche di un giocatore, Statistiche
+OUTPUT
+V, numero di sconfitte, intero
+V = campo numeroSconfitte di S
+
+Funzione Set_sconfitte
+INPUT
+S, record di statistiche di un giocatore, Statistiche
+V, nuovo numero di sconfitte, intero
+OUTPUT
+S, record con numero sconfitte aggiornato, Statistiche
+campo numeroSconfitte di S = V
+
+Funzione Get_pareggi
+INPUT
+S, record di statistiche di un giocatore, Statistiche
+OUTPUT
+V, numero di pareggi, intero
+V = campo numeroPareggi di S
+
+Funzione Set_pareggi
+INPUT
+S, record di statistiche di un giocatore, Statistiche
+V, nuovo numero di pareggi, intero
+OUTPUT
+S, record con numero pareggi aggiornato, Statistiche
+campo numeroPareggi di S = V
+
+Funzione Get_nomeAvversario
+INPUT
+R, record di un avversario, RecordAvversario
+OUTPUT
+N, nome dell'avversario, stringa di caratteri
+N = campo nomeAvversario di R
+
+Funzione Set_nomeAvversario
+INPUT
+R, record di un avversario, RecordAvversario
+N, nuovo nome dell'avversario, stringa di caratteri
+OUTPUT
+R, record con nome avversario aggiornato, RecordAvversario
+campo nomeAvversario di R = N
+
+
+Funzione stampaSchermataStatistiche
+INPUT
+NomeSchermata, nome del file della schermata da stampare, stringa di caratteri
+OUTPUT
+LAVORO
+Fp, puntatore al file della schermata, file
+C, carattere letto dal file, intero
+NomeCompleto, percorso completo del file, stringa di caratteri
+NomeCompleto = PERCORSO_STATISTICHE + NomeSchermata
+Fp = AprireFile(NomeCompleto, lettura)
+SE (Fp = NULL)
+ALLORA StampareAVideo("Errore caricamento schermata statistiche")
+ALTRIMENTI
+C = LeggereCarattereDaFile(Fp)
+MENTRE (C <> EOF)
+StampareAVideo(C)
+C = LeggereCarattereDaFile(Fp)
+FINE
+ChiudereFile(Fp)
+FINE
+
+
+Funzione aggiornaFileGiocatore
+INPUT
+NomeGiocatore, nome del giocatore di cui aggiornare il file, stringa di caratteri
+NomeAvversario, nome dell'avversario, stringa di caratteri
+Tipo, risultato da registrare (RISULTATO_VITTORIA_G1, RISULTATO_VITTORIA_G2 o RISULTATO_PAREGGIO), intero
+OUTPUT
+LAVORO
+Percorso, percorso del file di statistiche del giocatore, stringa di caratteri
+Lista, array di record avversario caricati dal file, array di RecordAvversario
+NumAvversari, numero di avversari presenti nel file, intero
+Trovato, indica se l'avversario e' gia' presente nella lista (1) o no (0), intero
+Fp, puntatore al file di statistiche, file
+I, serve a scandire gli elementi di Lista, intero
+RecordVuoto, record inizializzato a zero, RecordAvversario
+Percorso = PERCORSO_STATS_SALVATE + NomeGiocatore
+Lista = NULL
+NumAvversari = 0
+Trovato = 0
+Fp = AprireFile(Percorso, lettura binaria)
+SE (Fp <> NULL)
+ALLORA
+LeggereFileBinario(NumAvversari, Fp)
+SE (NumAvversari > 0)
+ALLORA
+Lista = AllocareMemoria(NumAvversari * dimensione di RecordAvversario)
+LeggereFileBinario(Lista, Fp)
+FINE
+ChiudereFile(Fp)
+FINE
+I = 1
+MENTRE (I <= NumAvversari AND Trovato = 0)
+SE (Get_nomeAvversario(Lista[I]) = NomeAvversario)
+ALLORA
+Trovato = 1
+SE (Tipo = RISULTATO_VITTORIA_G1)
+ALLORA
+VittorieCorrente = Get_vittorie(Lista[I].stats)
+Set_vittorie(Lista[I].stats, VittorieCorrente + 1)
+ALTRIMENTI
+SE (Tipo = RISULTATO_VITTORIA_G2)
+ALLORA
+SconfitteCorrente = Get_sconfitte(Lista[I].stats)
+Set_sconfitte(Lista[I].stats, SconfitteCorrente + 1)
+ALTRIMENTI
+PareggiCorrente = Get_pareggi(Lista[I].stats)
+Set_pareggi(Lista[I].stats, PareggiCorrente + 1)
+FINE
+FINE
+FINE
+I = I + 1
+FINE
+SE (Trovato = 0)
+ALLORA
+NumAvversari = NumAvversari + 1
+Lista = RiallocareMemoria(Lista, NumAvversari * dimensione di RecordAvversario)
+campo stats.numeroVittorie di Lista[NumAvversari] = 0
+campo stats.numeroSconfitte di Lista[NumAvversari] = 0
+campo stats.numeroPareggi di Lista[NumAvversari] = 0
+Set_nomeAvversario(Lista[NumAvversari], NomeAvversario)
+SE (Tipo = RISULTATO_VITTORIA_G1)
+ALLORA Set_vittorie(Lista[NumAvversari].stats, 1)
+ALTRIMENTI
+SE (Tipo = RISULTATO_VITTORIA_G2)
+ALLORA Set_sconfitte(Lista[NumAvversari].stats, 1)
+ALTRIMENTI Set_pareggi(Lista[NumAvversari].stats, 1)
+FINE
+FINE
+FINE
+Fp = AprireFile(Percorso, scrittura binaria)
+SE (Fp <> NULL)
+ALLORA
+ScrivereFileBinario(NumAvversari, Fp)
+ScrivereFileBinario(Lista, Fp)
+ChiudereFile(Fp)
+FINE
+LiberareMemoria(Lista)
+
+
+Funzione salvaStatistichePartita
+INPUT
+NomeG1, nome del primo giocatore, stringa di caratteri
+NomeG2, nome del secondo giocatore, stringa di caratteri
+Risultato, esito della partita (RISULTATO_VITTORIA_G1, RISULTATO_VITTORIA_G2 o RISULTATO_PAREGGIO), intero
+OUTPUT
+SE (Risultato = RISULTATO_VITTORIA_G1)
+ALLORA
+aggiornaFileGiocatore(NomeG1, NomeG2, RISULTATO_VITTORIA_G1)
+aggiornaFileGiocatore(NomeG2, NomeG1, RISULTATO_VITTORIA_G2)
+ALTRIMENTI
+SE (Risultato = RISULTATO_VITTORIA_G2)
+ALLORA
+aggiornaFileGiocatore(NomeG1, NomeG2, RISULTATO_VITTORIA_G2)
+aggiornaFileGiocatore(NomeG2, NomeG1, RISULTATO_VITTORIA_G1)
+ALTRIMENTI
+aggiornaFileGiocatore(NomeG1, NomeG2, RISULTATO_PAREGGIO)
+aggiornaFileGiocatore(NomeG2, NomeG1, RISULTATO_PAREGGIO)
+FINE
+FINE
+
+
+Funzione navigaStatistiche
+INPUT
+OUTPUT
+LAVORO
+Esci, indica se uscire (1) o no (0), intero
+Schermata, indice della schermata corrente, intero
+Pagina, numero della pagina di avversari visualizzata, intero
+NumAvversari, numero totale di avversari trovati nel file, intero
+Riga, riga del click del mouse, intero
+Colonna, colonna del click del mouse, intero
+Inizio, indice del primo avversario della pagina corrente, intero
+I, serve a scandire gli avversari da stampare, intero
+Percorso, percorso del file di statistiche cercato, stringa di caratteri
+NomeRicercato, nome del giocatore cercato dall'utente, stringa di caratteri
+Lista, array di record avversario caricati dal file, array di RecordAvversario
+Fp, puntatore al file di statistiche, file
+Esci = 0
+Schermata = SCHERMATA_STAT_MENU
+Pagina = 0
+Lista = NULL
+NumAvversari = 0
+AbilitareMouse()
+MENTRE (Esci = 0)
+PulireSchermo()
+SE (Schermata = SCHERMATA_STAT_MENU)
+ALLORA
+stampaSchermataStatistiche(schermateStatistiche[SCHERMATA_STAT_MENU])
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (areaCliccata(bStatMenu[0], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bStatMenu[0].c1+1, bStatMenu[0].r)
+AbilitareTastiera()
+LeggereDaTastiera(NomeRicercato)
+AbilitareMouse()
+Percorso = PERCORSO_STATS_SALVATE + NomeRicercato
+Fp = AprireFile(Percorso, lettura binaria)
+SE (Fp <> NULL)
+ALLORA
+SE (Lista <> NULL)
+ALLORA LiberareMemoria(Lista)
+FINE
+NumAvversari = 0
+LeggereFileBinario(NumAvversari, Fp)
+SE (NumAvversari > 0)
+ALLORA
+Lista = AllocareMemoria(NumAvversari * dimensione di RecordAvversario)
+LeggereFileBinario(Lista, Fp)
+FINE
+ChiudereFile(Fp)
+Schermata = SCHERMATA_STAT_LISTA
+Pagina = 0
+FINE
+ALTRIMENTI
+SE (areaCliccata(bStatMenu[1], Riga, Colonna) = VERO)
+ALLORA Esci = 1
+FINE
+FINE
+ALTRIMENTI
+SE (Schermata = SCHERMATA_STAT_LISTA)
+ALLORA
+stampaSchermataStatistiche(schermateStatistiche[SCHERMATA_STAT_LISTA])
+Inizio = COLONNA_CENTRO_SCHERMO - lunghezza(NomeRicercato) / 2
+GoTo(Inizio, RIGA_NOME_RICERCATO)
+StampareAVideo(NomeRicercato)
+Inizio = Pagina * AVVERSARI_PER_PAGINA
+I = 1
+MENTRE (I <= AVVERSARI_PER_PAGINA AND (Inizio + I) <= NumAvversari)
+GoTo(TABELLA_COL_INIZIO, TABELLA_RIG_INIZIO + I - 1)
+StampareAVideo(Get_nomeAvversario(Lista[Inizio + I]))
+GoTo(31, TABELLA_RIG_INIZIO + I - 1)
+StampareAVideo(Get_vittorie(Lista[Inizio + I].stats))
+GoTo(50, TABELLA_RIG_INIZIO + I - 1)
+StampareAVideo(Get_pareggi(Lista[Inizio + I].stats))
+GoTo(69, TABELLA_RIG_INIZIO + I - 1)
+StampareAVideo(Get_sconfitte(Lista[Inizio + I].stats))
+I = I + 1
+FINE
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (areaCliccata(bLista[0], Riga, Colonna) = VERO)
+ALLORA Schermata = SCHERMATA_STAT_MENU
+ALTRIMENTI
+SE (areaCliccata(bLista[1], Riga, Colonna) = VERO)
+ALLORA
+SE (Pagina > 0)
+ALLORA Pagina = Pagina - 1
+FINE
+ALTRIMENTI
+SE (areaCliccata(bLista[2], Riga, Colonna) = VERO)
+ALLORA
+PaginaSuccessiva = (Pagina + 1) * AVVERSARI_PER_PAGINA
+SE (PaginaSuccessiva < NumAvversari)
+ALLORA Pagina = Pagina + 1
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+SE (Lista <> NULL)
+ALLORA LiberareMemoria(Lista)
+FINE
+AbilitareTastiera()
+PulireSchermo()

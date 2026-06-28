@@ -1,0 +1,49 @@
+Casi di test - modulo salvataggio
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+salvaPartita
+
+La funzione costruisce il percorso del file usando il nome della partita e lo salva in formato binario.
+
+Classi di equivalenza:
+percorso valido e scrivibile, file non ancora esistente
+percorso valido e scrivibile, file gia' esistente (sovrascrittura)
+percorso non valido o non scrivibile
+
+3 classi di equivalenza totali
+
+TC1  (nomePartita = "partita1", percorso valido, file non esistente)
+     Atteso: il file viene creato, Esito = ESITO_SUCCESSO
+     Ottenuto: il file viene creato, Esito = ESITO_SUCCESSO  [Passato]
+
+TC2  (nomePartita = "partita1", percorso valido, file gia' esistente)
+     Atteso: il file viene sovrascritto con i nuovi dati, Esito = ESITO_SUCCESSO
+     Ottenuto: il file viene sovrascritto con i nuovi dati, Esito = ESITO_SUCCESSO  [Passato]
+
+TC3  (nomePartita = "partita1", percorso non valido, cartella inesistente)
+     Atteso: viene stampato "Errore apertura file per il salvataggio: ...", Esito = ESITO_ERRORE
+     Ottenuto: viene stampato "Errore apertura file per il salvataggio: ...", Esito = ESITO_ERRORE  [Passato]
+
+
+caricaPartita
+
+La funzione costruisce il percorso del file usando il campo partitaPrecedente e carica i dati in formato binario.
+
+Classi di equivalenza:
+partitaPrecedente corrisponde a un file esistente e leggibile
+partitaPrecedente corrisponde a un file inesistente
+
+2 classi di equivalenza totali
+
+TC4  (partitaPrecedente = "partita1", file esistente salvato in precedenza con salvaPartita)
+     Atteso: impostazioni e partita vengono ripristinate correttamente, Esito = ESITO_SUCCESSO
+     Ottenuto: impostazioni e partita vengono ripristinate correttamente, Esito = ESITO_SUCCESSO  [Passato]
+
+TC5  (partitaPrecedente = "fileinesistente", file non presente)
+     Atteso: viene stampato "Errore apertura file per il caricamento: ...", Esito = ESITO_ERRORE
+     Ottenuto: viene stampato "Errore apertura file per il caricamento: ...", Esito = ESITO_ERRORE  [Passato]
+
+TC6  (salvaPartita con nomePartita = "test", poi caricaPartita con partitaPrecedente = "test")
+     Atteso: i dati caricati coincidono esattamente con quelli salvati
+     Ottenuto: i dati caricati coincidono esattamente con quelli salvati  [Passato]

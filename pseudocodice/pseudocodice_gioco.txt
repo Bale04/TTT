@@ -1,0 +1,791 @@
+Pseudocodice - modulo gioco
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Funzioni di accesso al tipo Partita
+
+
+Funzione Get_griglia
+INPUT
+Partita, stato della partita corrente, Partita
+Riga, riga della cella da leggere, intero
+Colonna, colonna della cella da leggere, intero
+OUTPUT
+S, simbolo presente nella cella in posizione Riga, Colonna, carattere
+S = elemento in posizione Riga, Colonna del campo griglia di Partita
+
+Funzione Set_griglia
+INPUT
+Partita, stato della partita corrente, Partita
+Riga, riga della cella da modificare, intero
+Colonna, colonna della cella da modificare, intero
+S, simbolo da inserire nella cella, carattere
+OUTPUT
+Partita, partita con la cella aggiornata, Partita
+elemento in posizione Riga, Colonna del campo griglia di Partita = S
+
+Funzione Get_turno
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+T, turno corrente (TURNO_GIOCATORE1 o TURNO_GIOCATORE2), intero
+T = campo turno di Partita
+
+Funzione Set_turno
+INPUT
+Partita, stato della partita corrente, Partita
+T, nuovo turno, intero
+OUTPUT
+Partita, partita con turno aggiornato, Partita
+campo turno di Partita = T
+
+Funzione Get_round
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+R, numero del round corrente, intero
+R = campo round di Partita
+
+Funzione Set_round
+INPUT
+Partita, stato della partita corrente, Partita
+R, nuovo numero di round, intero
+OUTPUT
+Partita, partita con round aggiornato, Partita
+campo round di Partita = R
+
+Funzione Get_vittorieG1
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+V, numero di vittorie del giocatore 1 nella partita, intero
+V = campo numeroVittorie del campo statisticheG1 di Partita
+
+Funzione Set_vittorieG1
+INPUT
+Partita, stato della partita corrente, Partita
+V, nuovo numero di vittorie del giocatore 1, intero
+OUTPUT
+Partita, partita con vittorie giocatore 1 aggiornate, Partita
+campo numeroVittorie del campo statisticheG1 di Partita = V
+
+Funzione Get_sconfitteG1
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+V, numero di sconfitte del giocatore 1 nella partita, intero
+V = campo numeroSconfitte del campo statisticheG1 di Partita
+
+Funzione Set_sconfitteG1
+INPUT
+Partita, stato della partita corrente, Partita
+V, nuovo numero di sconfitte del giocatore 1, intero
+OUTPUT
+Partita, partita con sconfitte giocatore 1 aggiornate, Partita
+campo numeroSconfitte del campo statisticheG1 di Partita = V
+
+Funzione Get_pareggiG1
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+V, numero di pareggi del giocatore 1 nella partita, intero
+V = campo numeroPareggi del campo statisticheG1 di Partita
+
+Funzione Set_pareggiG1
+INPUT
+Partita, stato della partita corrente, Partita
+V, nuovo numero di pareggi del giocatore 1, intero
+OUTPUT
+Partita, partita con pareggi giocatore 1 aggiornati, Partita
+campo numeroPareggi del campo statisticheG1 di Partita = V
+
+Funzione Get_vittorieG2
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+V, numero di vittorie del giocatore 2 nella partita, intero
+V = campo numeroVittorie del campo statisticheG2 di Partita
+
+Funzione Set_vittorieG2
+INPUT
+Partita, stato della partita corrente, Partita
+V, nuovo numero di vittorie del giocatore 2, intero
+OUTPUT
+Partita, partita con vittorie giocatore 2 aggiornate, Partita
+campo numeroVittorie del campo statisticheG2 di Partita = V
+
+Funzione Get_sconfitteG2
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+V, numero di sconfitte del giocatore 2 nella partita, intero
+V = campo numeroSconfitte del campo statisticheG2 di Partita
+
+Funzione Set_sconfitteG2
+INPUT
+Partita, stato della partita corrente, Partita
+V, nuovo numero di sconfitte del giocatore 2, intero
+OUTPUT
+Partita, partita con sconfitte giocatore 2 aggiornate, Partita
+campo numeroSconfitte del campo statisticheG2 di Partita = V
+
+Funzione Get_pareggiG2
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+V, numero di pareggi del giocatore 2 nella partita, intero
+V = campo numeroPareggi del campo statisticheG2 di Partita
+
+Funzione Set_pareggiG2
+INPUT
+Partita, stato della partita corrente, Partita
+V, nuovo numero di pareggi del giocatore 2, intero
+OUTPUT
+Partita, partita con pareggi giocatore 2 aggiornati, Partita
+campo numeroPareggi del campo statisticheG2 di Partita = V
+
+
+Funzione controllaVincitoreGriglia
+INPUT
+G, copia della griglia di gioco, array di caratteri a 2 dimensioni
+OUTPUT
+Vincitore, simbolo del giocatore vincitore oppure il carattere nullo se nessuno ha vinto, carattere
+LAVORO
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+Vincitore = il carattere nullo
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA AND Vincitore = il carattere nullo)
+SE (G[R][1] <> spazio AND G[R][1] <> il carattere nullo AND G[R][1] = G[R][2] AND G[R][2] = G[R][3])
+ALLORA Vincitore = G[R][1]
+FINE
+R = R + 1
+FINE
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA AND Vincitore = il carattere nullo)
+SE (G[1][C] <> spazio AND G[1][C] <> il carattere nullo AND G[1][C] = G[2][C] AND G[2][C] = G[3][C])
+ALLORA Vincitore = G[1][C]
+FINE
+C = C + 1
+FINE
+SE (Vincitore = il carattere nullo)
+ALLORA
+SE (G[1][1] <> spazio AND G[1][1] <> il carattere nullo AND G[1][1] = G[2][2] AND G[2][2] = G[3][3])
+ALLORA Vincitore = G[1][1]
+ALTRIMENTI
+SE (G[1][3] <> spazio AND G[1][3] <> il carattere nullo AND G[1][3] = G[2][2] AND G[2][2] = G[3][1])
+ALLORA Vincitore = G[1][3]
+FINE
+FINE
+FINE
+
+
+Funzione controlloGriglia
+INPUT
+G, copia della griglia di gioco, array di caratteri a 2 dimensioni
+OUTPUT
+Piena, indica se la griglia e' piena (1) o no (0), intero
+LAVORO
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+Piena = 1
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA AND Piena = 1)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA AND Piena = 1)
+SE (G[R][C] = spazio OR G[R][C] = il carattere nullo)
+ALLORA Piena = 0
+FINE
+C = C + 1
+FINE
+R = R + 1
+FINE
+
+
+Funzione calcolaPunteggio
+INPUT
+G, copia della griglia di gioco, array di caratteri a 2 dimensioni
+SimboloBot, simbolo del bot, carattere
+SimboloAvversario, simbolo dell'avversario, carattere
+IsMaximizing, indica se e' il turno del bot (1) o del giocatore (0), intero
+OUTPUT
+Punteggio, punteggio calcolato per la posizione corrente, intero
+LAVORO
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+P, punteggio della mossa provata in ricorsione, intero
+Migliore, miglior punteggio trovato finora, intero
+Vincitore, simbolo del vincitore nella posizione corrente, carattere
+Vincitore = controllaVincitoreGriglia(G)
+SE (Vincitore = SimboloBot)
+ALLORA Punteggio = PUNTEGGIO_VITTORIA
+ALTRIMENTI
+SE (Vincitore = SimboloAvversario)
+ALLORA Punteggio = PUNTEGGIO_SCONFITTA
+ALTRIMENTI
+SE (controlloGriglia(G) = 1)
+ALLORA Punteggio = RISULTATO_PAREGGIO
+ALTRIMENTI
+SE (IsMaximizing = 1)
+ALLORA
+Migliore = PUNTEGGIO_MINIMO
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+SE (G[R][C] = spazio OR G[R][C] = il carattere nullo)
+ALLORA
+G[R][C] = SimboloBot
+P = calcolaPunteggio(G, SimboloBot, SimboloAvversario, 0)
+G[R][C] = spazio
+SE (P > Migliore)
+ALLORA Migliore = P
+FINE
+FINE
+C = C + 1
+FINE
+R = R + 1
+FINE
+Punteggio = Migliore
+ALTRIMENTI
+Migliore = PUNTEGGIO_MASSIMO
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+SE (G[R][C] = spazio OR G[R][C] = il carattere nullo)
+ALLORA
+G[R][C] = SimboloAvversario
+P = calcolaPunteggio(G, SimboloBot, SimboloAvversario, 1)
+G[R][C] = spazio
+SE (P < Migliore)
+ALLORA Migliore = P
+FINE
+FINE
+C = C + 1
+FINE
+R = R + 1
+FINE
+Punteggio = Migliore
+FINE
+FINE
+FINE
+FINE
+
+
+Funzione mossaBot
+INPUT
+Partita, stato della partita corrente, Partita
+SimboloBot, simbolo del bot, carattere
+SimboloAvversario, simbolo dell'avversario, carattere
+OUTPUT
+CellaMossa, indice della cella migliore da giocare (da 0 a 8) oppure CELLA_NON_VALIDA, intero
+LAVORO
+G, copia della griglia per il calcolo, array di caratteri a 2 dimensioni
+Migliore, miglior punteggio trovato, intero
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+P, punteggio della mossa provata, intero
+Migliore = PUNTEGGIO_MINIMO
+CellaMossa = CELLA_NON_VALIDA
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+G[R][C] = Get_griglia(Partita, R, C)
+C = C + 1
+FINE
+R = R + 1
+FINE
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+SE (G[R][C] = spazio OR G[R][C] = il carattere nullo)
+ALLORA
+G[R][C] = SimboloBot
+P = calcolaPunteggio(G, SimboloBot, SimboloAvversario, 0)
+G[R][C] = spazio
+SE (P > Migliore)
+ALLORA
+Migliore = P
+CellaMossa = (R - 1) * DIMENSIONE_GRIGLIA + (C - 1)
+FINE
+FINE
+C = C + 1
+FINE
+R = R + 1
+FINE
+
+
+Funzione stampaSchermataGioco
+INPUT
+S, nome del file della schermata da stampare, Stringa
+OUTPUT
+LAVORO
+Fp, puntatore al file della schermata, file
+C, carattere letto dal file, intero
+NomeCompleto, percorso completo del file, stringa di caratteri
+NomeCompleto = PERCORSO_GIOCO + campo data di S
+Fp = AprireFile(NomeCompleto, lettura)
+SE (Fp = NULL)
+ALLORA StampareAVideo("Errore caricamento schermata gioco")
+ALTRIMENTI
+C = LeggereCarattereDaFile(Fp)
+MENTRE (C <> EOF)
+StampareAVideo(C)
+C = LeggereCarattereDaFile(Fp)
+FINE
+ChiudereFile(Fp)
+FINE
+
+
+Funzione stampaGioco
+INPUT
+Partita, stato della partita corrente, Partita
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+LAVORO
+Turno, turno corrente letto dalla partita, intero
+Round, numero del round corrente letto dalla partita, intero
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+Simbolo, simbolo presente in una cella della griglia, carattere
+Turno = Get_turno(Partita)
+Round = Get_round(Partita)
+GoTo(GIOCO_TITOLO_COL, GIOCO_TITOLO_RIG)
+StampareAVideo(Get_nomePartita(Impostazioni))
+GoTo(GIOCO_ROUND_COL, GIOCO_ROUND_RIG)
+StampareAVideo(Round)
+GoTo(GIOCO_TURNO_COL, GIOCO_TURNO_RIG)
+StampareAVideo(Turno)
+GoTo(VITTORIA_COL, VITTORIA_G1_RIG)
+StampareAVideo(Get_vittorieG1(Partita))
+GoTo(VITTORIA_COL, VITTORIA_G2_RIG)
+StampareAVideo(Get_vittorieG2(Partita))
+R = 1
+MENTRE (R <= 3)
+C = 1
+MENTRE (C <= 3)
+Simbolo = Get_griglia(Partita, R, C)
+GoTo(GRIGLIA_CENTRO_COL[C], GRIGLIA_CENTRO_RIG[R])
+SE (Simbolo = spazio OR Simbolo = il carattere nullo)
+ALLORA StampareAVideo(spazio)
+ALTRIMENTI StampareAVideo(Simbolo)
+FINE
+C = C + 1
+FINE
+R = R + 1
+FINE
+
+
+Funzione controllaVincitoreRound
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+Vincitore, simbolo del giocatore vincitore del round oppure il carattere nullo, carattere
+LAVORO
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+CellaA, primo elemento della tripletta controllata, carattere
+CellaB, secondo elemento della tripletta controllata, carattere
+CellaC, terzo elemento della tripletta controllata, carattere
+Vincitore = il carattere nullo
+R = 1
+MENTRE (R <= 3 AND Vincitore = il carattere nullo)
+CellaA = Get_griglia(Partita, R, 1)
+CellaB = Get_griglia(Partita, R, 2)
+CellaC = Get_griglia(Partita, R, 3)
+SE (CellaA <> spazio AND CellaA <> il carattere nullo AND CellaA = CellaB AND CellaB = CellaC)
+ALLORA Vincitore = CellaA
+FINE
+R = R + 1
+FINE
+C = 1
+MENTRE (C <= 3 AND Vincitore = il carattere nullo)
+CellaA = Get_griglia(Partita, 1, C)
+CellaB = Get_griglia(Partita, 2, C)
+CellaC = Get_griglia(Partita, 3, C)
+SE (CellaA <> spazio AND CellaA <> il carattere nullo AND CellaA = CellaB AND CellaB = CellaC)
+ALLORA Vincitore = CellaA
+FINE
+C = C + 1
+FINE
+SE (Vincitore = il carattere nullo)
+ALLORA
+CellaA = Get_griglia(Partita, 1, 1)
+CellaB = Get_griglia(Partita, 2, 2)
+CellaC = Get_griglia(Partita, 3, 3)
+SE (CellaA <> spazio AND CellaA <> il carattere nullo AND CellaA = CellaB AND CellaB = CellaC)
+ALLORA Vincitore = CellaA
+ALTRIMENTI
+CellaA = Get_griglia(Partita, 1, 3)
+CellaB = Get_griglia(Partita, 2, 2)
+CellaC = Get_griglia(Partita, 3, 1)
+SE (CellaA <> spazio AND CellaA <> il carattere nullo AND CellaA = CellaB AND CellaB = CellaC)
+ALLORA Vincitore = CellaA
+FINE
+FINE
+FINE
+
+
+Funzione grigliaPiena
+INPUT
+Partita, stato della partita corrente, Partita
+OUTPUT
+Piena, indica se la griglia e' piena (1) o no (0), intero
+LAVORO
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+CellaRC, valore della cella corrente, carattere
+Piena = 1
+R = 1
+MENTRE (R <= 3 AND Piena = 1)
+C = 1
+MENTRE (C <= 3 AND Piena = 1)
+CellaRC = Get_griglia(Partita, R, C)
+SE (CellaRC = spazio OR CellaRC = il carattere nullo)
+ALLORA Piena = 0
+FINE
+C = C + 1
+FINE
+R = R + 1
+FINE
+
+
+Funzione navigaPartita
+INPUT
+Partita, stato della partita, Partita
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Partita, partita aggiornata al termine della navigazione, Partita
+Impostazioni, impostazioni aggiornate al termine della navigazione, Impostazioni
+LAVORO
+Esci, indica se uscire dal gioco (1) o no (0), intero
+R, serve a scandire le righe della griglia, intero
+C, serve a scandire le colonne della griglia, intero
+Riga, riga del click del mouse, intero
+Colonna, colonna del click del mouse, intero
+Cella, indice della cella cliccata (da 0 a 8) oppure CELLA_NON_VALIDA, intero
+Risultato, esito finale della partita, intero
+Confermato, indica se l'azione corrente e' stata confermata (1) o no (0), intero
+Piena, indica se la griglia e' piena, intero
+Vincitore, simbolo del vincitore del round oppure il carattere nullo, carattere
+SimboloCorrente, simbolo del giocatore di turno, carattere
+NomeG, nome del giocatore vincitore finale, Stringa
+Esci = 0
+NomePrecedente = Get_partitaPrecedente(Impostazioni)
+SE (lunghezza(campo data di NomePrecedente) > 0)
+ALLORA
+EsitoCaricamento = caricaPartita(Impostazioni, Partita)
+SE (EsitoCaricamento = ESITO_SUCCESSO)
+ALLORA primo carattere del campo data di partitaPrecedente = il carattere nullo
+ALTRIMENTI
+Set_turno(Partita, 1)
+Set_round(Partita, 1)
+Set_vittorieG1(Partita, 0)
+Set_sconfitteG1(Partita, 0)
+Set_pareggiG1(Partita, 0)
+Set_vittorieG2(Partita, 0)
+Set_sconfitteG2(Partita, 0)
+Set_pareggiG2(Partita, 0)
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+Set_griglia(Partita, R, C, spazio)
+C = C + 1
+FINE
+R = R + 1
+FINE
+FINE
+ALTRIMENTI
+Set_turno(Partita, 1)
+Set_round(Partita, 1)
+Set_vittorieG1(Partita, 0)
+Set_sconfitteG1(Partita, 0)
+Set_pareggiG1(Partita, 0)
+Set_vittorieG2(Partita, 0)
+Set_sconfitteG2(Partita, 0)
+Set_pareggiG2(Partita, 0)
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+Set_griglia(Partita, R, C, spazio)
+C = C + 1
+FINE
+R = R + 1
+FINE
+FINE
+AbilitareMouse()
+MENTRE (Esci = 0)
+PulireSchermo()
+stampaSchermataGioco(schermatePartita[0])
+stampaGioco(Partita, Impostazioni)
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+ModoCPU = Get_modoPartita(Impostazioni)
+TurnoCorrente = Get_turno(Partita)
+SE (ModoCPU = MODO_CPU AND TurnoCorrente = TURNO_GIOCATORE2)
+ALLORA
+SimboloCorrente = Get_simboloGiocatore2(Impostazioni)
+SimboloAvv = Get_simboloGiocatore1(Impostazioni)
+Cella = mossaBot(Partita, SimboloCorrente, SimboloAvv)
+SE (Cella <> CELLA_NON_VALIDA)
+ALLORA
+R = 1
+C = 1
+MENTRE (R * DIMENSIONE_GRIGLIA + C - DIMENSIONE_GRIGLIA - 1 <> Cella)
+C = C + 1
+SE (C > DIMENSIONE_GRIGLIA)
+ALLORA
+C = 1
+R = R + 1
+FINE
+FINE
+Set_griglia(Partita, R, C, SimboloCorrente)
+Vincitore = controllaVincitoreRound(Partita)
+Piena = grigliaPiena(Partita)
+SE (Vincitore <> il carattere nullo OR Piena = 1)
+ALLORA
+SE (Vincitore <> il carattere nullo)
+ALLORA
+SimboloG1 = Get_simboloGiocatore1(Impostazioni)
+SE (Vincitore = SimboloG1)
+ALLORA
+Set_vittorieG1(Partita, Get_vittorieG1(Partita) + 1)
+Set_sconfitteG2(Partita, Get_sconfitteG2(Partita) + 1)
+ALTRIMENTI
+Set_vittorieG2(Partita, Get_vittorieG2(Partita) + 1)
+Set_sconfitteG1(Partita, Get_sconfitteG1(Partita) + 1)
+FINE
+ALTRIMENTI
+Set_pareggiG1(Partita, Get_pareggiG1(Partita) + 1)
+Set_pareggiG2(Partita, Get_pareggiG2(Partita) + 1)
+FINE
+PulireSchermo()
+stampaSchermataGioco(schermatePartita[0])
+stampaGioco(Partita, Impostazioni)
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+RoundCorrente = Get_round(Partita)
+NumRound = Get_numeroRound(Impostazioni)
+SE (RoundCorrente >= NumRound)
+ALLORA
+Risultato = 0
+VittG1 = Get_vittorieG1(Partita)
+VittG2 = Get_vittorieG2(Partita)
+SE (VittG1 > VittG2)
+ALLORA Risultato = RISULTATO_VITTORIA_G1
+ALTRIMENTI
+SE (VittG2 > VittG1)
+ALLORA Risultato = RISULTATO_VITTORIA_G2
+ALTRIMENTI Risultato = RISULTATO_PAREGGIO
+FINE
+FINE
+NomeG1 = Get_nomeGiocatore1(Impostazioni)
+NomeG2 = Get_nomeGiocatore2(Impostazioni)
+salvaStatistichePartita(campo data di NomeG1, campo data di NomeG2, Risultato)
+Confermato = 0
+MENTRE (Confermato = 0)
+PulireSchermo()
+stampaSchermataGioco(schermatePartita[3])
+VittG1 = Get_vittorieG1(Partita)
+VittG2 = Get_vittorieG2(Partita)
+SE (VittG1 > VittG2)
+ALLORA
+NomeG = Get_nomeGiocatore1(Impostazioni)
+GoTo(NOME_VINCITORE_COL, NOME_VINCITORE_RIG)
+StampareAVideo(campo data di NomeG)
+ALTRIMENTI
+SE (VittG2 > VittG1)
+ALLORA
+NomeG = Get_nomeGiocatore2(Impostazioni)
+GoTo(NOME_VINCITORE_COL, NOME_VINCITORE_RIG)
+StampareAVideo(campo data di NomeG)
+FINE
+FINE
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (areaCliccata(bVittoria[0], Riga, Colonna) = VERO)
+ALLORA
+Confermato = 1
+Esci = 1
+FINE
+FINE
+ALTRIMENTI
+leggiClick(Riga, Colonna)
+Set_round(Partita, Get_round(Partita) + 1)
+Set_turno(Partita, TURNO_GIOCATORE1)
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+Set_griglia(Partita, R, C, spazio)
+C = C + 1
+FINE
+R = R + 1
+FINE
+FINE
+ALTRIMENTI
+Set_turno(Partita, TURNO_GIOCATORE1)
+FINE
+FINE
+continuare il ciclo
+FINE
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+Cella = cellaCliccata(Riga, Colonna)
+SE (Cella <> CELLA_NON_VALIDA)
+ALLORA
+R = 1
+C = 1
+MENTRE (R * DIMENSIONE_GRIGLIA + C - DIMENSIONE_GRIGLIA - 1 <> Cella)
+C = C + 1
+SE (C > DIMENSIONE_GRIGLIA)
+ALLORA
+C = 1
+R = R + 1
+FINE
+FINE
+CellaLibera = Get_griglia(Partita, R, C)
+SE (CellaLibera = spazio OR CellaLibera = il carattere nullo)
+ALLORA
+TurnoCorrente = Get_turno(Partita)
+SE (TurnoCorrente = TURNO_GIOCATORE1)
+ALLORA SimboloCorrente = Get_simboloGiocatore1(Impostazioni)
+ALTRIMENTI SimboloCorrente = Get_simboloGiocatore2(Impostazioni)
+FINE
+Set_griglia(Partita, R, C, SimboloCorrente)
+Vincitore = controllaVincitoreRound(Partita)
+Piena = grigliaPiena(Partita)
+SE (Vincitore <> il carattere nullo OR Piena = 1)
+ALLORA
+SE (Vincitore <> il carattere nullo)
+ALLORA
+SimboloG1 = Get_simboloGiocatore1(Impostazioni)
+SE (Vincitore = SimboloG1)
+ALLORA
+Set_vittorieG1(Partita, Get_vittorieG1(Partita) + 1)
+Set_sconfitteG2(Partita, Get_sconfitteG2(Partita) + 1)
+ALTRIMENTI
+Set_vittorieG2(Partita, Get_vittorieG2(Partita) + 1)
+Set_sconfitteG1(Partita, Get_sconfitteG1(Partita) + 1)
+FINE
+ALTRIMENTI
+Set_pareggiG1(Partita, Get_pareggiG1(Partita) + 1)
+Set_pareggiG2(Partita, Get_pareggiG2(Partita) + 1)
+FINE
+PulireSchermo()
+stampaSchermataGioco(schermatePartita[0])
+stampaGioco(Partita, Impostazioni)
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+RoundCorrente = Get_round(Partita)
+NumRound = Get_numeroRound(Impostazioni)
+SE (RoundCorrente >= NumRound)
+ALLORA
+Risultato = 0
+VittG1 = Get_vittorieG1(Partita)
+VittG2 = Get_vittorieG2(Partita)
+SE (VittG1 > VittG2)
+ALLORA Risultato = RISULTATO_VITTORIA_G1
+ALTRIMENTI
+SE (VittG2 > VittG1)
+ALLORA Risultato = RISULTATO_VITTORIA_G2
+ALTRIMENTI Risultato = RISULTATO_PAREGGIO
+FINE
+FINE
+NomeG1 = Get_nomeGiocatore1(Impostazioni)
+NomeG2 = Get_nomeGiocatore2(Impostazioni)
+salvaStatistichePartita(campo data di NomeG1, campo data di NomeG2, Risultato)
+Confermato = 0
+MENTRE (Confermato = 0)
+PulireSchermo()
+stampaSchermataGioco(schermatePartita[3])
+VittG1 = Get_vittorieG1(Partita)
+VittG2 = Get_vittorieG2(Partita)
+SE (VittG1 > VittG2)
+ALLORA
+NomeG = Get_nomeGiocatore1(Impostazioni)
+GoTo(NOME_VINCITORE_COL, NOME_VINCITORE_RIG)
+StampareAVideo(campo data di NomeG)
+ALTRIMENTI
+SE (VittG2 > VittG1)
+ALLORA
+NomeG = Get_nomeGiocatore2(Impostazioni)
+GoTo(NOME_VINCITORE_COL, NOME_VINCITORE_RIG)
+StampareAVideo(campo data di NomeG)
+FINE
+FINE
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (areaCliccata(bVittoria[0], Riga, Colonna) = VERO)
+ALLORA
+Confermato = 1
+Esci = 1
+FINE
+FINE
+ALTRIMENTI
+leggiClick(Riga, Colonna)
+Set_round(Partita, Get_round(Partita) + 1)
+Set_turno(Partita, TURNO_GIOCATORE1)
+R = 1
+MENTRE (R <= DIMENSIONE_GRIGLIA)
+C = 1
+MENTRE (C <= DIMENSIONE_GRIGLIA)
+Set_griglia(Partita, R, C, spazio)
+C = C + 1
+FINE
+R = R + 1
+FINE
+FINE
+ALTRIMENTI
+TurnoCorrente = Get_turno(Partita)
+SE (TurnoCorrente = TURNO_GIOCATORE1)
+ALLORA Set_turno(Partita, TURNO_GIOCATORE2)
+ALTRIMENTI Set_turno(Partita, TURNO_GIOCATORE1)
+FINE
+FINE
+FINE
+ALTRIMENTI
+SE (areaCliccata(bGiocoMenu[0], Riga, Colonna) = VERO)
+ALLORA Esci = 1
+ALTRIMENTI
+SE (areaCliccata(bGiocoMenu[1], Riga, Colonna) = VERO)
+ALLORA
+Confermato = 0
+MENTRE (Confermato = 0)
+PulireSchermo()
+stampaSchermataGioco(schermatePartita[1])
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (areaCliccata(bSalvaConferma[0], Riga, Colonna) = VERO)
+ALLORA
+salvaPartita(Impostazioni, Partita)
+Confermato = 1
+Esci = 1
+ALTRIMENTI
+SE (areaCliccata(bSalvaConferma[1], Riga, Colonna) = VERO OR areaCliccata(bSalvaConferma[2], Riga, Colonna) = VERO)
+ALLORA Confermato = 1
+FINE
+FINE
+FINE
+ALTRIMENTI
+SE (areaCliccata(bGiocoMenu[2], Riga, Colonna) = VERO)
+ALLORA
+AbilitareTastiera()
+navigaSupporto()
+AbilitareMouse()
+FINE
+FINE
+FINE
+FINE
+FINE
+AbilitareTastiera()
+PulireSchermo()

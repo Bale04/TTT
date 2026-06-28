@@ -1,0 +1,116 @@
+Pseudocodice - modulo supporto
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Funzione stampaSchermataSupporto
+INPUT
+NomeSchermata, nome del file della schermata da stampare, stringa di caratteri
+OUTPUT
+LAVORO
+Fp, puntatore al file della schermata, file
+C, carattere letto dal file, intero
+NomeCompleto, percorso completo del file, stringa di caratteri
+NomeCompleto = PERCORSO_SUPPORTO + NomeSchermata
+Fp = AprireFile(NomeCompleto, lettura)
+SE (Fp = NULL)
+ALLORA StampareAVideo("Errore caricamento schermata supporto")
+ALTRIMENTI
+C = LeggereCarattereDaFile(Fp)
+MENTRE (C <> EOF)
+StampareAVideo(C)
+C = LeggereCarattereDaFile(Fp)
+FINE
+ChiudereFile(Fp)
+StampareAVideo(a capo)
+FINE
+
+
+Funzione navigaSupporto
+INPUT
+OUTPUT
+LAVORO
+Riga, riga del click del mouse, intero
+Colonna, colonna del click del mouse, intero
+EsciSupporto, indica se uscire dal supporto (1) o no (0), intero
+Schermata, indice della schermata corrente, intero
+PagSuggerimento, numero della pagina di suggerimenti corrente, intero
+NomeSuggerimento, nome del file del suggerimento corrente, stringa di caratteri
+EsciSupporto = 0
+Schermata = PAGINA_SUPPORTO_MAIN
+PagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE
+AbilitareMouse()
+MENTRE (EsciSupporto = 0)
+PulireSchermo()
+SE (Schermata = PAGINA_SUPPORTO_MAIN)
+ALLORA stampaSchermataSupporto("Supporto")
+ALTRIMENTI
+SE (Schermata = PAGINA_SUPPORTO_REGOLAMENTO)
+ALLORA stampaSchermataSupporto("Regolamento")
+ALTRIMENTI
+SE (Schermata = PAGINA_SUPPORTO_MANUALE)
+ALLORA stampaSchermataSupporto("Manuale")
+ALTRIMENTI
+SE (Schermata = PAGINA_SUPPORTO_SUGGERIMENTI)
+ALLORA
+NomeSuggerimento = "Suggerimenti" + PagSuggerimento
+stampaSchermataSupporto(NomeSuggerimento)
+FINE
+FINE
+FINE
+FINE
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (Schermata = PAGINA_SUPPORTO_MAIN)
+ALLORA
+SE (areaCliccata(bSupporto[0], Riga, Colonna) = VERO)
+ALLORA Schermata = PAGINA_SUPPORTO_REGOLAMENTO
+ALTRIMENTI
+SE (areaCliccata(bSupporto[1], Riga, Colonna) = VERO)
+ALLORA Schermata = PAGINA_SUPPORTO_MANUALE
+ALTRIMENTI
+SE (areaCliccata(bSupporto[2], Riga, Colonna) = VERO)
+ALLORA
+Schermata = PAGINA_SUPPORTO_SUGGERIMENTI
+PagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE
+ALTRIMENTI
+SE (areaCliccata(bSupporto[3], Riga, Colonna) = VERO)
+ALLORA EsciSupporto = 1
+FINE
+FINE
+FINE
+FINE
+ALTRIMENTI
+SE (Schermata = PAGINA_SUPPORTO_REGOLAMENTO)
+ALLORA
+SE (areaCliccata(bManuale, Riga, Colonna) = VERO)
+ALLORA Schermata = PAGINA_SUPPORTO_MAIN
+FINE
+ALTRIMENTI
+SE (Schermata = PAGINA_SUPPORTO_MANUALE)
+ALLORA
+SE (areaCliccata(bManuale, Riga, Colonna) = VERO)
+ALLORA Schermata = PAGINA_SUPPORTO_MAIN
+FINE
+ALTRIMENTI
+SE (Schermata = PAGINA_SUPPORTO_SUGGERIMENTI)
+ALLORA
+SE (areaCliccata(bSuggerimenti[0], Riga, Colonna) = VERO)
+ALLORA Schermata = PAGINA_SUPPORTO_MAIN
+ALTRIMENTI
+SE (PagSuggerimento > PAGINA_SUGGERIMENTO_INIZIALE AND areaCliccata(bSuggerimenti[1], Riga, Colonna) = VERO)
+ALLORA PagSuggerimento = PagSuggerimento - 1
+ALTRIMENTI
+SE (PagSuggerimento < PAGINA_SUGGERIMENTO_FINALE AND areaCliccata(bSuggerimenti[2], Riga, Colonna) = VERO)
+ALLORA PagSuggerimento = PagSuggerimento + 1
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+AbilitareTastiera()
+PulireSchermo()

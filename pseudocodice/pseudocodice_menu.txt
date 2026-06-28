@@ -1,0 +1,80 @@
+Pseudocodice - modulo menu
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Funzione stampaSchermataMenu
+INPUT
+S, nome del file della schermata da stampare, Stringa
+OUTPUT
+LAVORO
+Fp, puntatore al file della schermata, file
+C, carattere letto dal file, intero
+NomeCompleto, percorso completo del file, stringa di caratteri
+NomeCompleto = PERCORSO_MENU + campo data di S
+Fp = AprireFile(NomeCompleto, lettura)
+SE (Fp = NULL)
+ALLORA StampareAVideo("Errore caricamento schermata menu")
+ALTRIMENTI
+C = LeggereCarattereDaFile(Fp)
+MENTRE (C <> EOF)
+StampareAVideo(C)
+C = LeggereCarattereDaFile(Fp)
+FINE
+ChiudereFile(Fp)
+FINE
+
+
+Funzione navigaMenu
+INPUT
+Impostazioni, impostazioni di gioco correnti, Impostazioni
+OUTPUT
+Impostazioni, impostazioni aggiornate dopo la navigazione, Impostazioni
+LAVORO
+Esci, indica se uscire dal menu (1) o no (0), intero
+Riga, riga del click del mouse, intero
+Colonna, colonna del click del mouse, intero
+Partita, partita corrente, Partita
+Esci = 0
+AbilitareMouse()
+MENTRE (Esci = 0)
+PulireSchermo()
+stampaSchermataMenu(schermateMenu[INDICE_MENU_PRINCIPALE])
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (areaCliccata(bMainMenu[0], Riga, Colonna) = VERO)
+ALLORA
+AbilitareTastiera()
+navigaPartita(Partita, Impostazioni)
+AbilitareMouse()
+ALTRIMENTI
+SE (areaCliccata(bMainMenu[1], Riga, Colonna) = VERO)
+ALLORA
+AbilitareTastiera()
+navigaImpostazioni(Impostazioni)
+AbilitareMouse()
+ALTRIMENTI
+SE (areaCliccata(bMainMenu[2], Riga, Colonna) = VERO)
+ALLORA
+AbilitareTastiera()
+navigaSupporto()
+AbilitareMouse()
+ALTRIMENTI
+SE (areaCliccata(bMainMenu[3], Riga, Colonna) = VERO)
+ALLORA
+AbilitareTastiera()
+navigaStatistiche()
+AbilitareMouse()
+ALTRIMENTI
+SE (areaCliccata(bMainMenu[4], Riga, Colonna) = VERO)
+ALLORA Esci = 1
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+AbilitareTastiera()
+PulireSchermo()
+StampareAVideo("Arrivederci!")

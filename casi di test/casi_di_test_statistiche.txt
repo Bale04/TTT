@@ -1,0 +1,180 @@
+Casi di test - modulo statistiche
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Get_vittorie e Set_vittorie
+Get_sconfitte e Set_sconfitte
+Get_pareggi e Set_pareggi
+
+Classi di equivalenza:
+v = 0
+v > 0
+
+2 classi di equivalenza totali per ciascuna coppia
+
+TC1  (Set_vittorie con v = 0)
+     Atteso: Get_vittorie restituisce 0
+     Ottenuto: Get_vittorie restituisce 0  [Passato]
+
+TC2  (Set_vittorie con v = 5)
+     Atteso: Get_vittorie restituisce 5
+     Ottenuto: Get_vittorie restituisce 5  [Passato]
+
+TC3  (Set_sconfitte con v = 0)
+     Atteso: Get_sconfitte restituisce 0
+     Ottenuto: Get_sconfitte restituisce 0  [Passato]
+
+TC4  (Set_sconfitte con v = 3)
+     Atteso: Get_sconfitte restituisce 3
+     Ottenuto: Get_sconfitte restituisce 3  [Passato]
+
+TC5  (Set_pareggi con v = 0)
+     Atteso: Get_pareggi restituisce 0
+     Ottenuto: Get_pareggi restituisce 0  [Passato]
+
+TC6  (Set_pareggi con v = 7)
+     Atteso: Get_pareggi restituisce 7
+     Ottenuto: Get_pareggi restituisce 7  [Passato]
+
+
+Get_nomeAvversario e Set_nomeAvversario
+
+La stringa e' limitata a LUNGHEZZA_STRINGA - 1 caratteri (19 caratteri).
+
+Classi di equivalenza:
+nome vuoto
+nome di lunghezza 1
+nome di lunghezza 19 (massimo valido)
+nome di lunghezza 20 o piu' (tronca a 19)
+
+4 classi di equivalenza totali
+
+TC7  (nome = "")
+     Atteso: Get_nomeAvversario restituisce stringa vuota
+     Ottenuto: Get_nomeAvversario restituisce stringa vuota  [Passato]
+
+TC8  (nome = "a")
+     Atteso: Get_nomeAvversario restituisce "a"
+     Ottenuto: Get_nomeAvversario restituisce "a"  [Passato]
+
+TC9  (nome = "abcdefghijklmnopqrs", 19 caratteri)
+     Atteso: Get_nomeAvversario restituisce "abcdefghijklmnopqrs"
+     Ottenuto: Get_nomeAvversario restituisce "abcdefghijklmnopqrs"  [Passato]
+
+TC10 (nome = "abcdefghijklmnopqrst", 20 caratteri)
+     Atteso: Get_nomeAvversario restituisce "abcdefghijklmnopqrs" (troncata a 19)
+     Ottenuto: Get_nomeAvversario restituisce "abcdefghijklmnopqrs"  [Passato]
+
+
+aggiornaFileGiocatore
+
+La funzione aggiorna il file di statistiche di un giocatore aggiungendo o modificando il record per un avversario.
+
+Classi di equivalenza:
+file del giocatore non esiste ancora (primo aggiornamento)
+file esiste, l'avversario e' gia' presente nel file
+file esiste, l'avversario non e' ancora presente
+tipo = RISULTATO_VITTORIA_G1
+tipo = RISULTATO_VITTORIA_G2
+tipo = RISULTATO_PAREGGIO
+
+6 classi di equivalenza totali
+
+TC11 (file non esiste, nomeGiocatore = "mario", nomeAvversario = "luigi", tipo = RISULTATO_VITTORIA_G1)
+     Atteso: il file viene creato con 1 record, vittorie = 1, sconfitte = 0, pareggi = 0
+     Ottenuto: il file viene creato con 1 record, vittorie = 1, sconfitte = 0, pareggi = 0  [Passato]
+
+TC12 (file esiste con record per "luigi", tipo = RISULTATO_VITTORIA_G1)
+     Atteso: vittorie del record per "luigi" aumenta di 1
+     Ottenuto: vittorie del record per "luigi" aumenta di 1  [Passato]
+
+TC13 (file esiste ma "luigi" non e' presente, tipo = RISULTATO_PAREGGIO)
+     Atteso: viene aggiunto un nuovo record per "luigi" con pareggi = 1
+     Ottenuto: viene aggiunto un nuovo record per "luigi" con pareggi = 1  [Passato]
+
+TC14 (tipo = RISULTATO_VITTORIA_G2)
+     Atteso: sconfitte del record per l'avversario aumenta di 1
+     Ottenuto: sconfitte del record per l'avversario aumenta di 1  [Passato]
+
+TC15 (tipo = RISULTATO_PAREGGIO)
+     Atteso: pareggi del record per l'avversario aumenta di 1
+     Ottenuto: pareggi del record per l'avversario aumenta di 1  [Passato]
+
+
+salvaStatistichePartita
+
+La funzione aggiorna i file di entrambi i giocatori in base al risultato della partita.
+
+Classi di equivalenza:
+risultato = RISULTATO_VITTORIA_G1
+risultato = RISULTATO_VITTORIA_G2
+risultato = RISULTATO_PAREGGIO
+
+3 classi di equivalenza totali
+
+TC16 (nomeG1 = "mario", nomeG2 = "luigi", risultato = RISULTATO_VITTORIA_G1)
+     Atteso: nel file di "mario" vittorie vs "luigi" aumenta di 1,
+             nel file di "luigi" sconfitte vs "mario" aumenta di 1
+     Ottenuto: nel file di "mario" vittorie vs "luigi" aumenta di 1,
+               nel file di "luigi" sconfitte vs "mario" aumenta di 1  [Passato]
+
+TC17 (nomeG1 = "mario", nomeG2 = "luigi", risultato = RISULTATO_VITTORIA_G2)
+     Atteso: nel file di "mario" sconfitte vs "luigi" aumenta di 1,
+             nel file di "luigi" vittorie vs "mario" aumenta di 1
+     Ottenuto: nel file di "mario" sconfitte vs "luigi" aumenta di 1,
+               nel file di "luigi" vittorie vs "mario" aumenta di 1  [Passato]
+
+TC18 (nomeG1 = "mario", nomeG2 = "luigi", risultato = RISULTATO_PAREGGIO)
+     Atteso: nel file di "mario" pareggi vs "luigi" aumenta di 1,
+             nel file di "luigi" pareggi vs "mario" aumenta di 1
+     Ottenuto: nel file di "mario" pareggi vs "luigi" aumenta di 1,
+               nel file di "luigi" pareggi vs "mario" aumenta di 1  [Passato]
+
+
+navigaStatistiche
+
+Classi di equivalenza per schermata = SCHERMATA_STAT_MENU:
+click su bStatMenu[0] (RICERCA), giocatore trovato nel file
+click su bStatMenu[0] (RICERCA), giocatore non trovato nel file
+click su bStatMenu[1] (ESCI)
+
+Classi di equivalenza per schermata = SCHERMATA_STAT_LISTA:
+click su bLista[0] (ESCI)
+click su bLista[1] (INDIETRO) con pagina = 0
+click su bLista[1] (INDIETRO) con pagina > 0
+click su bLista[2] (AVANTI) con ultima pagina gia' raggiunta
+click su bLista[2] (AVANTI) con pagine successive disponibili
+
+8 classi di equivalenza totali
+
+TC19 (schermata = MENU, click su bStatMenu[0], inserimento "mario", file di "mario" esiste)
+     Atteso: schermata = SCHERMATA_STAT_LISTA, pagina = 0, lista caricata correttamente
+     Ottenuto: schermata = SCHERMATA_STAT_LISTA, pagina = 0, lista caricata correttamente  [Passato]
+
+TC20 (schermata = MENU, click su bStatMenu[0], inserimento "sconosciuto", file non esiste)
+     Atteso: schermata rimane SCHERMATA_STAT_MENU, nessuna modifica alla lista
+     Ottenuto: schermata rimane SCHERMATA_STAT_MENU, nessuna modifica alla lista  [Passato]
+
+TC21 (schermata = MENU, click su bStatMenu[1])
+     Atteso: esci = 1, il loop termina
+     Ottenuto: esci = 1, il loop termina  [Passato]
+
+TC22 (schermata = LISTA, click su bLista[0])
+     Atteso: schermata = SCHERMATA_STAT_MENU
+     Ottenuto: schermata = SCHERMATA_STAT_MENU  [Passato]
+
+TC23 (schermata = LISTA, pagina = 0, click su bLista[1])
+     Atteso: pagina rimane 0
+     Ottenuto: pagina rimane 0  [Passato]
+
+TC24 (schermata = LISTA, pagina = 2, click su bLista[1])
+     Atteso: pagina = 1
+     Ottenuto: pagina = 1  [Passato]
+
+TC25 (schermata = LISTA, ultima pagina raggiunta, click su bLista[2])
+     Atteso: pagina rimane invariata
+     Ottenuto: pagina rimane invariata  [Passato]
+
+TC26 (schermata = LISTA, pagine successive disponibili, click su bLista[2])
+     Atteso: pagina aumenta di 1
+     Ottenuto: pagina aumenta di 1  [Passato]

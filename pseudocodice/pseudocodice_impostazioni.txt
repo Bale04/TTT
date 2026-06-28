@@ -1,0 +1,404 @@
+Pseudocodice - modulo impostazioni
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Funzioni di accesso al tipo Impostazioni
+
+
+Funzione Get_modoPartita
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+M, modalita' di gioco corrente, intero
+M = campo modoPartita di Impostazioni
+
+Funzione Set_modoPartita
+INPUT
+M, nuova modalita' di gioco, intero
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con modalita' aggiornata, Impostazioni
+campo modoPartita di Impostazioni = M
+
+Funzione Get_nomeGiocatore1
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+N, nome del primo giocatore, Stringa
+N = campo nomeGiocatore1 di Impostazioni
+
+Funzione Set_nomeGiocatore1
+INPUT
+N, nuovo nome del primo giocatore, Stringa
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con nome giocatore 1 aggiornato, Impostazioni
+campo nomeGiocatore1 di Impostazioni = N
+
+Funzione Get_nomeGiocatore2
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+N, nome del secondo giocatore, Stringa
+N = campo nomeGiocatore2 di Impostazioni
+
+Funzione Set_nomeGiocatore2
+INPUT
+N, nuovo nome del secondo giocatore, Stringa
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con nome giocatore 2 aggiornato, Impostazioni
+campo nomeGiocatore2 di Impostazioni = N
+
+Funzione Get_simboloGiocatore1
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+S, simbolo del primo giocatore, carattere
+S = campo simboloGiocatore1 di Impostazioni
+
+Funzione Set_simboloGiocatore1
+INPUT
+S, nuovo simbolo del primo giocatore, carattere
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con simbolo giocatore 1 aggiornato, Impostazioni
+campo simboloGiocatore1 di Impostazioni = S
+
+Funzione Get_simboloGiocatore2
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+S, simbolo del secondo giocatore, carattere
+S = campo simboloGiocatore2 di Impostazioni
+
+Funzione Set_simboloGiocatore2
+INPUT
+S, nuovo simbolo del secondo giocatore, carattere
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con simbolo giocatore 2 aggiornato, Impostazioni
+campo simboloGiocatore2 di Impostazioni = S
+
+Funzione Get_partitaPrecedente
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+P, nome della partita salvata da caricare, Stringa
+P = campo partitaPrecedente di Impostazioni
+
+Funzione Set_partitaPrecedente
+INPUT
+P, nome della partita salvata da caricare, Stringa
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con partita precedente aggiornata, Impostazioni
+campo partitaPrecedente di Impostazioni = P
+
+Funzione Get_annullaImpostazioni
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+X, valore del flag annullaImpostazioni, intero
+X = campo annullaImpostazioni di Impostazioni
+
+Funzione Set_annullaImpostazioni
+INPUT
+X, nuovo valore del flag annullaImpostazioni, intero
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni aggiornate, Impostazioni
+campo annullaImpostazioni di Impostazioni = X
+SE (X = IMPOSTAZIONI_DEFAULT)
+ALLORA
+Set_nomeGiocatore1("giocatore1", Impostazioni)
+Set_nomeGiocatore2("giocatore2", Impostazioni)
+Set_modoPartita(MODO_CPU, Impostazioni)
+Set_partitaPrecedente("", Impostazioni)
+Set_simboloGiocatore1(il carattere X, Impostazioni)
+Set_simboloGiocatore2(il carattere O, Impostazioni)
+Set_numeroRound(1, Impostazioni)
+Set_nomePartita("partita", Impostazioni)
+FINE
+
+Funzione Get_numeroRound
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+R, numero di round da giocare, intero
+R = campo numeroRound di Impostazioni
+
+Funzione Set_numeroRound
+INPUT
+R, nuovo numero di round, intero
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con numero round aggiornato, Impostazioni
+SE (R > MAX_ROUND)
+ALLORA campo numeroRound di Impostazioni = MAX_ROUND
+ALTRIMENTI campo numeroRound di Impostazioni = R
+FINE
+
+Funzione Get_nomePartita
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+N, nome della partita corrente, Stringa
+N = campo nomePartita di Impostazioni
+
+Funzione Set_nomePartita
+INPUT
+N, nuovo nome della partita, Stringa
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni con nome partita aggiornato, Impostazioni
+campo nomePartita di Impostazioni = N
+
+
+Funzione resetImpostazioni
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni riportate ai valori di default, Impostazioni
+Set_nomeGiocatore1("giocatore1", Impostazioni)
+Set_nomeGiocatore2("giocatore2", Impostazioni)
+Set_modoPartita(MODO_CPU, Impostazioni)
+Set_partitaPrecedente("", Impostazioni)
+Set_simboloGiocatore1(il carattere X, Impostazioni)
+Set_simboloGiocatore2(il carattere O, Impostazioni)
+Set_annullaImpostazioni(IMPOSTAZIONI_DEFAULT, Impostazioni)
+Set_numeroRound(1, Impostazioni)
+Set_nomePartita("partita", Impostazioni)
+
+
+Funzione stampaSchermataImpostazioni
+INPUT
+S, nome del file della schermata da stampare, Stringa
+OUTPUT
+LAVORO
+Fp, puntatore al file della schermata, file
+C, carattere letto dal file, intero
+NomeCompleto, percorso completo del file, stringa di caratteri
+NomeCompleto = PERCORSO_FILE + campo data di S
+Fp = AprireFile(NomeCompleto, lettura)
+SE (Fp = NULL)
+ALLORA StampareAVideo("Errore Caricamento Schermata")
+ALTRIMENTI
+C = LeggereCarattereDaFile(Fp)
+MENTRE (C <> EOF)
+StampareAVideo(C)
+C = LeggereCarattereDaFile(Fp)
+FINE
+ChiudereFile(Fp)
+StampareAVideo(a capo)
+FINE
+
+
+Funzione navigaImpostazioni
+INPUT
+Impostazioni, impostazioni di gioco, Impostazioni
+OUTPUT
+Impostazioni, impostazioni aggiornate dopo la navigazione, Impostazioni
+LAVORO
+Riga, riga del click del mouse, intero
+Colonna, colonna del click del mouse, intero
+Pagina, indice della pagina corrente del menu impostazioni, intero
+Esci, indica se uscire (1) o no (0), intero
+StringaInput, stringa letta da tastiera, Stringa
+SimboloNuovo, nuovo simbolo inserito da tastiera, carattere
+Riga = 0
+Colonna = 0
+Pagina = PAGINA_IMPOSTAZIONI_MAIN
+Esci = 0
+AbilitareMouse()
+MENTRE (Esci = 0)
+PulireSchermo()
+stampaSchermataImpostazioni(schermateImpostazioni[Pagina])
+SE (Pagina = PAGINA_IMPOSTAZIONI_NOMI)
+ALLORA
+GoTo(bNomi[0].c1+1, bNomi[0].r)
+StampareAVideo(Get_nomeGiocatore1(Impostazioni))
+GoTo(bNomi[1].c1+1, bNomi[1].r)
+StampareAVideo(Get_nomeGiocatore2(Impostazioni))
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_CARICA)
+ALLORA
+GoTo(bCarica[0].c1+1, bCarica[0].r)
+StampareAVideo(Get_partitaPrecedente(Impostazioni))
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_SIMBOLI)
+ALLORA
+GoTo(bSimb[0].c1+1, bSimb[0].r)
+StampareAVideo(Get_simboloGiocatore1(Impostazioni))
+GoTo(bSimb[1].c1+1, bSimb[1].r)
+StampareAVideo(Get_simboloGiocatore2(Impostazioni))
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_ROUND)
+ALLORA
+GoTo(bRound[0].c1+1, bRound[0].r)
+StampareAVideo(Get_nomePartita(Impostazioni))
+GoTo(bRound[1].c1+1, bRound[1].r)
+StampareAVideo(Get_numeroRound(Impostazioni))
+FINE
+FINE
+FINE
+FINE
+GoTo(CURSORE_BASE.col, CURSORE_BASE.rig)
+SE (leggiClick(Riga, Colonna) = 0)
+ALLORA continuare il ciclo
+FINE
+SE (Pagina = PAGINA_IMPOSTAZIONI_MAIN)
+ALLORA
+SE (areaCliccata(bMenu[0], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_NOMI
+ALTRIMENTI
+SE (areaCliccata(bMenu[1], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_MODALITA
+ALTRIMENTI
+SE (areaCliccata(bMenu[2], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_CARICA
+ALTRIMENTI
+SE (areaCliccata(bMenu[3], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_SIMBOLI
+ALTRIMENTI
+SE (areaCliccata(bMenu[4], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_ANNULLA
+ALTRIMENTI
+SE (areaCliccata(bMenu[5], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_ROUND
+ALTRIMENTI
+SE (areaCliccata(bMenu[6], Riga, Colonna) = VERO)
+ALLORA Esci = 1
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_NOMI)
+ALLORA
+SE (areaCliccata(bNomi[0], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bNomi[0].c1+1, bNomi[0].r)
+AbilitareTastiera()
+LeggereDaTastiera(StringaInput)
+AbilitareMouse()
+Set_nomeGiocatore1(StringaInput, Impostazioni)
+ALTRIMENTI
+SE (areaCliccata(bNomi[1], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bNomi[1].c1+1, bNomi[1].r)
+AbilitareTastiera()
+LeggereDaTastiera(StringaInput)
+AbilitareMouse()
+Set_nomeGiocatore2(StringaInput, Impostazioni)
+ALTRIMENTI
+SE (areaCliccata(bNomi[2], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_MAIN
+FINE
+FINE
+FINE
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_MODALITA)
+ALLORA
+SE (areaCliccata(bModo[0], Riga, Colonna) = VERO)
+ALLORA
+Set_modoPartita(MODO_GIOCATORE, Impostazioni)
+Pagina = PAGINA_IMPOSTAZIONI_MAIN
+ALTRIMENTI
+SE (areaCliccata(bModo[1], Riga, Colonna) = VERO)
+ALLORA
+Set_modoPartita(MODO_CPU, Impostazioni)
+Pagina = PAGINA_IMPOSTAZIONI_MAIN
+ALTRIMENTI
+SE (areaCliccata(bModo[2], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_MAIN
+FINE
+FINE
+FINE
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_CARICA)
+ALLORA
+SE (areaCliccata(bCarica[0], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bCarica[0].c1+1, bCarica[0].r)
+AbilitareTastiera()
+LeggereDaTastiera(StringaInput)
+AbilitareMouse()
+Set_partitaPrecedente(StringaInput, Impostazioni)
+ALTRIMENTI
+SE (areaCliccata(bCarica[1], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_MAIN
+FINE
+FINE
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_SIMBOLI)
+ALLORA
+SE (areaCliccata(bSimb[0], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bSimb[0].c1+1, bSimb[0].r)
+AbilitareTastiera()
+LeggereDaTastiera(SimboloNuovo)
+AbilitareMouse()
+Set_simboloGiocatore1(SimboloNuovo, Impostazioni)
+ALTRIMENTI
+SE (areaCliccata(bSimb[1], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bSimb[1].c1+1, bSimb[1].r)
+AbilitareTastiera()
+LeggereDaTastiera(SimboloNuovo)
+AbilitareMouse()
+Set_simboloGiocatore2(SimboloNuovo, Impostazioni)
+ALTRIMENTI
+SE (areaCliccata(bSimb[2], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_MAIN
+FINE
+FINE
+FINE
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_ANNULLA)
+ALLORA
+SE (areaCliccata(bAnnulla[0], Riga, Colonna) = VERO)
+ALLORA
+resetImpostazioni(Impostazioni)
+Pagina = PAGINA_IMPOSTAZIONI_MAIN
+ALTRIMENTI
+SE (areaCliccata(bAnnulla[1], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_MAIN
+FINE
+FINE
+ALTRIMENTI
+SE (Pagina = PAGINA_IMPOSTAZIONI_ROUND)
+ALLORA
+SE (areaCliccata(bRound[0], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bRound[0].c1+1, bRound[0].r)
+AbilitareTastiera()
+LeggereDaTastiera(StringaInput)
+AbilitareMouse()
+Set_nomePartita(StringaInput, Impostazioni)
+ALTRIMENTI
+SE (areaCliccata(bRound[1], Riga, Colonna) = VERO)
+ALLORA
+GoTo(bRound[1].c1+1, bRound[1].r)
+AbilitareTastiera()
+LeggereDaTastiera(StringaInput)
+AbilitareMouse()
+Set_numeroRound(ValoreIntero(StringaInput), Impostazioni)
+ALTRIMENTI
+SE (areaCliccata(bRound[2], Riga, Colonna) = VERO)
+ALLORA Pagina = PAGINA_IMPOSTAZIONI_MAIN
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+FINE
+AbilitareTastiera()
+PulireSchermo()

@@ -1,0 +1,77 @@
+Casi di test - modulo supporto
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+stampaSchermataSupporto
+
+La funzione apre un file .txt e ne stampa il contenuto a schermo.
+
+Classi di equivalenza:
+NomeSchermata con file esistente sul percorso corretto
+NomeSchermata con file inesistente
+
+2 classi di equivalenza totali
+
+TC1  (NomeSchermata = "Supporto", file esistente)
+     Atteso: il contenuto del file viene stampato a schermo senza errori
+     Ottenuto: il contenuto del file viene stampato a schermo senza errori  [Passato]
+
+TC2  (NomeSchermata = "FileInesistente", file non presente)
+     Atteso: viene stampato "Errore caricamento schermata supporto: ..."
+     Ottenuto: viene stampato "Errore caricamento schermata supporto: ..."  [Passato]
+
+
+navigaSupporto
+
+La funzione gestisce la navigazione tra le schermate del supporto.
+
+Classi di equivalenza per la schermata corrente = PAGINA_SUPPORTO_MAIN:
+click su bSupporto[0] (REGOLAMENTO)
+click su bSupporto[1] (MANUALE)
+click su bSupporto[2] (SUGGERIMENTI)
+click su bSupporto[3] (ESCI)
+click fuori da tutti i bottoni
+
+Classi di equivalenza per la schermata corrente = PAGINA_SUPPORTO_SUGGERIMENTI:
+click su bSuggerimenti[1] (INDIETRO) con pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE
+click su bSuggerimenti[1] (INDIETRO) con pagSuggerimento > PAGINA_SUGGERIMENTO_INIZIALE
+click su bSuggerimenti[2] (AVANTI) con pagSuggerimento = PAGINA_SUGGERIMENTO_FINALE
+click su bSuggerimenti[2] (AVANTI) con pagSuggerimento < PAGINA_SUGGERIMENTO_FINALE
+
+9 classi di equivalenza totali
+
+TC3  (schermata = MAIN, click su bSupporto[0])
+     Atteso: schermata = PAGINA_SUPPORTO_REGOLAMENTO
+     Ottenuto: schermata = PAGINA_SUPPORTO_REGOLAMENTO  [Passato]
+
+TC4  (schermata = MAIN, click su bSupporto[1])
+     Atteso: schermata = PAGINA_SUPPORTO_MANUALE
+     Ottenuto: schermata = PAGINA_SUPPORTO_MANUALE  [Passato]
+
+TC5  (schermata = MAIN, click su bSupporto[2])
+     Atteso: schermata = PAGINA_SUPPORTO_SUGGERIMENTI, pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE
+     Ottenuto: schermata = PAGINA_SUPPORTO_SUGGERIMENTI, pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE  [Passato]
+
+TC6  (schermata = MAIN, click su bSupporto[3])
+     Atteso: esciSupporto = 1, il loop termina
+     Ottenuto: esciSupporto = 1, il loop termina  [Passato]
+
+TC7  (schermata = MAIN, click fuori da tutti i bottoni, riga=1, colonna=1)
+     Atteso: nessuna azione, il loop riparte
+     Ottenuto: nessuna azione, il loop riparte  [Passato]
+
+TC8  (schermata = SUGGERIMENTI, pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE, click su bSuggerimenti[1])
+     Atteso: pagSuggerimento rimane invariato a PAGINA_SUGGERIMENTO_INIZIALE
+     Ottenuto: pagSuggerimento rimane invariato a PAGINA_SUGGERIMENTO_INIZIALE  [Passato]
+
+TC9  (schermata = SUGGERIMENTI, pagSuggerimento = 3, click su bSuggerimenti[1])
+     Atteso: pagSuggerimento = 2
+     Ottenuto: pagSuggerimento = 2  [Passato]
+
+TC10 (schermata = SUGGERIMENTI, pagSuggerimento = PAGINA_SUGGERIMENTO_FINALE, click su bSuggerimenti[2])
+     Atteso: pagSuggerimento rimane invariato a PAGINA_SUGGERIMENTO_FINALE
+     Ottenuto: pagSuggerimento rimane invariato a PAGINA_SUGGERIMENTO_FINALE  [Passato]
+
+TC11 (schermata = SUGGERIMENTI, pagSuggerimento = 3, click su bSuggerimenti[2])
+     Atteso: pagSuggerimento = 4
+     Ottenuto: pagSuggerimento = 4  [Passato]

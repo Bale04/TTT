@@ -1,0 +1,53 @@
+Pseudocodice - modulo salvataggio
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Funzione salvaPartita
+INPUT
+Impostazioni, impostazioni della partita da salvare, Impostazioni
+Partita, stato della partita da salvare, Partita
+OUTPUT
+Esito, indica se il salvataggio e' andato a buon fine (ESITO_SUCCESSO) o no (ESITO_ERRORE), intero
+LAVORO
+Percorso, percorso completo del file di salvataggio, stringa di caratteri
+Fp, puntatore al file di salvataggio, file
+NomePartita, nome della partita letto dalle impostazioni, Stringa
+NomePartita = Get_nomePartita(Impostazioni)
+Percorso = PERCORSO_SALVATAGGIO_FILE + campo data di NomePartita
+Fp = AprireFile(Percorso, scrittura binaria)
+SE (Fp = NULL)
+ALLORA
+StampareAVideo("Errore apertura file per il salvataggio")
+Esito = ESITO_ERRORE
+ALTRIMENTI
+ScrivereFileBinario(Impostazioni, Fp)
+ScrivereFileBinario(Partita, Fp)
+ChiudereFile(Fp)
+Esito = ESITO_SUCCESSO
+FINE
+
+
+Funzione caricaPartita
+INPUT
+Impostazioni, impostazioni correnti, Impostazioni
+OUTPUT
+Impostazioni, impostazioni caricate dal file, Impostazioni
+Partita, stato della partita caricato dal file, Partita
+Esito, indica se il caricamento e' andato a buon fine (ESITO_SUCCESSO) o no (ESITO_ERRORE), intero
+LAVORO
+Percorso, percorso completo del file da caricare, stringa di caratteri
+Fp, puntatore al file da caricare, file
+NomePrecedente, nome del file da caricare letto dalle impostazioni, Stringa
+NomePrecedente = Get_partitaPrecedente(Impostazioni)
+Percorso = PERCORSO_SALVATAGGIO_FILE + campo data di NomePrecedente
+Fp = AprireFile(Percorso, lettura binaria)
+SE (Fp = NULL)
+ALLORA
+StampareAVideo("Errore apertura file per il caricamento")
+Esito = ESITO_ERRORE
+ALTRIMENTI
+LeggereFileBinario(Impostazioni, Fp)
+LeggereFileBinario(Partita, Fp)
+ChiudereFile(Fp)
+Esito = ESITO_SUCCESSO
+FINE

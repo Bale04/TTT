@@ -1,0 +1,60 @@
+Casi di test - modulo menu
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+stampaSchermataMenu
+
+La funzione apre un file .txt e ne stampa il contenuto a schermo.
+
+Classi di equivalenza:
+S con nome file esistente sul percorso corretto
+S con nome file inesistente
+
+2 classi di equivalenza totali
+
+TC1  (S = "MenuPrincipale", file esistente)
+     Atteso: il contenuto del file viene stampato a schermo senza errori
+     Ottenuto: il contenuto del file viene stampato a schermo senza errori  [Passato]
+
+TC2  (S = "FileInesistente", file non presente)
+     Atteso: viene stampato "Errore caricamento schermata menu: ..."
+     Ottenuto: viene stampato "Errore caricamento schermata menu: ..."  [Passato]
+
+
+navigaMenu
+
+La funzione gestisce il loop principale del menu. Esce quando si clicca il bottone ESCI (bMainMenu[4]).
+
+Classi di equivalenza per il click ricevuto:
+click su bMainMenu[0] (GIOCA)
+click su bMainMenu[1] (IMPOSTAZIONI)
+click su bMainMenu[2] (SUPPORTO)
+click su bMainMenu[3] (STATISTICHE)
+click su bMainMenu[4] (ESCI)
+click fuori da qualsiasi bottone
+
+6 classi di equivalenza totali
+
+TC3  (click su bMainMenu[0], riga=10, colonna=40)
+     Atteso: viene chiamata navigaPartita, poi si torna al loop del menu
+     Ottenuto: viene chiamata navigaPartita, poi si torna al loop del menu  [Passato]
+
+TC4  (click su bMainMenu[1], riga=12, colonna=40)
+     Atteso: viene chiamata navigaImpostazioni, poi si torna al loop del menu
+     Ottenuto: viene chiamata navigaImpostazioni, poi si torna al loop del menu  [Passato]
+
+TC5  (click su bMainMenu[2], riga=14, colonna=40)
+     Atteso: viene chiamata navigaSupporto, poi si torna al loop del menu
+     Ottenuto: viene chiamata navigaSupporto, poi si torna al loop del menu  [Passato]
+
+TC6  (click su bMainMenu[3], riga=16, colonna=40)
+     Atteso: viene chiamata navigaStatistiche, poi si torna al loop del menu
+     Ottenuto: viene chiamata navigaStatistiche, poi si torna al loop del menu  [Passato]
+
+TC7  (click su bMainMenu[4], riga=18, colonna=40)
+     Atteso: esci = 1, il loop termina, viene stampato "Arrivederci!"
+     Ottenuto: esci = 1, il loop termina, viene stampato "Arrivederci!"  [Passato]
+
+TC8  (click fuori da tutti i bottoni, riga=1, colonna=1)
+     Atteso: nessuna azione, il loop riparte dall'inizio
+     Ottenuto: nessuna azione, il loop riparte dall'inizio  [Passato]

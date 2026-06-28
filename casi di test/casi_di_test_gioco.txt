@@ -1,0 +1,252 @@
+Casi di test - modulo gioco
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Get_griglia e Set_griglia
+
+Classi di equivalenza per il simbolo:
+simbolo = il carattere X
+simbolo = il carattere O
+simbolo = spazio (cella vuota)
+
+Classi di equivalenza per la posizione:
+riga e colonna valide (da 0 a 2)
+
+3 classi di equivalenza totali
+
+TC1  (riga=0, colonna=0, simbolo = il carattere X)
+     Atteso: Get_griglia(partita, 0, 0) restituisce il carattere X
+     Ottenuto: Get_griglia(partita, 0, 0) restituisce il carattere X  [Passato]
+
+TC2  (riga=1, colonna=2, simbolo = il carattere O)
+     Atteso: Get_griglia(partita, 1, 2) restituisce il carattere O
+     Ottenuto: Get_griglia(partita, 1, 2) restituisce il carattere O  [Passato]
+
+TC3  (riga=2, colonna=1, simbolo = spazio)
+     Atteso: Get_griglia(partita, 2, 1) restituisce spazio
+     Ottenuto: Get_griglia(partita, 2, 1) restituisce spazio  [Passato]
+
+
+Get_turno e Set_turno
+
+Classi di equivalenza:
+turno = TURNO_GIOCATORE1
+turno = TURNO_GIOCATORE2
+
+2 classi di equivalenza totali
+
+TC4  (turno = TURNO_GIOCATORE1)
+     Atteso: Get_turno restituisce TURNO_GIOCATORE1
+     Ottenuto: Get_turno restituisce TURNO_GIOCATORE1  [Passato]
+
+TC5  (turno = TURNO_GIOCATORE2)
+     Atteso: Get_turno restituisce TURNO_GIOCATORE2
+     Ottenuto: Get_turno restituisce TURNO_GIOCATORE2  [Passato]
+
+
+Get_round e Set_round
+
+TC6  (round = 1)
+     Atteso: Get_round restituisce 1
+     Ottenuto: Get_round restituisce 1  [Passato]
+
+TC7  (round = 5)
+     Atteso: Get_round restituisce 5
+     Ottenuto: Get_round restituisce 5  [Passato]
+
+
+Get/Set_vittorieG1, Get/Set_sconfitteG1, Get/Set_pareggiG1
+Get/Set_vittorieG2, Get/Set_sconfitteG2, Get/Set_pareggiG2
+
+TC8  (Set_vittorieG1 con v = 3)
+     Atteso: Get_vittorieG1 restituisce 3
+     Ottenuto: Get_vittorieG1 restituisce 3  [Passato]
+
+TC9  (Set_sconfitteG2 con v = 1)
+     Atteso: Get_sconfitteG2 restituisce 1
+     Ottenuto: Get_sconfitteG2 restituisce 1  [Passato]
+
+TC10 (Set_pareggiG1 con v = 2)
+     Atteso: Get_pareggiG1 restituisce 2
+     Ottenuto: Get_pareggiG1 restituisce 2  [Passato]
+
+
+controllaVincitoreRound
+
+La funzione verifica righe, colonne e diagonali per trovare un vincitore.
+
+Classi di equivalenza:
+griglia con tre simboli uguali sulla stessa riga
+griglia con tre simboli uguali sulla stessa colonna
+griglia con tre simboli uguali sulla diagonale principale
+griglia con tre simboli uguali sulla diagonale secondaria
+griglia senza vincitore (cella vuota o simboli misti)
+
+5 classi di equivalenza totali
+
+TC11 (griglia con riga 0 tutta X: X X X / _ _ _ / _ _ _)
+     Atteso: Vincitore = il carattere X
+     Ottenuto: Vincitore = il carattere X  [Passato]
+
+TC12 (griglia con colonna 1 tutta O: _ O _ / _ O _ / _ O _)
+     Atteso: Vincitore = il carattere O
+     Ottenuto: Vincitore = il carattere O  [Passato]
+
+TC13 (griglia con diagonale principale tutta X: X _ _ / _ X _ / _ _ X)
+     Atteso: Vincitore = il carattere X
+     Ottenuto: Vincitore = il carattere X  [Passato]
+
+TC14 (griglia con diagonale secondaria tutta O: _ _ O / _ O _ / O _ _)
+     Atteso: Vincitore = il carattere O
+     Ottenuto: Vincitore = il carattere O  [Passato]
+
+TC15 (griglia senza vincitore: X O X / O X O / O X O)
+     Atteso: Vincitore = il carattere nullo
+     Ottenuto: Vincitore = il carattere nullo  [Passato]
+
+TC16 (griglia completamente vuota)
+     Atteso: Vincitore = il carattere nullo
+     Ottenuto: Vincitore = il carattere nullo  [Passato]
+
+
+grigliaPiena
+
+Classi di equivalenza:
+griglia completamente piena (nessuna cella con spazio o carattere nullo)
+griglia con almeno una cella libera
+griglia completamente vuota
+
+3 classi di equivalenza totali
+
+TC17 (griglia piena: X O X / O X O / O X O)
+     Atteso: Piena = 1
+     Ottenuto: Piena = 1  [Passato]
+
+TC18 (griglia con una sola cella libera: X O X / O _ O / O X O)
+     Atteso: Piena = 0
+     Ottenuto: Piena = 0  [Passato]
+
+TC19 (griglia completamente vuota)
+     Atteso: Piena = 0
+     Ottenuto: Piena = 0  [Passato]
+
+
+controllaVincitoreGriglia (funzione usata internamente dal bot)
+
+Stesse classi di equivalenza di controllaVincitoreRound ma applicata alla copia della griglia usata dal bot.
+
+TC20 (copia griglia con riga 2 tutta O: _ _ _ / _ _ _ / O O O)
+     Atteso: restituisce il carattere O
+     Ottenuto: restituisce il carattere O  [Passato]
+
+TC21 (copia griglia senza vincitore)
+     Atteso: restituisce il carattere nullo
+     Ottenuto: restituisce il carattere nullo  [Passato]
+
+
+mossaBot
+
+La funzione restituisce l'indice della cella migliore (0-8) usando l'algoritmo minimax.
+
+Classi di equivalenza:
+griglia con una sola mossa disponibile
+griglia con piu' mosse disponibili
+griglia completamente piena (nessuna mossa disponibile)
+
+Valori limite: cella 0 (angolo), cella 4 (centro), cella 8 (angolo opposto)
+
+3 classi di equivalenza totali
+
+TC22 (griglia con una sola cella libera in posizione 4)
+     Atteso: CellaMossa = 4
+     Ottenuto: CellaMossa = 4  [Passato]
+
+TC23 (griglia completamente vuota, bot sceglie la mossa migliore)
+     Atteso: CellaMossa tra 0 e 8 (mossa valida)
+     Ottenuto: CellaMossa tra 0 e 8 (mossa valida)  [Passato]
+
+TC24 (griglia piena, nessuna mossa disponibile)
+     Atteso: CellaMossa = CELLA_NON_VALIDA
+     Ottenuto: CellaMossa = CELLA_NON_VALIDA  [Passato]
+
+TC25 (bot con simbolo O puo' vincere al prossimo turno: X _ X / O O _ / _ _ _)
+     Atteso: il bot sceglie la cella che gli garantisce la vittoria (colonna 2, riga 1 -> cella 5)
+     Ottenuto: il bot sceglie la cella 5  [Passato]
+
+
+navigaPartita
+
+Classi di equivalenza per lo stato iniziale:
+partitaPrecedente non vuota e file esistente (caricamento)
+partitaPrecedente non vuota e file inesistente (nuova partita per fallimento)
+partitaPrecedente vuota (nuova partita)
+
+Classi di equivalenza per il click durante il gioco:
+click su cella libera, turno giocatore 1
+click su cella libera, turno giocatore 2 (modo giocatore)
+click su cella gia' occupata
+click su bGiocoMenu[0] (ESCI al menu)
+click su bGiocoMenu[1] (SALVA), poi conferma con bSalvaConferma[0]
+click su bGiocoMenu[1] (SALVA), poi annulla con bSalvaConferma[1]
+click su bGiocoMenu[2] (SUPPORTO)
+
+Classi di equivalenza per la fine del round:
+round terminato con vincitore e round non e' l'ultimo
+round terminato con pareggio e round non e' l'ultimo
+round terminato e e' l'ultimo round, G1 ha piu' vittorie
+round terminato e e' l'ultimo round, G2 ha piu' vittorie
+round terminato e e' l'ultimo round, pareggio finale
+
+10 classi di equivalenza totali
+
+TC26 (partitaPrecedente = "partita1", file esistente)
+     Atteso: la partita viene caricata, partitaPrecedente viene svuotata
+     Ottenuto: la partita viene caricata, partitaPrecedente viene svuotata  [Passato]
+
+TC27 (partitaPrecedente = "fileinesistente", file non trovato)
+     Atteso: viene inizializzata una nuova partita con turno = 1, round = 1, griglia vuota
+     Ottenuto: viene inizializzata una nuova partita con turno = 1, round = 1, griglia vuota  [Passato]
+
+TC28 (partitaPrecedente = "", nuova partita)
+     Atteso: turno = TURNO_GIOCATORE1, round = 1, griglia vuota, statistiche a 0
+     Ottenuto: turno = TURNO_GIOCATORE1, round = 1, griglia vuota, statistiche a 0  [Passato]
+
+TC29 (click su cella libera [0][0], turno = TURNO_GIOCATORE1, simboloG1 = il carattere X)
+     Atteso: griglia[0][0] = il carattere X, turno passa a TURNO_GIOCATORE2
+     Ottenuto: griglia[0][0] = il carattere X, turno passa a TURNO_GIOCATORE2  [Passato]
+
+TC30 (click su cella gia' occupata)
+     Atteso: la griglia non viene modificata, il turno non cambia
+     Ottenuto: la griglia non viene modificata, il turno non cambia  [Passato]
+
+TC31 (click su bGiocoMenu[0])
+     Atteso: esci = 1, il loop termina
+     Ottenuto: esci = 1, il loop termina  [Passato]
+
+TC32 (click su bGiocoMenu[1], poi click su bSalvaConferma[0])
+     Atteso: la partita viene salvata su file, esci = 1
+     Ottenuto: la partita viene salvata su file, esci = 1  [Passato]
+
+TC33 (click su bGiocoMenu[1], poi click su bSalvaConferma[1])
+     Atteso: la partita non viene salvata, si torna al gioco
+     Ottenuto: la partita non viene salvata, si torna al gioco  [Passato]
+
+TC34 (il simbolo X completa una riga, round non e' l'ultimo)
+     Atteso: vittorieG1 aumenta di 1, sconfitteG2 aumenta di 1, round aumenta di 1, griglia resettata
+     Ottenuto: vittorieG1 aumenta di 1, sconfitteG2 aumenta di 1, round aumenta di 1, griglia resettata  [Passato]
+
+TC35 (griglia piena senza vincitore, round non e' l'ultimo)
+     Atteso: pareggiG1 e pareggiG2 aumentano di 1, round aumenta di 1, griglia resettata
+     Ottenuto: pareggiG1 e pareggiG2 aumentano di 1, round aumenta di 1, griglia resettata  [Passato]
+
+TC36 (fine ultimo round, G1 ha piu' vittorie)
+     Atteso: salvaStatistichePartita chiamata con RISULTATO_VITTORIA_G1, schermata vittoria mostrata
+     Ottenuto: salvaStatistichePartita chiamata con RISULTATO_VITTORIA_G1, schermata vittoria mostrata  [Passato]
+
+TC37 (fine ultimo round, G2 ha piu' vittorie)
+     Atteso: salvaStatistichePartita chiamata con RISULTATO_VITTORIA_G2, schermata vittoria mostrata
+     Ottenuto: salvaStatistichePartita chiamata con RISULTATO_VITTORIA_G2, schermata vittoria mostrata  [Passato]
+
+TC38 (fine ultimo round, pareggio)
+     Atteso: salvaStatistichePartita chiamata con RISULTATO_PAREGGIO, schermata vittoria mostrata
+     Ottenuto: salvaStatistichePartita chiamata con RISULTATO_PAREGGIO, schermata vittoria mostrata  [Passato]

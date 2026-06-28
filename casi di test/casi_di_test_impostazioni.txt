@@ -1,0 +1,253 @@
+Casi di test - modulo impostazioni
+Autori: Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato
+
+
+Get_modoPartita e Set_modoPartita
+
+Classi di equivalenza:
+m = MODO_GIOCATORE (0)
+m = MODO_CPU (1)
+m diverso da entrambi i valori validi
+
+3 classi di equivalenza totali
+
+TC1  (m = MODO_GIOCATORE)
+     Atteso: Get_modoPartita restituisce MODO_GIOCATORE
+     Ottenuto: Get_modoPartita restituisce MODO_GIOCATORE  [Passato]
+
+TC2  (m = MODO_CPU)
+     Atteso: Get_modoPartita restituisce MODO_CPU
+     Ottenuto: Get_modoPartita restituisce MODO_CPU  [Passato]
+
+TC3  (m = 5)
+     Atteso: Get_modoPartita restituisce 5 (la funzione non valida il valore)
+     Ottenuto: Get_modoPartita restituisce 5  [Passato]
+
+
+Get_nomeGiocatore1 e Set_nomeGiocatore1
+Get_nomeGiocatore2 e Set_nomeGiocatore2
+
+La stringa e' limitata a LUNGHEZZA_STRINGA - 1 caratteri (19 caratteri).
+
+Classi di equivalenza:
+stringa vuota
+stringa di lunghezza 1
+stringa di lunghezza 19 (massimo valido)
+stringa di lunghezza 20 o piu' (tronca a 19)
+
+4 classi di equivalenza totali
+
+TC4  (n = "")
+     Atteso: Get_nomeGiocatore1 restituisce stringa vuota
+     Ottenuto: Get_nomeGiocatore1 restituisce stringa vuota  [Passato]
+
+TC5  (n = "a")
+     Atteso: Get_nomeGiocatore1 restituisce "a"
+     Ottenuto: Get_nomeGiocatore1 restituisce "a"  [Passato]
+
+TC6  (n = "abcdefghijklmnopqrs", 19 caratteri)
+     Atteso: Get_nomeGiocatore1 restituisce "abcdefghijklmnopqrs"
+     Ottenuto: Get_nomeGiocatore1 restituisce "abcdefghijklmnopqrs"  [Passato]
+
+TC7  (n = "abcdefghijklmnopqrst", 20 caratteri)
+     Atteso: Get_nomeGiocatore1 restituisce "abcdefghijklmnopqrs" (troncata a 19)
+     Ottenuto: Get_nomeGiocatore1 restituisce "abcdefghijklmnopqrs"  [Passato]
+
+
+Get_simboloGiocatore1 e Set_simboloGiocatore1
+Get_simboloGiocatore2 e Set_simboloGiocatore2
+
+Classi di equivalenza:
+simbolo = carattere X
+simbolo = carattere O
+simbolo = altro carattere stampabile
+
+3 classi di equivalenza totali
+
+TC8  (s = il carattere X)
+     Atteso: Get_simboloGiocatore1 restituisce il carattere X
+     Ottenuto: Get_simboloGiocatore1 restituisce il carattere X  [Passato]
+
+TC9  (s = il carattere O)
+     Atteso: Get_simboloGiocatore1 restituisce il carattere O
+     Ottenuto: Get_simboloGiocatore1 restituisce il carattere O  [Passato]
+
+TC10 (s = il carattere Z)
+     Atteso: Get_simboloGiocatore1 restituisce il carattere Z
+     Ottenuto: Get_simboloGiocatore1 restituisce il carattere Z  [Passato]
+
+
+Get_numeroRound e Set_numeroRound
+
+Il numero di round e' limitato a MAX_ROUND (99).
+
+Classi di equivalenza:
+r = 0
+r tra 1 e 98
+r = 99 (MAX_ROUND)
+r maggiore di 99
+
+Valori limite: r = 1, r = 98, r = 99, r = 100
+
+4 classi di equivalenza totali
+
+TC11 (r = 0)
+     Atteso: Get_numeroRound restituisce 0
+     Ottenuto: Get_numeroRound restituisce 0  [Passato]
+
+TC12 (r = 1)
+     Atteso: Get_numeroRound restituisce 1
+     Ottenuto: Get_numeroRound restituisce 1  [Passato]
+
+TC13 (r = 50)
+     Atteso: Get_numeroRound restituisce 50
+     Ottenuto: Get_numeroRound restituisce 50  [Passato]
+
+TC14 (r = 98)
+     Atteso: Get_numeroRound restituisce 98
+     Ottenuto: Get_numeroRound restituisce 98  [Passato]
+
+TC15 (r = 99)
+     Atteso: Get_numeroRound restituisce 99
+     Ottenuto: Get_numeroRound restituisce 99  [Passato]
+
+TC16 (r = 100)
+     Atteso: Get_numeroRound restituisce 99 (limitato a MAX_ROUND)
+     Ottenuto: Get_numeroRound restituisce 99  [Passato]
+
+
+Get_nomePartita e Set_nomePartita
+
+Stesse classi di equivalenza di Get/Set_nomeGiocatore1.
+
+TC17 (n = "")
+     Atteso: Get_nomePartita restituisce stringa vuota
+     Ottenuto: Get_nomePartita restituisce stringa vuota  [Passato]
+
+TC18 (n = "partita")
+     Atteso: Get_nomePartita restituisce "partita"
+     Ottenuto: Get_nomePartita restituisce "partita"  [Passato]
+
+TC19 (n = "abcdefghijklmnopqrst", 20 caratteri)
+     Atteso: Get_nomePartita restituisce "abcdefghijklmnopqrs" (troncata a 19)
+     Ottenuto: Get_nomePartita restituisce "abcdefghijklmnopqrs"  [Passato]
+
+
+Get_partitaPrecedente e Set_partitaPrecedente
+
+TC20 (p = "")
+     Atteso: Get_partitaPrecedente restituisce stringa vuota
+     Ottenuto: Get_partitaPrecedente restituisce stringa vuota  [Passato]
+
+TC21 (p = "salvataggio1")
+     Atteso: Get_partitaPrecedente restituisce "salvataggio1"
+     Ottenuto: Get_partitaPrecedente restituisce "salvataggio1"  [Passato]
+
+
+Get_annullaImpostazioni e Set_annullaImpostazioni
+
+Classi di equivalenza:
+x = IMPOSTAZIONI_DEFAULT (1): deve resettare tutti i campi ai valori di default
+x = IMPOSTAZIONI_MODIFICATE (0): aggiorna solo il flag
+
+2 classi di equivalenza totali
+
+TC22 (x = IMPOSTAZIONI_DEFAULT)
+     Atteso: annullaImpostazioni = 1, nomeGiocatore1 = "giocatore1", nomeGiocatore2 = "giocatore2",
+             modoPartita = MODO_CPU, simboloGiocatore1 = il carattere X,
+             simboloGiocatore2 = il carattere O, numeroRound = 1, nomePartita = "partita"
+     Ottenuto: annullaImpostazioni = 1, nomeGiocatore1 = "giocatore1", nomeGiocatore2 = "giocatore2",
+               modoPartita = MODO_CPU, simboloGiocatore1 = il carattere X,
+               simboloGiocatore2 = il carattere O, numeroRound = 1, nomePartita = "partita"  [Passato]
+
+TC23 (x = IMPOSTAZIONI_MODIFICATE)
+     Atteso: annullaImpostazioni = 0, gli altri campi non vengono modificati
+     Ottenuto: annullaImpostazioni = 0, gli altri campi non vengono modificati  [Passato]
+
+
+resetImpostazioni
+
+TC24 (chiamata con qualsiasi stato delle impostazioni)
+     Atteso: nomeGiocatore1 = "giocatore1", nomeGiocatore2 = "giocatore2",
+             modoPartita = MODO_CPU, partitaPrecedente = "",
+             simboloGiocatore1 = il carattere X, simboloGiocatore2 = il carattere O,
+             annullaImpostazioni = IMPOSTAZIONI_DEFAULT, numeroRound = 1, nomePartita = "partita"
+     Ottenuto: nomeGiocatore1 = "giocatore1", nomeGiocatore2 = "giocatore2",
+               modoPartita = MODO_CPU, partitaPrecedente = "",
+               simboloGiocatore1 = il carattere X, simboloGiocatore2 = il carattere O,
+               annullaImpostazioni = IMPOSTAZIONI_DEFAULT, numeroRound = 1, nomePartita = "partita"  [Passato]
+
+
+navigaImpostazioni
+
+Classi di equivalenza per la pagina corrente = PAGINA_IMPOSTAZIONI_MAIN:
+click su bMenu[0] (NOMI)
+click su bMenu[1] (MODALITA)
+click su bMenu[2] (CARICA)
+click su bMenu[3] (SIMBOLI)
+click su bMenu[4] (ANNULLA)
+click su bMenu[5] (ROUND)
+click su bMenu[6] (ESCI)
+click fuori da tutti i bottoni
+
+8 classi di equivalenza totali per la pagina MAIN
+
+TC25 (pagina = MAIN, click su bMenu[0])
+     Atteso: pagina = PAGINA_IMPOSTAZIONI_NOMI
+     Ottenuto: pagina = PAGINA_IMPOSTAZIONI_NOMI  [Passato]
+
+TC26 (pagina = MAIN, click su bMenu[1])
+     Atteso: pagina = PAGINA_IMPOSTAZIONI_MODALITA
+     Ottenuto: pagina = PAGINA_IMPOSTAZIONI_MODALITA  [Passato]
+
+TC27 (pagina = MAIN, click su bMenu[2])
+     Atteso: pagina = PAGINA_IMPOSTAZIONI_CARICA
+     Ottenuto: pagina = PAGINA_IMPOSTAZIONI_CARICA  [Passato]
+
+TC28 (pagina = MAIN, click su bMenu[3])
+     Atteso: pagina = PAGINA_IMPOSTAZIONI_SIMBOLI
+     Ottenuto: pagina = PAGINA_IMPOSTAZIONI_SIMBOLI  [Passato]
+
+TC29 (pagina = MAIN, click su bMenu[4])
+     Atteso: pagina = PAGINA_IMPOSTAZIONI_ANNULLA
+     Ottenuto: pagina = PAGINA_IMPOSTAZIONI_ANNULLA  [Passato]
+
+TC30 (pagina = MAIN, click su bMenu[5])
+     Atteso: pagina = PAGINA_IMPOSTAZIONI_ROUND
+     Ottenuto: pagina = PAGINA_IMPOSTAZIONI_ROUND  [Passato]
+
+TC31 (pagina = MAIN, click su bMenu[6])
+     Atteso: esci = 1, il loop termina
+     Ottenuto: esci = 1, il loop termina  [Passato]
+
+TC32 (pagina = MAIN, click fuori da tutti i bottoni, riga=1, colonna=1)
+     Atteso: nessuna azione, il loop riparte
+     Ottenuto: nessuna azione, il loop riparte  [Passato]
+
+TC33 (pagina = NOMI, click su bNomi[0], inserimento "mario")
+     Atteso: nomeGiocatore1 = "mario"
+     Ottenuto: nomeGiocatore1 = "mario"  [Passato]
+
+TC34 (pagina = NOMI, click su bNomi[2])
+     Atteso: pagina = PAGINA_IMPOSTAZIONI_MAIN
+     Ottenuto: pagina = PAGINA_IMPOSTAZIONI_MAIN  [Passato]
+
+TC35 (pagina = MODALITA, click su bModo[0])
+     Atteso: modoPartita = MODO_GIOCATORE, pagina = PAGINA_IMPOSTAZIONI_MAIN
+     Ottenuto: modoPartita = MODO_GIOCATORE, pagina = PAGINA_IMPOSTAZIONI_MAIN  [Passato]
+
+TC36 (pagina = MODALITA, click su bModo[1])
+     Atteso: modoPartita = MODO_CPU, pagina = PAGINA_IMPOSTAZIONI_MAIN
+     Ottenuto: modoPartita = MODO_CPU, pagina = PAGINA_IMPOSTAZIONI_MAIN  [Passato]
+
+TC37 (pagina = ROUND, click su bRound[1], inserimento "5")
+     Atteso: numeroRound = 5
+     Ottenuto: numeroRound = 5  [Passato]
+
+TC38 (pagina = ROUND, click su bRound[1], inserimento "999")
+     Atteso: numeroRound = 99 (limitato a MAX_ROUND)
+     Ottenuto: numeroRound = 99  [Passato]
+
+TC39 (pagina = ANNULLA, click su bAnnulla[0])
+     Atteso: le impostazioni vengono resettate ai valori di default, pagina = PAGINA_IMPOSTAZIONI_MAIN
+     Ottenuto: le impostazioni vengono resettate ai valori di default, pagina = PAGINA_IMPOSTAZIONI_MAIN  [Passato]
