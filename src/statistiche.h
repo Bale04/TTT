@@ -1,35 +1,35 @@
-#ifndef statistiche_H
-#define statistiche_H
+#ifndef STATS_H
+#define STATS_H
 
+#include "costanti.h"
 #include "strutture.h"
 
-// numero massimo di avversari per pagina nella schermata StatisticheLista
-// numero massimo di avversari per pagina nella schermata StatisticheLista
-const int AVVERSARI_PER_PAGINA = 5;
+// numero massimo di avversari per pagina nella schermata StatsList
+const int OPPONENTS_PER_PAGE = 5;
 
-// associa un nome avversario alla struttura Statistiche
+// associa un nome avversario alla struttura Stats
 typedef struct {
-    char nomeAvversario[20];
-    Statistiche stats;
-} RecordAvversario;
+    char opponent_name[STRING_LENGTH];
+    Stats stats;
+} OpponentRecord;
 
-// bottoni della schermata StatisticheMenu (RICERCA, ESCI)
-AreaCliccabile bStatMenu[] = {{14, 38, 42}, {18, 38, 43}};
+// bottoni della schermata StatsMenu (RICERCA, ESCI)
+ClickableArea btn_stat_menu[] = {{14, 38, 42}, {18, 38, 43}};
 
 // ESCI - INDIETRO - AVANTI
-AreaCliccabile bLista[] = {{18, 38, 43}, {20, 5, 9}, {20, 73, 76}};
+ClickableArea btn_list[] = {{18, 38, 43}, {20, 5, 9}, {20, 73, 76}};
 
 // nomi delle schermate
-Stringa schermateStatistiche[2] = {{"StatisticheMenu"}, {"StatisticheLista"}};
+String stats_screens[] = {{"StatisticheMenu"}, {"StatisticheLista"}};
 
 // percorso interfacce statistiche
-const char PERCORSO_STATISTICHE[80] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/Statistiche/%s.txt";
+const char STATS_PATH[] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/Statistiche/%s.txt";
 
 // percorso file statistiche salvate
-const char PERCORSO_STATS_SALVATE[80] = "C:/Users/Bale/Desktop/git/TTT/StatisticheSalvate/%s";
+const char SAVED_STATS_PATH[] = "C:/Users/Bale/Desktop/git/TTT/StatisticheSalvate/%s";
 
 // Dichiarazione funzioni
-void navigaStatistiche(void);
-void salvaStatistichePartita(const char *nomeG1, const char *nomeG2, int risultato);
+void navigate_stats(void);
+void save_game_stats(const char *p1_name, const char *p2_name, int result);
 
 #endif

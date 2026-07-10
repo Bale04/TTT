@@ -11,132 +11,168 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "mouse.h"
 #include "gioco.h"
 
 #pragma region funzioni esterne
 // funzioni esterne da supporto.c
-extern void navigaSupporto(void);
+extern void navigate_support(void);
 
 // funzioni esterne da salvataggio.c
-extern int salvaPartita(const Impostazioni *impostazioni, const Partita *partita);
-extern int caricaPartita(Impostazioni *impostazioni, Partita *partita);
+extern int save_game(const Settings *settings, const Game *game);
+extern int load_game(Settings *settings, Game *game);
 
 // funzione esterna da statistiche.c
-extern void salvaStatistichePartita(const char *nomeG1, const char *nomeG2, int risultato);
+extern void save_game_stats(const char *player1_name, const char *player2_name, int result);
 
 // funzioni esterne da impostazioni.c
-extern Stringa Get_nomePartita(Impostazioni impostazioni);
-extern Stringa Get_nomeGiocatore1(Impostazioni impostazioni);
-extern Stringa Get_nomeGiocatore2(Impostazioni impostazioni);
-extern int Get_numeroRound(Impostazioni impostazioni);
-extern char Get_simboloGiocatore1(Impostazioni impostazioni);
-extern char Get_simboloGiocatore2(Impostazioni impostazioni);
-extern int Get_modoPartita(Impostazioni impostazioni);
+extern String get_game_name(Settings settings);
+extern String get_player1_name(Settings settings);
+extern String get_player2_name(Settings settings);
+extern int get_num_rounds(Settings settings);
+extern char get_p1_symbol(Settings settings);
+extern char get_p2_symbol(Settings settings);
+extern int get_game_mode(Settings settings);
 #pragma endregion
 
 #pragma region dichiarazioni funzioni
-// funzioni di accesso Partita
-void Set_griglia(Partita *partita, int riga, int colonna, char simbolo);
-char Get_griglia(Partita partita, int riga, int colonna);
-void Set_turno(Partita *partita, int turno);
-int Get_turno(Partita partita);
-void Set_round(Partita *partita, int round);
-int Get_round(Partita partita);
-// funzioni di accesso Partita - statisticheG1
-int Get_vittorieG1(Partita partita);
-void Set_vittorieG1(Partita *partita, int v);
-int Get_sconfitteG1(Partita partita);
-void Set_sconfitteG1(Partita *partita, int v);
-int Get_pareggiG1(Partita partita);
-void Set_pareggiG1(Partita *partita, int v);
-// funzioni di accesso Partita - statisticheG2
-int Get_vittorieG2(Partita partita);
-void Set_vittorieG2(Partita *partita, int v);
-int Get_sconfitteG2(Partita partita);
-void Set_sconfitteG2(Partita *partita, int v);
-int Get_pareggiG2(Partita partita);
-void Set_pareggiG2(Partita *partita, int v);
+// funzioni di accesso Game
+void set_grid(Game *game, int row, int col, char symbol);
+char get_grid(Game game, int row, int col);
+void set_turn(Game *game, int turn);
+int get_turn(Game game);
+void set_round(Game *game, int round);
+int get_round(Game game);
+// funzioni di accesso Game - p1_stats
+int get_p1_wins(Game game);
+void set_p1_wins(Game *game, int v);
+int get_p1_losses(Game game);
+void set_p1_losses(Game *game, int v);
+int get_p1_draws(Game game);
+void set_p1_draws(Game *game, int v);
+// funzioni di accesso Game - p2_stats
+int get_p2_wins(Game game);
+void set_p2_wins(Game *game, int v);
+int get_p2_losses(Game game);
+void set_p2_losses(Game *game, int v);
+int get_p2_draws(Game game);
+void set_p2_draws(Game *game, int v);
 
 // funzioni di stampa
-void stampaSchermataGioco(Stringa s);
-void stampaGioco(Partita partita, Impostazioni impostazioni);
+void print_game_screen(String s);
+void print_game(Game game, Settings settings);
 
 // funzione di navigazione
-void navigaPartita(Partita *partita, Impostazioni *impostazioni);
+void navigate_game(Game *game, Settings *settings);
 
 // funzioni di verifica stato round
-char controllaVincitoreRound(Partita partita);
-int grigliaPiena(Partita partita);
+char get_round_winner(Game game);
+int is_grid_full(Game game);
 
 // funzioni bot CPU
-char controllaVincitoreGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]);
-int controlloGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]);
-int calcolaPunteggio(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA], char simboloBot, char simboloAvversario, int isMaximizing);
-int mossaBot(Partita partita, char simboloBot, char simboloAvversario);
+char get_grid_winner(char g[GRID_SIZE][GRID_SIZE]);
+int is_grid_full_copy(char g[GRID_SIZE][GRID_SIZE]);
+int calculate_score(char g[GRID_SIZE][GRID_SIZE], char bot_symbol, char opponent_symbol, int isMaximizing);
+int bot_move(Game game, char bot_symbol, char opponent_symbol);
 
 #pragma endregion
 
-// ------------------------- FUNZIONI DI ACCESSO PARTITA -------------------------------
+// ------------------------- FUNZIONI DI ACCESSO GAME -------------------------------
 #pragma region funzioni di accesso
 
-// ---------------------GRIGLIA---------------------------
-void Set_griglia(Partita *partita, int riga, int colonna, char simbolo){
-    partita->griglia[riga][colonna] = simbolo;
+// ---------------------GRID---------------------------
+void set_grid(Game *game, int row, int col, char symbol)
+{
+    game->grid[row][col] = symbol;
 }
-char Get_griglia(Partita partita, int riga, int colonna){
-    return partita.griglia[riga][colonna];
+
+char get_grid(Game game, int row, int col)
+{
+    return game.grid[row][col];
 }
-// ---------------------TURNO---------------------------
-void Set_turno(Partita *partita, int turno){
-    partita->turno = turno;
+
+// ---------------------TURN---------------------------
+void set_turn(Game *game, int turn)
+{
+    game->turn = turn;
 }
-int Get_turno(Partita partita){
-    return partita.turno;
+
+int get_turn(Game game)
+{
+    return game.turn;
 }
+
 // ---------------------ROUND---------------------------
-void Set_round(Partita *partita, int round){
-    partita->round = round;
+void set_round(Game *game, int round)
+{
+    game->round = round;
 }
-int Get_round(Partita partita){
-    return partita.round;
+
+int get_round(Game game)
+{
+    return game.round;
 }
-// ---------------------STATISTICHE G1---------------------------
-void Set_vittorieG1(Partita *partita, int v){
-    partita->statisticheG1.numeroVittorie = v;
+
+// ---------------------STATS P1---------------------------
+void set_p1_wins(Game *game, int v)
+{
+    game->p1_stats.wins = v;
 }
-int Get_vittorieG1(Partita partita){
-    return partita.statisticheG1.numeroVittorie;
+
+int get_p1_wins(Game game)
+{
+    return game.p1_stats.wins;
 }
-void Set_sconfitteG1(Partita *partita, int v){
-    partita->statisticheG1.numeroSconfitte = v;
+
+void set_p1_losses(Game *game, int v)
+{
+    game->p1_stats.losses = v;
 }
-int Get_sconfitteG1(Partita partita){
-    return partita.statisticheG1.numeroSconfitte;
+
+int get_p1_losses(Game game)
+{
+    return game.p1_stats.losses;
 }
-void Set_pareggiG1(Partita *partita, int v){
-    partita->statisticheG1.numeroPareggi = v;
+
+void set_p1_draws(Game *game, int v)
+{
+    game->p1_stats.draws = v;
 }
-int Get_pareggiG1(Partita partita){
-    return partita.statisticheG1.numeroPareggi;
+
+int get_p1_draws(Game game)
+{
+    return game.p1_stats.draws;
 }
-// ---------------------STATISTICHE G2---------------------------
-void Set_vittorieG2(Partita *partita, int v){
-    partita->statisticheG2.numeroVittorie = v;
+
+// ---------------------STATS P2---------------------------
+void set_p2_wins(Game *game, int v)
+{
+    game->p2_stats.wins = v;
 }
-int Get_vittorieG2(Partita partita){
-    return partita.statisticheG2.numeroVittorie;
+
+int get_p2_wins(Game game)
+{
+    return game.p2_stats.wins;
 }
-void Set_sconfitteG2(Partita *partita, int v){
-    partita->statisticheG2.numeroSconfitte = v;
+
+void set_p2_losses(Game *game, int v)
+{
+    game->p2_stats.losses = v;
 }
-int Get_sconfitteG2(Partita partita){
-    return partita.statisticheG2.numeroSconfitte;
+
+int get_p2_losses(Game game)
+{
+    return game.p2_stats.losses;
 }
-void Set_pareggiG2(Partita *partita, int v){
-    partita->statisticheG2.numeroPareggi = v;
+
+void set_p2_draws(Game *game, int v)
+{
+    game->p2_stats.draws = v;
 }
-int Get_pareggiG2(Partita partita){
-    return partita.statisticheG2.numeroPareggi;
+
+int get_p2_draws(Game game)
+{
+    return game.p2_stats.draws;
 }
 
 #pragma endregion
@@ -145,148 +181,163 @@ int Get_pareggiG2(Partita partita){
 #pragma region bot
 
 // controlla il vincitore sulla copia della griglia usata dal bot
-char controllaVincitoreGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]){
-    char vincitore = '\0';
+char get_grid_winner(char g[GRID_SIZE][GRID_SIZE])
+{
+    char winner = '\0';
     int r;
     int c;
 
     // Controlla righe
     r = 0;
-    while (r < DIMENSIONE_GRIGLIA && vincitore == '\0'){
-        if (g[r][0] != ' ' && g[r][0] != '\0' && g[r][0] == g[r][1] && g[r][1] == g[r][2]){
-            vincitore = g[r][0];
+    while (r < GRID_SIZE && winner == '\0') {
+        if ((g[r][0] != ' ') &&
+            (g[r][0] != '\0') &&
+            (g[r][0] == g[r][1]) &&
+            (g[r][1] == g[r][2])) {
+            winner = g[r][0];
         }
         r = r + 1;
     }
 
     // Controlla colonne
     c = 0;
-    while (c < DIMENSIONE_GRIGLIA && vincitore == '\0'){
-        if (g[0][c] != ' ' && g[0][c] != '\0' && g[0][c] == g[1][c] && g[1][c] == g[2][c]){
-            vincitore = g[0][c];
+    while (c < GRID_SIZE && winner == '\0') {
+        if ((g[0][c] != ' ') &&
+            (g[0][c] != '\0') &&
+            (g[0][c] == g[1][c]) &&
+            (g[1][c] == g[2][c])) {
+            winner = g[0][c];
         }
         c = c + 1;
     }
 
     // Controlla diagonale principale e secondaria
-    if (vincitore == '\0'){
-        if (g[0][0] != ' ' && g[0][0] != '\0' && g[0][0] == g[1][1] && g[1][1] == g[2][2]){
-            vincitore = g[0][0];
-        }else if (g[0][2] != ' ' && g[0][2] != '\0' && g[0][2] == g[1][1] && g[1][1] == g[2][0]){
-            vincitore = g[0][2];
+    if (winner == '\0') {
+        if ((g[0][0] != ' ') &&
+            (g[0][0] != '\0') &&
+            (g[0][0] == g[1][1]) &&
+            (g[1][1] == g[2][2])) {
+            winner = g[0][0];
+        } else if ((g[0][2] != ' ') &&
+                   (g[0][2] != '\0') &&
+                   (g[0][2] == g[1][1]) &&
+                   (g[1][1] == g[2][0])) {
+            winner = g[0][2];
         }
     }
 
-    return vincitore;
+    return winner;
 }
 
-// controlla se la griglia è piena
-int controlloGriglia(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]){
-    int piena;
+// controlla se la griglia e' piena
+int is_grid_full_copy(char g[GRID_SIZE][GRID_SIZE])
+{
+    int full = 1;
     int r;
     int c;
 
-    piena = 1;
     r = 0;
     c = 0;
 
     // Scansiona le 9 celle
-    while (r < DIMENSIONE_GRIGLIA && piena == 1){
+    while (r < GRID_SIZE && full == 1) {
         c = 0;
-        while (c < DIMENSIONE_GRIGLIA && piena == 1){
-            if (g[r][c] == ' ' || g[r][c] == '\0'){
-                piena = 0;
+        while (c < GRID_SIZE && full == 1) {
+            if (g[r][c] == ' ' || g[r][c] == '\0') {
+                full = 0;
             }
             c = c + 1;
         }
         r = r + 1;
     }
 
-    return piena;
+    return full;
 }
 
 // algoritmo ricorsivo per il calcolo del punteggio della posizione
 // isMaximizing == 1: turno del bot (massimizza)
 // isMaximizing == 0: turno del giocatore (minimizza)
-int calcolaPunteggio(char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA], char simboloBot, char simboloAvversario, int isMaximizing){
-    int punteggio;
+int calculate_score(char g[GRID_SIZE][GRID_SIZE], char bot_symbol, char opponent_symbol, int isMaximizing)
+{
+    int score;
     int r;
     int c;
     int p;
-    int migliore;
-    char vincitore;
+    int best;
+    char winner;
 
-    punteggio = 0;
-    vincitore = controllaVincitoreGriglia(g);
+    score = 0;
+    winner = get_grid_winner(g);
 
-    if (vincitore == simboloBot){
-        punteggio = PUNTEGGIO_VITTORIA;
-    }else if (vincitore == simboloAvversario){
-        punteggio = PUNTEGGIO_SCONFITTA;
-    }else if (controlloGriglia(g)){
-        punteggio = RISULTATO_PAREGGIO;
-    }else{
-        if (isMaximizing){
-            migliore = PUNTEGGIO_MINIMO;
+    if (winner == bot_symbol) {
+        score = SCORE_WIN;
+    } else if (winner == opponent_symbol) {
+        score = SCORE_LOSS;
+    } else if (is_grid_full_copy(g)) {
+        score = RESULT_DRAW;
+    } else {
+        if (isMaximizing) {
+            best = MIN_SCORE;
             r = 0;
             c = 0;
-            while (r < DIMENSIONE_GRIGLIA){
+            while (r < GRID_SIZE) {
                 c = 0;
-                while (c < DIMENSIONE_GRIGLIA){
-                    if (g[r][c] == ' ' || g[r][c] == '\0'){
-                        g[r][c] = simboloBot;
-                        p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
+                while (c < GRID_SIZE) {
+                    if (g[r][c] == ' ' || g[r][c] == '\0') {
+                        g[r][c] = bot_symbol;
+                        p = calculate_score(g, bot_symbol, opponent_symbol, 0);
                         g[r][c] = ' ';
-                        if (p > migliore){
-                            migliore = p;
+                        if (p > best) {
+                            best = p;
                         }
                     }
                     c = c + 1;
                 }
                 r = r + 1;
             }
-            punteggio = migliore;
-        }else{
-            migliore = PUNTEGGIO_MASSIMO;
+            score = best;
+        } else {
+            best = MAX_SCORE;
             r = 0;
             c = 0;
-            while (r < DIMENSIONE_GRIGLIA){
+            while (r < GRID_SIZE) {
                 c = 0;
-                while (c < DIMENSIONE_GRIGLIA){
-                    if (g[r][c] == ' ' || g[r][c] == '\0'){
-                        g[r][c] = simboloAvversario;
-                        p = calcolaPunteggio(g, simboloBot, simboloAvversario, 1);
+                while (c < GRID_SIZE) {
+                    if (g[r][c] == ' ' || g[r][c] == '\0') {
+                        g[r][c] = opponent_symbol;
+                        p = calculate_score(g, bot_symbol, opponent_symbol, 1);
                         g[r][c] = ' ';
-                        if (p < migliore){
-                            migliore = p;
+                        if (p < best) {
+                            best = p;
                         }
                     }
                     c = c + 1;
                 }
                 r = r + 1;
             }
-            punteggio = migliore;
+            score = best;
         }
     }
 
-    return punteggio;
+    return score;
 }
 
 // restituisce la cella migliore (0-8) per il bot, o -1 se nessuna mossa disponibile
-int mossaBot(Partita partita, char simboloBot, char simboloAvversario){
-    char g[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA];
-    int migliore = PUNTEGGIO_MINIMO;
+int bot_move(Game game, char bot_symbol, char opponent_symbol)
+{
+    char g[GRID_SIZE][GRID_SIZE];
+    int best = MIN_SCORE;
     int r;
     int c;
     int p;
-    int cellaMossa = CELLA_NON_VALIDA;
+    int move_cell = INVALID_CELL;
 
     // Copia lo stato della griglia
     r = 0;
-    while (r < DIMENSIONE_GRIGLIA){
+    while (r < GRID_SIZE) {
         c = 0;
-        while (c < DIMENSIONE_GRIGLIA){
-            g[r][c] = Get_griglia(partita, r, c);
+        while (c < GRID_SIZE) {
+            g[r][c] = get_grid(game, r, c);
             c = c + 1;
         }
         r = r + 1;
@@ -294,16 +345,16 @@ int mossaBot(Partita partita, char simboloBot, char simboloAvversario){
 
     // Ricerca la mossa migliore
     r = 0;
-    while (r < DIMENSIONE_GRIGLIA){
+    while (r < GRID_SIZE) {
         c = 0;
-        while (c < DIMENSIONE_GRIGLIA){
-            if (g[r][c] == ' ' || g[r][c] == '\0'){
-                g[r][c] = simboloBot;
-                p = calcolaPunteggio(g, simboloBot, simboloAvversario, 0);
+        while (c < GRID_SIZE) {
+            if (g[r][c] == ' ' || g[r][c] == '\0') {
+                g[r][c] = bot_symbol;
+                p = calculate_score(g, bot_symbol, opponent_symbol, 0);
                 g[r][c] = ' ';
-                if (p > migliore){
-                    migliore = p;
-                    cellaMossa = r * DIMENSIONE_GRIGLIA + c;
+                if (p > best) {
+                    best = p;
+                    move_cell = r * GRID_SIZE + c;
                 }
             }
             c = c + 1;
@@ -311,7 +362,7 @@ int mossaBot(Partita partita, char simboloBot, char simboloAvversario){
         r = r + 1;
     }
 
-    return cellaMossa;
+    return move_cell;
 }
 
 #pragma endregion
@@ -319,65 +370,67 @@ int mossaBot(Partita partita, char simboloBot, char simboloAvversario){
 // ----------------- STAMPA SCHERMATA ------------------
 #pragma region stampa
 
-void stampaSchermataGioco(Stringa s){
+void print_game_screen(String s)
+{
     FILE *fp;
-    int c;
-    char nomeCompleto[256];
+    int ch;
+    char full_name[PATH_LENGTH];
 
-    sprintf(nomeCompleto, PERCORSO_GIOCO, s.data);
-    fp = fopen(nomeCompleto, "r");
-    if (fp == NULL){
-        printf("Errore caricamento schermata gioco: %s\n", nomeCompleto);
-    }else{
-        while ((c = fgetc(fp)) != EOF){
-            putchar(c);
+    sprintf(full_name, GAME_PATH, s.data);
+    fp = fopen(full_name, "r");
+    if (fp == NULL) {
+        printf("Errore caricamento schermata gioco: %s\n", full_name);
+    } else {
+        while ((ch = fgetc(fp)) != EOF) {
+            putchar(ch);
         }
         fclose(fp);
     }
 }
 
 // mostra a schermo i dati della partita in corso
-void stampaGioco(Partita partita, Impostazioni impostazioni){
-    int turno;
-    int round;
+void print_game(Game game, Settings settings)
+{
+    int turn;
+    int current_round;
     int r;
     int c;
-    char simbolo;
+    char symbol;
 
-    turno = Get_turno(partita);
-    round = Get_round(partita);
+    turn = get_turn(game);
+    current_round = get_round(game);
 
     // stampa il nome della partita
-    goTo(GIOCO_TITOLO_COL, GIOCO_TITOLO_RIG);
-    printf("%s", Get_nomePartita(impostazioni).data);
+    goto_xy(GAME_TITLE_COL, GAME_TITLE_ROW);
+    printf("%s", get_game_name(settings).data);
 
     // stampa il numero del round
-    goTo(GIOCO_ROUND_COL, GIOCO_ROUND_RIG);
-    printf("%d", round);
+    goto_xy(GAME_ROUND_COL, GAME_ROUND_ROW);
+    printf("%d", current_round);
 
     // stampa il turno del giocatore
-    goTo(GIOCO_TURNO_COL, GIOCO_TURNO_RIG);
-    printf("%d", turno);
+    goto_xy(GAME_TURN_COL, GAME_TURN_ROW);
+    printf("%d", turn);
 
     // stampa il numero di vittorie correnti per giocatori in base ai round giocati
-    goTo(VITTORIA_COL, VITTORIA_G1_RIG);
-    printf("%d", Get_vittorieG1(partita));
-    goTo(VITTORIA_COL, VITTORIA_G2_RIG);
-    printf("%d", Get_vittorieG2(partita));
+    goto_xy(WIN_COL, P1_WIN_ROW);
+    printf("%d", get_p1_wins(game));
+    goto_xy(WIN_COL, P2_WIN_ROW);
+    printf("%d", get_p2_wins(game));
 
     fflush(stdout);
 
     // stampa i simboli al centro di ogni cella della griglia
     r = 0;
-    while (r < 3){
+    while (r < GRID_SIZE) {
         c = 0;
-        while (c < 3){
-            simbolo = Get_griglia(partita, r, c);
-            goTo(GRIGLIA_CENTRO_COL[c], GRIGLIA_CENTRO_RIG[r]);
-            if (simbolo == ' ' || simbolo == '\0'){
+        while (c < GRID_SIZE) {
+            symbol = get_grid(game, r, c);
+            goto_xy(GRID_CENTER_COL[c], GRID_CENTER_ROW[r]);
+            if (symbol == ' ' || symbol == '\0') {
                 printf(" ");
-            }else{
-                printf("%c", simbolo);
+            } else {
+                printf("%c", symbol);
             }
             c = c + 1;
         }
@@ -391,63 +444,64 @@ void stampaGioco(Partita partita, Impostazioni impostazioni){
 // --------------------- NAVIGAZIONE PARTITA -----------------------------
 #pragma region navigazione
 
-void navigaPartita(Partita *partita, Impostazioni *impostazioni){
-    int esci;
+void navigate_game(Game *game, Settings *settings)
+{
+    int quit;
     int r;
     int c;
-    int riga;
-    int colonna;
-    int cella;
-    int risultato;
-    int confermato;
-    int piena;
-    char vincitore;
-    char simboloCorrente;
-    Stringa nomeG;
+    int row;
+    int col;
+    int cell;
+    int result;
+    int confirmed;
+    int full;
+    char winner;
+    char current_symbol;
+    String winner_name;
 
-    esci = 0;
+    quit = 0;
 
-    // Se c'è una partita precedente specificata la carica
-    if (strlen(impostazioni->partitaPrecedente.data) > 0){
-        if (caricaPartita(impostazioni, partita)){
-            // dopo aver caricato la partita pulisce il campo partitaPrecedente in modo che non venga caricata di nuovo ad ogni ciclo di while
-            impostazioni->partitaPrecedente.data[0] = '\0';
-        }else{
+    // Se c'e' una partita precedente specificata la carica
+    if (strlen(settings->previous_game.data) > 0) {
+        if (load_game(settings, game)) {
+            // dopo aver caricato la partita pulisce il campo previous_game in modo che non venga caricata di nuovo ad ogni ciclo di while
+            settings->previous_game.data[0] = '\0';
+        } else {
             // Se fallisce il caricamento inizializza normalmente
-            Set_turno(partita, 1);
-            Set_round(partita, 1);
-            Set_vittorieG1(partita, 0);
-            Set_sconfitteG1(partita, 0);
-            Set_pareggiG1(partita, 0);
-            Set_vittorieG2(partita, 0);
-            Set_sconfitteG2(partita, 0);
-            Set_pareggiG2(partita, 0);
+            set_turn(game, 1);
+            set_round(game, 1);
+            set_p1_wins(game, 0);
+            set_p1_losses(game, 0);
+            set_p1_draws(game, 0);
+            set_p2_wins(game, 0);
+            set_p2_losses(game, 0);
+            set_p2_draws(game, 0);
             r = 0;
-            while (r < DIMENSIONE_GRIGLIA){
+            while (r < GRID_SIZE) {
                 c = 0;
-                while (c < DIMENSIONE_GRIGLIA){
-                    Set_griglia(partita, r, c, ' ');
+                while (c < GRID_SIZE) {
+                    set_grid(game, r, c, ' ');
                     c = c + 1;
                 }
                 r = r + 1;
             }
         }
-    }else{
+    } else {
         // Inizializza una nuova partita
-        Set_turno(partita, 1);
-        Set_round(partita, 1);
-        Set_vittorieG1(partita, 0);
-        Set_sconfitteG1(partita, 0);
-        Set_pareggiG1(partita, 0);
-        Set_vittorieG2(partita, 0);
-        Set_sconfitteG2(partita, 0);
-        Set_pareggiG2(partita, 0);
+        set_turn(game, 1);
+        set_round(game, 1);
+        set_p1_wins(game, 0);
+        set_p1_losses(game, 0);
+        set_p1_draws(game, 0);
+        set_p2_wins(game, 0);
+        set_p2_losses(game, 0);
+        set_p2_draws(game, 0);
         // inizializza la griglia vuota
         r = 0;
-        while (r < DIMENSIONE_GRIGLIA){
+        while (r < GRID_SIZE) {
             c = 0;
-            while (c < DIMENSIONE_GRIGLIA){
-                Set_griglia(partita, r, c, ' ');
+            while (c < GRID_SIZE) {
+                set_grid(game, r, c, ' ');
                 c = c + 1;
             }
             r = r + 1;
@@ -455,9 +509,9 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni){
     }
 
     // abilita il mouse tramite la libreria mouse.h
-    abilitaMouse();
+    enable_mouse();
 
-    while (!esci){
+    while (!quit) {
         // pulisce il terminale
         #ifdef _WIN32
             system("cls");
@@ -466,43 +520,43 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni){
         #endif
 
         // stampa la schermata base del gioco
-        stampaSchermataGioco(schermatePartita[0]);
+        print_game_screen(game_screens[0]);
 
         // stampa a schermo i dati della partita
-        stampaGioco(*partita, *impostazioni);
-        goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+        print_game(*game, *settings);
+        goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
         fflush(stdout);
 
-        // se modalità CPU e turno del bot (giocatore 2), muove automaticamente
-        if (Get_modoPartita(*impostazioni) == MODO_CPU && Get_turno(*partita) == TURNO_GIOCATORE2){
-            simboloCorrente = Get_simboloGiocatore2(*impostazioni);
-            cella = mossaBot(*partita, simboloCorrente, Get_simboloGiocatore1(*impostazioni));
-            if (cella != CELLA_NON_VALIDA){
+        // se modalita' CPU e turno del bot (giocatore 2), muove automaticamente
+        if ((get_game_mode(*settings) == MODE_CPU) && (get_turn(*game) == PLAYER2_TURN)) {
+            current_symbol = get_p2_symbol(*settings);
+            cell = bot_move(*game, current_symbol, get_p1_symbol(*settings));
+            if (cell != INVALID_CELL) {
                 r = 0;
                 c = 0;
-                while (r * DIMENSIONE_GRIGLIA + c != cella){
+                while (r * GRID_SIZE + c != cell) {
                     c = c + 1;
-                    if (c == DIMENSIONE_GRIGLIA){
+                    if (c == GRID_SIZE) {
                         c = 0;
                         r = r + 1;
                     }
                 }
-                Set_griglia(partita, r, c, simboloCorrente);
+                set_grid(game, r, c, current_symbol);
                 // controllo fine round
-                vincitore = controllaVincitoreRound(*partita);
-                piena = grigliaPiena(*partita);
-                if (vincitore != '\0' || piena){
-                    if (vincitore != '\0'){
-                        if (vincitore == Get_simboloGiocatore1(*impostazioni)){
-                            Set_vittorieG1(partita, Get_vittorieG1(*partita) + 1);
-                            Set_sconfitteG2(partita, Get_sconfitteG2(*partita) + 1);
-                        }else{
-                            Set_vittorieG2(partita, Get_vittorieG2(*partita) + 1);
-                            Set_sconfitteG1(partita, Get_sconfitteG1(*partita) + 1);
+                winner = get_round_winner(*game);
+                full = is_grid_full(*game);
+                if ((winner != '\0') || (full == 1)) {
+                    if (winner != '\0') {
+                        if (winner == get_p1_symbol(*settings)) {
+                            set_p1_wins(game, get_p1_wins(*game) + 1);
+                            set_p2_losses(game, get_p2_losses(*game) + 1);
+                        } else {
+                            set_p2_wins(game, get_p2_wins(*game) + 1);
+                            set_p1_losses(game, get_p1_losses(*game) + 1);
                         }
-                    }else{
-                        Set_pareggiG1(partita, Get_pareggiG1(*partita) + 1);
-                        Set_pareggiG2(partita, Get_pareggiG2(*partita) + 1);
+                    } else {
+                        set_p1_draws(game, get_p1_draws(*game) + 1);
+                        set_p2_draws(game, get_p2_draws(*game) + 1);
                     }
                     // aggiorna schermo con lo stato finale del round
                     #ifdef _WIN32
@@ -510,132 +564,134 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni){
                     #else
                         system("clear");
                     #endif
-                    stampaSchermataGioco(schermatePartita[0]);
-                    stampaGioco(*partita, *impostazioni);
-                    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+                    print_game_screen(game_screens[0]);
+                    print_game(*game, *settings);
+                    goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
                     fflush(stdout);
 
-                    if (Get_round(*partita) >= Get_numeroRound(*impostazioni)){
+                    if (get_round(*game) >= get_num_rounds(*settings)) {
                         // fine partita
-                        risultato = 0;
-                        if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)){
-                            risultato = RISULTATO_VITTORIA_G1;
-                        }else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)){
-                            risultato = RISULTATO_VITTORIA_G2;
-                        }else{
-                            risultato = RISULTATO_PAREGGIO;
+                        result = 0;
+                        if (get_p1_wins(*game) > get_p2_wins(*game)) {
+                            result = RESULT_PLAYER1_WIN;
+                        } else if (get_p2_wins(*game) > get_p1_wins(*game)) {
+                            result = RESULT_PLAYER2_WIN;
+                        } else {
+                            result = RESULT_DRAW;
                         }
-                        salvaStatistichePartita(Get_nomeGiocatore1(*impostazioni).data, Get_nomeGiocatore2(*impostazioni).data, risultato);
+                        save_game_stats(get_player1_name(*settings).data,
+                                        get_player2_name(*settings).data,
+                                        result);
 
-                        confermato = 0;
-                        while (!confermato){
+                        confirmed = 0;
+                        while (!confirmed) {
                             #ifdef _WIN32
                                 system("cls");
                             #else
                                 system("clear");
                             #endif
-                            stampaSchermataGioco(schermatePartita[3]);
-                            if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)){
-                                // nome vincitore è giocatore 1
-                                nomeG = Get_nomeGiocatore1(*impostazioni);
-                                goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
+                            print_game_screen(game_screens[3]);
+                            if (get_p1_wins(*game) > get_p2_wins(*game)) {
+                                // nome vincitore e' giocatore 1
+                                winner_name = get_player1_name(*settings);
+                                goto_xy(WINNER_NAME_COL - 10, WINNER_NAME_ROW);
                                 printf("                    ");
-                                cella = NOME_VINCITORE_COL - (int)strlen(nomeG.data) / 2;
-                                goTo(cella, NOME_VINCITORE_RIG);
-                                printf("%s", nomeG.data);
-                            }else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)){
-                                nomeG = Get_nomeGiocatore2(*impostazioni);
-                                goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
+                                cell = WINNER_NAME_COL - (int)strlen(winner_name.data) / 2;
+                                goto_xy(cell, WINNER_NAME_ROW);
+                                printf("%s", winner_name.data);
+                            } else if (get_p2_wins(*game) > get_p1_wins(*game)) {
+                                winner_name = get_player2_name(*settings);
+                                goto_xy(WINNER_NAME_COL - 10, WINNER_NAME_ROW);
                                 printf("                    ");
-                                cella = NOME_VINCITORE_COL - (int)strlen(nomeG.data) / 2;
-                                goTo(cella, NOME_VINCITORE_RIG);
-                                printf("%s", nomeG.data);
+                                cell = WINNER_NAME_COL - (int)strlen(winner_name.data) / 2;
+                                goto_xy(cell, WINNER_NAME_ROW);
+                                printf("%s", winner_name.data);
                             }
                             fflush(stdout);
-                            goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
-                            if (!leggiClick(&riga, &colonna)){
+                            goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
+                            if (!read_click(&row, &col)) {
                                 continue;
                             }
-                            if (areaCliccata(bVittoria[0], riga, colonna)){
-                                confermato = 1;
-                                esci = 1;
+                            if (is_area_clicked(btn_victory[0], row, col)) {
+                                confirmed = 1;
+                                quit = 1;
                             }
                         }
-                    }else{
+                    } else {
                         // round successivo
                         fflush(stdout);
-                        while (!leggiClick(&riga, &colonna));
-                        Set_round(partita, Get_round(*partita) + 1);
-                        Set_turno(partita, TURNO_GIOCATORE1);
+                        while (!read_click(&row, &col))
+                            ; /* wait for click */
+                        set_round(game, get_round(*game) + 1);
+                        set_turn(game, PLAYER1_TURN);
                         r = 0;
-                        while (r < DIMENSIONE_GRIGLIA){
+                        while (r < GRID_SIZE) {
                             c = 0;
-                            while (c < DIMENSIONE_GRIGLIA){
-                                Set_griglia(partita, r, c, ' ');
+                            while (c < GRID_SIZE) {
+                                set_grid(game, r, c, ' ');
                                 c = c + 1;
                             }
                             r = r + 1;
                         }
                     }
-                }else{
+                } else {
                     // round non terminato: torna al turno del giocatore
-                    Set_turno(partita, TURNO_GIOCATORE1);
+                    set_turn(game, PLAYER1_TURN);
                 }
             }
             continue;
         }
 
         // legge il click del giocatore
-        if (!leggiClick(&riga, &colonna)){
+        if (!read_click(&row, &col)) {
             continue;
         }
-        // rilevamento della cella cliccata tramite la funzione cellaCliccata di gioco.h
-        cella = cellaCliccata(riga, colonna);
+        // rilevamento della cella cliccata tramite la funzione get_clicked_cell di gioco.h
+        cell = get_clicked_cell(row, col);
 
-        if (cella != CELLA_NON_VALIDA){
+        if (cell != INVALID_CELL) {
             r = 0;
             c = 0;
-            while (r * DIMENSIONE_GRIGLIA + c != cella){
+            while (r * GRID_SIZE + c != cell) {
                 c = c + 1;
-                if (c == DIMENSIONE_GRIGLIA){
+                if (c == GRID_SIZE) {
                     c = 0;
                     r = r + 1;
                 }
             }
 
-            // se la cella è ancora libera
-            if (Get_griglia(*partita, r, c) == ' ' || Get_griglia(*partita, r, c) == '\0'){
+            // se la cella e' ancora libera
+            if ((get_grid(*game, row, col) == ' ') || (get_grid(*game, row, col) == '\0')) {
                 // simbolo del giocatore corrente letto dalle impostazioni
-                if (Get_turno(*partita) == TURNO_GIOCATORE1){
-                    simboloCorrente = Get_simboloGiocatore1(*impostazioni);
-                }
-                else{
-                    simboloCorrente = Get_simboloGiocatore2(*impostazioni);
+                if (get_turn(*game) == PLAYER1_TURN) {
+                    current_symbol = get_p1_symbol(*settings);
+                } else {
+                    current_symbol = get_p2_symbol(*settings);
                 }
 
                 // piazza il simbolo nella cella
-                Set_griglia(partita, r, c, simboloCorrente);
+                set_grid(game, row, col, current_symbol);
 
                 // controllo fine round
-                vincitore = controllaVincitoreRound(*partita);
-                piena = grigliaPiena(*partita);
+                winner = get_round_winner(*game);
+                full = is_grid_full(*game);
 
-                if (vincitore != '\0' || piena){
-                    // Aggiorna punteggio se c'è un vincitore del round
-                    if (vincitore != '\0'){
-                        if (vincitore == Get_simboloGiocatore1(*impostazioni)){
+                if ((winner != '\0') || (full == 1)) {
+                    // Aggiorna punteggio se c'e' un vincitore del round
+                    if (winner != '\0') {
+                        if (winner == get_p1_symbol(*settings)) {
                             // Aggiorna vittorie giocatore 1 e sconfitte giocatore 2
-                            Set_vittorieG1(partita, Get_vittorieG1(*partita) + 1);
-                            Set_sconfitteG2(partita, Get_sconfitteG2(*partita) + 1);
-                        }else{
+                            set_p1_wins(game, get_p1_wins(*game) + 1);
+                            set_p2_losses(game, get_p2_losses(*game) + 1);
+                        } else {
                             // Aggiorna vittorie giocatore 2 e sconfitte giocatore 1
-                            Set_vittorieG2(partita, Get_vittorieG2(*partita) + 1);
-                            Set_sconfitteG1(partita, Get_sconfitteG1(*partita) + 1);
+                            set_p2_wins(game, get_p2_wins(*game) + 1);
+                            set_p1_losses(game, get_p1_losses(*game) + 1);
                         }
-                    }else{
+                    } else {
                         // Pareggio round
-                        Set_pareggiG1(partita, Get_pareggiG1(*partita) + 1);
-                        Set_pareggiG2(partita, Get_pareggiG2(*partita) + 1);
+                        set_p1_draws(game, get_p1_draws(*game) + 1);
+                        set_p2_draws(game, get_p2_draws(*game) + 1);
                     }
 
                     // Stampa l'ultimo stato grafico prima di procedere
@@ -644,131 +700,134 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni){
                     #else
                         system("clear");
                     #endif
-                    stampaSchermataGioco(schermatePartita[0]);
-                    stampaGioco(*partita, *impostazioni);
-                    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+                    print_game_screen(game_screens[0]);
+                    print_game(*game, *settings);
+                    goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
                     fflush(stdout);
 
                     // Se siamo all'ultimo round, termina la partita e vai alla schermata vittoria
-                    if (Get_round(*partita) >= Get_numeroRound(*impostazioni)){
+                    if (get_round(*game) >= get_num_rounds(*settings)) {
                         // Determina il risultato finale e salva le statistiche per-avversario
-                        risultato = 0;
-                        if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)){
-                            risultato = RISULTATO_VITTORIA_G1; // vittoria G1
-                        }else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)){
-                            risultato = RISULTATO_VITTORIA_G2; // vittoria G2
-                        }else{
-                            risultato = RISULTATO_PAREGGIO; // pareggio
+                        result = 0;
+                        if (get_p1_wins(*game) > get_p2_wins(*game)) {
+                            result = RESULT_PLAYER1_WIN; // vittoria G1
+                        } else if (get_p2_wins(*game) > get_p1_wins(*game)) {
+                            result = RESULT_PLAYER2_WIN; // vittoria G2
+                        } else {
+                            result = RESULT_DRAW; // pareggio
                         }
-                        salvaStatistichePartita(Get_nomeGiocatore1(*impostazioni).data, Get_nomeGiocatore2(*impostazioni).data, risultato);
+                        save_game_stats(get_player1_name(*settings).data,
+                                        get_player2_name(*settings).data,
+                                        result);
 
-                        confermato = 0;
-                        while (!confermato){
+                        confirmed = 0;
+                        while (!confirmed) {
                             #ifdef _WIN32
                                 system("cls");
                             #else
                                 system("clear");
                             #endif
-                            stampaSchermataGioco(schermatePartita[3]);
+                            print_game_screen(game_screens[3]);
 
                             // Calcola e scrivi il vincitore finale
-                            if (Get_vittorieG1(*partita) > Get_vittorieG2(*partita)){
+                            if (get_p1_wins(*game) > get_p2_wins(*game)) {
                                 // vittoria G1
-                                nomeG = Get_nomeGiocatore1(*impostazioni);
-                                goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
+                                winner_name = get_player1_name(*settings);
+                                goto_xy(WINNER_NAME_COL - 10, WINNER_NAME_ROW);
                                 printf("                    "); // ripulisce il puntino
-                                cella = NOME_VINCITORE_COL - (int)strlen(nomeG.data) / 2;
-                                goTo(cella, NOME_VINCITORE_RIG);
-                                printf("%s", nomeG.data);
-                            }else if (Get_vittorieG2(*partita) > Get_vittorieG1(*partita)){
+                                cell = WINNER_NAME_COL - (int)strlen(winner_name.data) / 2;
+                                goto_xy(cell, WINNER_NAME_ROW);
+                                printf("%s", winner_name.data);
+                            } else if (get_p2_wins(*game) > get_p1_wins(*game)) {
                                 // vittoria G2
-                                nomeG = Get_nomeGiocatore2(*impostazioni);
-                                goTo(NOME_VINCITORE_COL - 10, NOME_VINCITORE_RIG);
+                                winner_name = get_player2_name(*settings);
+                                goto_xy(WINNER_NAME_COL - 10, WINNER_NAME_ROW);
                                 printf("                    "); // ripulisce il punto
-                                cella = NOME_VINCITORE_COL - (int)strlen(nomeG.data) / 2;
-                                goTo(cella, NOME_VINCITORE_RIG);
-                                printf("%s", nomeG.data);
+                                cell = WINNER_NAME_COL - (int)strlen(winner_name.data) / 2;
+                                goto_xy(cell, WINNER_NAME_ROW);
+                                printf("%s", winner_name.data);
                             }
                             fflush(stdout);
-                            goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+                            goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
 
-                            if (!leggiClick(&riga, &colonna)){
+                            if (!read_click(&row, &col)) {
                                 continue;
                             }
 
-                            // Verifica click su bVittoria[0]
-                            if (areaCliccata(bVittoria[0], riga, colonna)){
-                                confermato = 1;
-                                esci = 1;
+                            // Verifica click su btn_victory[0]
+                            if (is_area_clicked(btn_victory[0], row, col)) {
+                                confirmed = 1;
+                                quit = 1;
                             }
                         }
-                    }else{
+                    } else {
                         fflush(stdout);
 
-                        while (!leggiClick(&riga, &colonna));
+                        while (!read_click(&row, &col))
+                            ; /* wait for click */
 
-                        Set_round(partita, Get_round(*partita) + 1);
-                        Set_turno(partita, TURNO_GIOCATORE1);
+                        set_round(game, get_round(*game) + 1);
+                        set_turn(game, PLAYER1_TURN);
                         // resetta la griglia per il prossimo round
                         r = 0;
-                        while (r < DIMENSIONE_GRIGLIA){
+                        while (r < GRID_SIZE) {
                             c = 0;
-                            while (c < DIMENSIONE_GRIGLIA){
-                                Set_griglia(partita, r, c, ' ');
+                            while (c < GRID_SIZE) {
+                                set_grid(game, r, c, ' ');
                                 c = c + 1;
                             }
                             r = r + 1;
                         }
                     }
-                }else{
-                    // Alterna il turno solo se il round non è terminato
-                    if (Get_turno(*partita) == TURNO_GIOCATORE1){
-                        Set_turno(partita, TURNO_GIOCATORE2);
-                    }else{
-                        Set_turno(partita, TURNO_GIOCATORE1);
+                } else {
+                    // Alterna il turno solo se il round non e' terminato
+                    if (get_turn(*game) == PLAYER1_TURN) {
+                        set_turn(game, PLAYER2_TURN);
+                    } else {
+                        set_turn(game, PLAYER1_TURN);
                     }
                 }
             }
-        }else if (areaCliccata(bGiocoMenu[0], riga, colonna)){
+        } else if (is_area_clicked(btn_game_menu[0], row, col)) {
             // esce al menu principale
-            esci = 1;
-        }else if (areaCliccata(bGiocoMenu[1], riga, colonna)){
+            quit = 1;
+        } else if (is_area_clicked(btn_game_menu[1], row, col)) {
             // mostra la schermata di salvataggio e conferma
-            confermato = 0;
-            while (!confermato){
+            confirmed = 0;
+            while (!confirmed) {
                 #ifdef _WIN32
                     system("cls");
                 #else
                     system("clear");
                 #endif
-                stampaSchermataGioco(schermatePartita[1]);
-                goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+                print_game_screen(game_screens[1]);
+                goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
                 fflush(stdout);
 
-                if (!leggiClick(&riga, &colonna)){
+                if (!read_click(&row, &col)) {
                     continue;
                 }
 
-                if (areaCliccata(bSalvaConferma[0], riga, colonna)){
+                if (is_area_clicked(btn_save_confirm[0], row, col)) {
                     // salva la partita ed esci al menu principale
-                    salvaPartita(impostazioni, partita);
-                    confermato = 1;
-                    esci = 1;
-                }else if (areaCliccata(bSalvaConferma[1], riga, colonna) || areaCliccata(bSalvaConferma[2], riga, colonna)){
+                    save_game(settings, game);
+                    confirmed = 1;
+                    quit = 1;
+                } else if (is_area_clicked(btn_save_confirm[1], row, col) || is_area_clicked(btn_save_confirm[2], row, col)) {
                     // ritorna al gioco
-                    confermato = 1;
+                    confirmed = 1;
                 }
             }
-        }else if (areaCliccata(bGiocoMenu[2], riga, colonna)){
+        } else if (is_area_clicked(btn_game_menu[2], row, col)) {
             // apre il supporto del gioco
-            abilitaTastiera();
-            navigaSupporto();
-            abilitaMouse();
+            enable_keyboard();
+            navigate_support();
+            enable_mouse();
         }
     }
 
     // ripristina terminale
-    abilitaTastiera();
+    enable_keyboard();
     #ifdef _WIN32
         system("cls");
     #else
@@ -776,48 +835,62 @@ void navigaPartita(Partita *partita, Impostazioni *impostazioni){
     #endif
 }
 
-// Controlla se c'è un vincitore del round. Ritorna il simbolo vincitore o '\0'.
-char controllaVincitoreRound(Partita partita){
+// Controlla se c'e' un vincitore del round. Ritorna il simbolo vincitore o '\0'.
+char get_round_winner(Game game)
+{
     int r;
     int c;
 
     // righe
     r = 0;
-    while (r < 3){
-        if (partita.griglia[r][0] != ' ' && partita.griglia[r][0] != '\0' && partita.griglia[r][0] == partita.griglia[r][1] && partita.griglia[r][1] == partita.griglia[r][2]){
-            return partita.griglia[r][0];
+    while (r < GRID_SIZE) {
+        if ((game.grid[r][0] != ' ') &&
+            (game.grid[r][0] != '\0') &&
+            (game.grid[r][0] == game.grid[r][1]) &&
+            (game.grid[r][1] == game.grid[r][2])) {
+            return game.grid[r][0];
         }
         r = r + 1;
     }
     // colonne
     c = 0;
-    while (c < 3){
-        if (partita.griglia[0][c] != ' ' && partita.griglia[0][c] != '\0' && partita.griglia[0][c] == partita.griglia[1][c] && partita.griglia[1][c] == partita.griglia[2][c]){
-            return partita.griglia[0][c];
+    while (c < GRID_SIZE) {
+        if ((game.grid[0][c] != ' ') &&
+            (game.grid[0][c] != '\0') &&
+            (game.grid[0][c] == game.grid[1][c]) &&
+            (game.grid[1][c] == game.grid[2][c])) {
+            return game.grid[0][c];
         }
         c = c + 1;
     }
     // diagonale principale
-    if (partita.griglia[0][0] != ' ' && partita.griglia[0][0] != '\0' && partita.griglia[0][0] == partita.griglia[1][1] && partita.griglia[1][1] == partita.griglia[2][2]){
-        return partita.griglia[0][0];
+    if ((game.grid[0][0] != ' ') &&
+        (game.grid[0][0] != '\0') &&
+        (game.grid[0][0] == game.grid[1][1]) &&
+        (game.grid[1][1] == game.grid[2][2])) {
+        return game.grid[0][0];
     }
     // diagonale secondaria
-    if (partita.griglia[0][2] != ' ' && partita.griglia[0][2] != '\0' && partita.griglia[0][2] == partita.griglia[1][1] && partita.griglia[1][1] == partita.griglia[2][0]){
-        return partita.griglia[0][2];
+    if ((game.grid[0][2] != ' ') &&
+        (game.grid[0][2] != '\0') &&
+        (game.grid[0][2] == game.grid[1][1]) &&
+        (game.grid[1][1] == game.grid[2][0])) {
+        return game.grid[0][2];
     }
     return '\0';
 }
 
-// Verifica se la griglia è piena. Ritorna 1 se piena, 0 altrimenti.
-int grigliaPiena(Partita partita){
+// Verifica se la griglia e' piena. Ritorna 1 se piena, 0 altrimenti.
+int is_grid_full(Game game)
+{
     int r;
     int c;
 
     r = 0;
-    while (r < 3){
+    while (r < GRID_SIZE) {
         c = 0;
-        while (c < 3){
-            if (partita.griglia[r][c] == ' ' || partita.griglia[r][c] == '\0'){
+        while (c < GRID_SIZE) {
+            if ((game.grid[r][c] == ' ') || (game.grid[r][c] == '\0')) {
                 return 0;
             }
             c = c + 1;

@@ -7,11 +7,11 @@
  ============================================================================
  */
 
-#ifndef mouse_H
-#define mouse_H
+#ifndef MOUSE_H
+#define MOUSE_H
 
+#include "costanti.h"
 #include "strutture.h"
-
 
 #ifdef _WIN32
   #include <windows.h>
@@ -21,12 +21,12 @@
   #include <stdio.h>
 #endif
 
-
 // posizione base del cursore nel terminale (dopo ogni input)
-#define CURSORE_BASE ((Cursore){1, 25})
+#define CURSOR_BASE ((Cursor){1, 25})
 
 // gestisce lo spostamento del cursore al click
-static inline void goTo(int x, int y) {
+static inline void goto_xy(int x, int y)
+{
 #ifdef _WIN32
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD pos = {(SHORT)(x - 1), (SHORT)(y - 1)};
@@ -38,7 +38,8 @@ static inline void goTo(int x, int y) {
 }
 
 // funzione di abilitazione del mouse
-static inline void abilitaMouse(void) {
+static inline void enable_mouse(void)
+{
 #ifdef _WIN32
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
     DWORD mode;
@@ -56,10 +57,11 @@ static inline void abilitaMouse(void) {
 #endif
 }
 
-// blocca finché non riceve un click sinistro del mouse. Restituisce 1 se il click è valido, 0 in caso di errore.
+// blocca finche' non riceve un click sinistro del mouse. Restituisce 1 se il click e' valido, 0 in caso di errore.
 #ifdef _WIN32
-static inline int leggiClick(int *riga, int *colonna) {
-    abilitaMouse();
+static inline int read_click(int *row, int *col)
+{
+    enable_mouse();
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
     INPUT_RECORD ev;
     DWORD cnt;
@@ -67,38 +69,39 @@ static inline int leggiClick(int *riga, int *colonna) {
         ReadConsoleInput(h, &ev, 1, &cnt);
         if (ev.EventType == MOUSE_EVENT &&
             ev.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-            *colonna = ev.Event.MouseEvent.dwMousePosition.X + 1;
-            *riga    = ev.Event.MouseEvent.dwMousePosition.Y + 1;
-            goTo(*colonna, *riga);
+            *col = ev.Event.MouseEvent.dwMousePosition.X + 1;
+            *row = ev.Event.MouseEvent.dwMousePosition.Y + 1;
+            goto_xy(*col, *row);
             return 1;
         }
     }
 }
 #else
-static inline int leggiClick(int *riga, int *colonna) {
-    char sequenza[32];
-    int indice;
+static inline int read_click(int *row, int *col)
+{
+    char sequence[32];
+    int index;
     while (1) {
-        if (read(STDIN_FILENO, sequenza, 1) != 1) return 0;
-        if (sequenza[0] != '\033') continue;
-        if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '[') continue;
-        if (read(STDIN_FILENO, sequenza, 1) != 1 || sequenza[0] != '<') continue;
-        indice = 0;
-        while (indice < 30) {
-            if (read(STDIN_FILENO, &sequenza[indice], 1) != 1) break;
-            if (sequenza[indice] == 'M' || sequenza[indice] == 'm') {
-                sequenza[indice + 1] = '\0';
+        if (read(STDIN_FILENO, sequence, 1) != 1) return 0;
+        if (sequence[0] != '\033') continue;
+        if (read(STDIN_FILENO, sequence, 1) != 1 || sequence[0] != '[') continue;
+        if (read(STDIN_FILENO, sequence, 1) != 1 || sequence[0] != '<') continue;
+        index = 0;
+        while (index < 30) {
+            if (read(STDIN_FILENO, &sequence[index], 1) != 1) break;
+            if (sequence[index] == 'M' || sequence[index] == 'm') {
+                sequence[index + 1] = '\0';
                 break;
             }
-            indice= indice +1;
+            index = index + 1;
         }
-        if (sequenza[indice] == 'M') {
-            int bottone, col, rig;
-            if (sscanf(sequenza, "%d;%d;%d", &bottone, &col, &rig) == 3 &&
-                bottone == 0) {
-                *colonna = col;
-                *riga    = rig;
-                goTo(*colonna, *riga);
+        if (sequence[index] == 'M') {
+            int button, c, r;
+            if (sscanf(sequence, "%d;%d;%d", &button, &c, &r) == 3 &&
+                button == 0) {
+                *col = c;
+                *row = r;
+                goto_xy(*col, *row);
                 return 1;
             }
         }
@@ -107,7 +110,8 @@ static inline int leggiClick(int *riga, int *colonna) {
 #endif
 
 // abilita l'input da tastiera
-static inline void abilitaTastiera(void) {
+static inline void enable_keyboard(void)
+{
 #ifdef _WIN32
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
     DWORD mode;
@@ -127,8 +131,9 @@ static inline void abilitaTastiera(void) {
 }
 
 // controlla se il click corrisponde all'area cliccabile
-static inline int areaCliccata(AreaCliccabile area, int riga, int colonna) {
-    return (riga == area.r && colonna >= area.c1 && colonna <= area.c2);
+static inline int is_area_clicked(ClickableArea area, int row, int col)
+{
+    return (row == area.row && col >= area.col1 && col <= area.col2);
 }
 
-#endif 
+#endif

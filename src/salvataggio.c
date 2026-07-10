@@ -2,7 +2,7 @@
  ============================================================================
  Name        : salvataggio.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 1.0
+ Version     : V 1.0 
  Copyright   : Your copyright notice
  Description : file di gestione salvataggio e recupero delle partite
  ============================================================================
@@ -15,42 +15,43 @@
 
 #pragma region funzioni esterne
 // funzioni esterne da impostazioni.c
-extern Stringa Get_nomePartita(Impostazioni impostazioni);
-extern Stringa Get_partitaPrecedente(Impostazioni impostazioni);
+extern String get_game_name(Settings settings);
+extern String get_previous_game(Settings settings);
 #pragma endregion
 
 // ----------------- GESTIONE FILE SALVATAGGI ------------------
 #pragma region gestione file
 
-int salvaPartita(const Impostazioni *impostazioni, const Partita *partita) {
-  char percorso[LUNGHEZZA_PERCORSO];
-  // Il nome del file è il nome della partita
-  sprintf(percorso, PERCORSO_SALVATAGGIO_FILE, Get_nomePartita(*impostazioni).data);
-  FILE *fp = fopen(percorso, "wb");
+int save_game(const Settings *settings, const Game *game)
+{
+  char path[PATH_LENGTH];
+  // Il nome del file e' il nome della partita
+  sprintf(path, SAVE_FILE_PATH, get_game_name(*settings).data);
+  FILE *fp = fopen(path, "wb");
   if (fp == NULL) {
-    printf("Errore apertura file per il salvataggio: %s\n", percorso);
-    return ESITO_ERRORE;
+    printf("Errore apertura file per il salvataggio: %s\n", path);
+    return STATUS_ERROR;
   }
-  fwrite(impostazioni, sizeof(Impostazioni), 1, fp);
-  fwrite(partita, sizeof(Partita), 1, fp);
+  fwrite(settings, sizeof(Settings), 1, fp);
+  fwrite(game, sizeof(Game), 1, fp);
   fclose(fp);
-  return ESITO_SUCCESSO;
+  return STATUS_SUCCESS;
 }
 
-int caricaPartita(Impostazioni *impostazioni, Partita *partita) {
-  char percorso[LUNGHEZZA_PERCORSO];
-  // Il file da caricare è specificato in partitaPrecedente
-  sprintf(percorso, PERCORSO_SALVATAGGIO_FILE, Get_partitaPrecedente(*impostazioni).data);
-  FILE *fp = fopen(percorso, "rb");
+int load_game(Settings *settings, Game *game)
+{
+  char path[PATH_LENGTH];
+  // Il file da caricare e' specificato in previous_game
+  sprintf(path, SAVE_FILE_PATH, get_previous_game(*settings).data);
+  FILE *fp = fopen(path, "rb");
   if (fp == NULL) {
-    printf("Errore apertura file per il caricamento: %s\n", percorso);
-    return ESITO_ERRORE;
+    printf("Errore apertura file per il caricamento: %s\n", path);
+    return STATUS_ERROR;
   }
-  fread(impostazioni, sizeof(Impostazioni), 1, fp);
-  fread(partita, sizeof(Partita), 1, fp);
+  fread(settings, sizeof(Settings), 1, fp);
+  fread(game, sizeof(Game), 1, fp);
   fclose(fp);
-  return ESITO_SUCCESSO;
+  return STATUS_SUCCESS;
 }
 
 #pragma endregion
-

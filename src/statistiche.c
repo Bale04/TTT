@@ -17,33 +17,47 @@
 // --------------------- FUNZIONI DI ACCESSO ---------------------
 #pragma region funzioni di accesso
 
-// ---------------------STATISTICHE---------------------------
-int Get_vittorie(Statistiche s) { 
-  return s.numeroVittorie; 
-}
-void Set_vittorie(Statistiche *s, int v) {
-  s->numeroVittorie = v; 
-}
-int Get_sconfitte(Statistiche s) {
-  return s.numeroSconfitte; 
-}
-void Set_sconfitte(Statistiche *s, int v) {
-  s->numeroSconfitte = v; 
-}
-int Get_pareggi(Statistiche s) {
-  return s.numeroPareggi; 
-}
-void Set_pareggi(Statistiche *s, int v) {
-  s->numeroPareggi = v; 
+// ---------------------STATS---------------------------
+int get_wins(Stats s)
+{
+  return s.wins;
 }
 
-// ---------------------RECORD AVVERSARIO---------------------------
-const char *Get_nomeAvversario(const RecordAvversario *r) { 
-  return r->nomeAvversario; 
+void set_wins(Stats *s, int v)
+{
+  s->wins = v;
 }
-void Set_nomeAvversario(RecordAvversario *r, const char *nome) {
-  strncpy(r->nomeAvversario, nome, LUNGHEZZA_STRINGA - 1);
-  r->nomeAvversario[LUNGHEZZA_STRINGA - 1] = '\0';
+
+int get_losses(Stats s)
+{
+  return s.losses;
+}
+
+void set_losses(Stats *s, int v)
+{
+  s->losses = v;
+}
+
+int get_draws(Stats s)
+{
+  return s.draws;
+}
+
+void set_draws(Stats *s, int v)
+{
+  s->draws = v;
+}
+
+// ---------------------OPPONENT RECORD---------------------------
+const char *get_opponent_name(const OpponentRecord *r)
+{
+  return r->opponent_name;
+}
+
+void set_opponent_name(OpponentRecord *r, const char *name)
+{
+  strncpy(r->opponent_name, name, STRING_LENGTH - 1);
+  r->opponent_name[STRING_LENGTH - 1] = '\0';
 }
 
 #pragma endregion
@@ -51,18 +65,19 @@ void Set_nomeAvversario(RecordAvversario *r, const char *nome) {
 // --------------------- STAMPA SCHERMATA ---------------------
 #pragma region stampa
 
-void stampaSchermataStatistiche(const char *nomeSchermata) {
+void print_stats_screen(const char *screen_name)
+{
   FILE *fp;
-  int c;
-  char nomeCompleto[256];
+  int ch;
+  char full_name[PATH_LENGTH];
 
-  sprintf(nomeCompleto, PERCORSO_STATISTICHE, nomeSchermata);
-  fp = fopen(nomeCompleto, "r");
+  sprintf(full_name, STATS_PATH, screen_name);
+  fp = fopen(full_name, "r");
   if (fp == NULL) {
-    printf("Errore caricamento schermata statistiche: %s\n", nomeCompleto);
+    printf("Errore caricamento schermata statistiche: %s\n", full_name);
   } else {
-    while ((c = fgetc(fp)) != EOF) {
-      putchar(c);
+    while ((ch = fgetc(fp)) != EOF) {
+      putchar(ch);
     }
     fclose(fp);
   }
@@ -75,95 +90,97 @@ void stampaSchermataStatistiche(const char *nomeSchermata) {
 
 // Aggiorna il file statistiche di un giocatore per il record vs un avversario
 // tipo: 1 = vittoria, 2 = sconfitta, 0 = pareggio
-static void aggiornaFileGiocatore(const char *nomeGiocatore, const char *nomeAvversario, int tipo){
-    char percorso[256];
-    RecordAvversario *lista;
-    int numAvversari;
-    int trovato;
+static void update_player_file(const char *player_name, const char *opponent_name, int type)
+{
+    char path[PATH_LENGTH];
+    OpponentRecord *list;
+    int num_opponents;
+    int found;
     FILE *fp;
     int i;
-    RecordAvversario recordVuoto;
+    OpponentRecord empty_record;
 
-    sprintf(percorso, PERCORSO_STATS_SALVATE, nomeGiocatore);
+    sprintf(path, SAVED_STATS_PATH, player_name);
 
-    lista = NULL;
-    numAvversari = 0;
-    trovato = 0;
+    list = NULL;
+    num_opponents = 0;
+    found = 0;
 
     // Prova a caricare il file esistente
-    fp = fopen(percorso, "rb");
-    if (fp != NULL){
-        fread(&numAvversari, sizeof(int), 1, fp);
-        if (numAvversari > 0){
-            lista = (RecordAvversario *)malloc(numAvversari * sizeof(RecordAvversario));
-            fread(lista, sizeof(RecordAvversario), numAvversari, fp);
+    fp = fopen(path, "rb");
+    if (fp != NULL) {
+        fread(&num_opponents, sizeof(int), 1, fp);
+        if (num_opponents > 0) {
+            list = (OpponentRecord *)malloc(num_opponents * sizeof(OpponentRecord));
+            fread(list, sizeof(OpponentRecord), num_opponents, fp);
         }
         fclose(fp);
     }
 
     // Cerca il record dell'avversario nella lista
     i = 0;
-    while (i < numAvversari){
-      if (strcmp(Get_nomeAvversario(&lista[i]), nomeAvversario) == 0){
-      trovato = 1;
-      if (tipo == RISULTATO_VITTORIA_G1) {
-        Set_vittorie(&lista[i].stats, Get_vittorie(lista[i].stats) + 1);
-      } else if (tipo == RISULTATO_VITTORIA_G2) {
-        Set_sconfitte(&lista[i].stats, Get_sconfitte(lista[i].stats) + 1);
-      } else {
-        Set_pareggi(&lista[i].stats, Get_pareggi(lista[i].stats) + 1);
-      }
+    while (i < num_opponents) {
+        if (strcmp(get_opponent_name(&list[i]), opponent_name) == 0) {
+            found = 1;
+            if (type == RESULT_PLAYER1_WIN) {
+                set_wins(&list[i].stats, get_wins(list[i].stats) + 1);
+            } else if (type == RESULT_PLAYER2_WIN) {
+                set_losses(&list[i].stats, get_losses(list[i].stats) + 1);
+            } else {
+                set_draws(&list[i].stats, get_draws(list[i].stats) + 1);
+            }
+        }
+        i = i + 1;
     }
-    i = i + 1;
-  }
 
-    if (!trovato){
-        numAvversari = numAvversari + 1;
-        lista = (RecordAvversario *)realloc(lista, numAvversari * sizeof(RecordAvversario));
-        recordVuoto.stats.numeroVittorie = 0;
-        recordVuoto.stats.numeroSconfitte = 0;
-        recordVuoto.stats.numeroPareggi = 0;
-        lista[numAvversari - 1] = recordVuoto;
-        Set_nomeAvversario(&lista[numAvversari - 1], nomeAvversario);
-        if (tipo == RISULTATO_VITTORIA_G1){
-            Set_vittorie(&lista[numAvversari - 1].stats, 1);
-        }else if (tipo == RISULTATO_VITTORIA_G2){
-            Set_sconfitte(&lista[numAvversari - 1].stats, 1);
-        }else{
-            Set_pareggi(&lista[numAvversari - 1].stats, 1);
+    if (!found) {
+        num_opponents = num_opponents + 1;
+        list = (OpponentRecord *)realloc(list, num_opponents * sizeof(OpponentRecord));
+        empty_record.stats.wins = 0;
+        empty_record.stats.losses = 0;
+        empty_record.stats.draws = 0;
+        list[num_opponents - 1] = empty_record;
+        set_opponent_name(&list[num_opponents - 1], opponent_name);
+        if (type == RESULT_PLAYER1_WIN) {
+            set_wins(&list[num_opponents - 1].stats, 1);
+        } else if (type == RESULT_PLAYER2_WIN) {
+            set_losses(&list[num_opponents - 1].stats, 1);
+        } else {
+            set_draws(&list[num_opponents - 1].stats, 1);
         }
     }
 
     // Salva il file aggiornato
-    fp = fopen(percorso, "wb");
-    if (fp != NULL){
-        fwrite(&numAvversari, sizeof(int), 1, fp);
-        fwrite(lista, sizeof(RecordAvversario), numAvversari, fp);
+    fp = fopen(path, "wb");
+    if (fp != NULL) {
+        fwrite(&num_opponents, sizeof(int), 1, fp);
+        fwrite(list, sizeof(OpponentRecord), num_opponents, fp);
         fclose(fp);
     }
 
-    if (lista != NULL){
-        free(lista);
+    if (list != NULL) {
+        free(list);
     }
 }
 
 // Salva le statistiche della partita per entrambi i giocatori
-// risultato: 1 = vittoria G1, 2 = vittoria G2, 0 = pareggio
-void salvaStatistichePartita(const char *nomeG1, const char *nomeG2, int risultato) {
-  if (risultato == RISULTATO_VITTORIA_G1) {
+// result: 1 = vittoria G1, 2 = vittoria G2, 0 = pareggio
+void save_game_stats(const char *p1_name, const char *p2_name, int result)
+{
+  if (result == RESULT_PLAYER1_WIN) {
     // G1 vittoria vs G2
-    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_VITTORIA_G1);
+    update_player_file(p1_name, p2_name, RESULT_PLAYER1_WIN);
     // G2 sconfitta vs G1
-    aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_VITTORIA_G2);
-  } else if (risultato == RISULTATO_VITTORIA_G2) {
+    update_player_file(p2_name, p1_name, RESULT_PLAYER2_WIN);
+  } else if (result == RESULT_PLAYER2_WIN) {
     // G1 sconfitta vs G2
-    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_VITTORIA_G2);
+    update_player_file(p1_name, p2_name, RESULT_PLAYER2_WIN);
     // G2 vittoria vs G1
-    aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_VITTORIA_G1);
+    update_player_file(p2_name, p1_name, RESULT_PLAYER1_WIN);
   } else {
     // pareggio per entrambi
-    aggiornaFileGiocatore(nomeG1, nomeG2, RISULTATO_PAREGGIO);
-    aggiornaFileGiocatore(nomeG2, nomeG1, RISULTATO_PAREGGIO);
+    update_player_file(p1_name, p2_name, RESULT_DRAW);
+    update_player_file(p2_name, p1_name, RESULT_DRAW);
   }
 }
 
@@ -172,140 +189,141 @@ void salvaStatistichePartita(const char *nomeG1, const char *nomeG2, int risulta
 // --------------------- NAVIGAZIONE STATISTICHE ---------------------
 #pragma region navigazione
 
-void navigaStatistiche(void){
-    int esci;
-    int schermata;
-    int pagina;
-    int numAvversari;
-    int riga;
-    int colonna;
-    int inizio;
+void navigate_stats(void)
+{
+    int quit;
+    int screen;
+    int page;
+    int num_opponents;
+    int row;
+    int col;
+    int start;
     int i;
-    char percorso[256];
-    char nomeRicercato[LUNGHEZZA_STRINGA];
-    RecordAvversario *lista;
+    char path[PATH_LENGTH];
+    char searched_name[STRING_LENGTH];
+    OpponentRecord *list;
     FILE *fp;
 
-    esci = 0;
-    schermata = SCHERMATA_STAT_MENU;
-    pagina = 0;
-    lista = NULL;
-    numAvversari = 0;
-    memset(nomeRicercato, 0, sizeof(nomeRicercato));
+    quit = 0;
+    screen = STATS_SCREEN_MENU;
+    page = 0;
+    list = NULL;
+    num_opponents = 0;
+    memset(searched_name, 0, sizeof(searched_name));
 
-    abilitaMouse();
+    enable_mouse();
 
-    while (!esci){
+    while (!quit) {
 #ifdef _WIN32
         system("cls");
 #else
         system("clear");
 #endif
 
-        if (schermata == SCHERMATA_STAT_MENU){
-            // ----- StatisticheMenu -----
-            stampaSchermataStatistiche(schermateStatistiche[SCHERMATA_STAT_MENU].data);
-            goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+        if (screen == STATS_SCREEN_MENU) {
+            // ----- StatsMenu -----
+            print_stats_screen(stats_screens[STATS_SCREEN_MENU].data);
+            goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
             fflush(stdout);
 
-            if (!leggiClick(&riga, &colonna)){
+            if (!read_click(&row, &col)) {
                 continue;
             }
 
-            if (areaCliccata(bStatMenu[0], riga, colonna)){
+            if (is_area_clicked(btn_stat_menu[0], row, col)) {
                 // [RICERCA] - input nome giocatore
-                goTo(bStatMenu[0].c1 + 1, bStatMenu[0].r);
-                abilitaTastiera();
-                scanf("%19s", nomeRicercato);
-                abilitaMouse();
+                goto_xy(btn_stat_menu[0].col1 + 1, btn_stat_menu[0].row);
+                enable_keyboard();
+                scanf("%19s", searched_name);
+                enable_mouse();
 
                 // Cerca il file del giocatore nella cartella StatisticheSalvate
-                sprintf(percorso, PERCORSO_STATS_SALVATE, nomeRicercato);
-                fp = fopen(percorso, "rb");
-                if (fp != NULL){
+                sprintf(path, SAVED_STATS_PATH, searched_name);
+                fp = fopen(path, "rb");
+                if (fp != NULL) {
                     // File trovato: carica i dati
-                    if (lista != NULL){
-                        free(lista);
-                        lista = NULL;
+                    if (list != NULL) {
+                        free(list);
+                        list = NULL;
                     }
-                    numAvversari = 0;
-                    fread(&numAvversari, sizeof(int), 1, fp);
-                    if (numAvversari > 0){
-                        lista = (RecordAvversario *)malloc(numAvversari * sizeof(RecordAvversario));
-                        fread(lista, sizeof(RecordAvversario), numAvversari, fp);
+                    num_opponents = 0;
+                    fread(&num_opponents, sizeof(int), 1, fp);
+                    if (num_opponents > 0) {
+                        list = (OpponentRecord *)malloc(num_opponents * sizeof(OpponentRecord));
+                        fread(list, sizeof(OpponentRecord), num_opponents, fp);
                     }
                     fclose(fp);
-                    schermata = SCHERMATA_STAT_LISTA;
-                    pagina = 0;
+                    screen = STATS_SCREEN_LIST;
+                    page = 0;
                 }
-                // Se il file non esiste, non accade nulla (rimane su StatisticheMenu)
-            }else if (areaCliccata(bStatMenu[1], riga, colonna)){
+                // Se il file non esiste, non accade nulla (rimane su StatsMenu)
+            } else if (is_area_clicked(btn_stat_menu[1], row, col)) {
                 // [ESCI] - torna al menu principale
-                esci = 1;
+                quit = 1;
             }
-        }else if (schermata == SCHERMATA_STAT_LISTA){
-            // ----- StatisticheLista -----
-            stampaSchermataStatistiche(schermateStatistiche[SCHERMATA_STAT_LISTA].data);
+        } else if (screen == STATS_SCREEN_LIST) {
+            // ----- StatsList -----
+            print_stats_screen(stats_screens[STATS_SCREEN_LIST].data);
 
             // Stampa il nome del giocatore cercato (riga 9, centrato)
-            inizio = COLONNA_CENTRO_SCHERMO - (int)strlen(nomeRicercato) / 2;
-            goTo(inizio, RIGA_NOME_RICERCATO);
-            printf("%s", nomeRicercato);
+            start = SCREEN_CENTER_COL - (int)strlen(searched_name) / 2;
+            goto_xy(start, SEARCHED_NAME_ROW);
+            printf("%s", searched_name);
 
             // Stampa gli avversari della pagina corrente (righe 12-16)
-            inizio = pagina * AVVERSARI_PER_PAGINA;
+            start = page * OPPONENTS_PER_PAGE;
             i = 0;
-            while (i < AVVERSARI_PER_PAGINA && (inizio + i) < numAvversari){
+            while (i < OPPONENTS_PER_PAGE && (start + i) < num_opponents) {
                 // Stampa il nome dell'avversario
-                goTo(TABELLA_COL_INIZIO, TABELLA_RIG_INIZIO + i);
-                printf("%s", Get_nomeAvversario(&lista[inizio + i]));
+                goto_xy(TABLE_COL_START, TABLE_ROW_START + i);
+                printf("%s", get_opponent_name(&list[start + i]));
 
                 // Stampa il numero di vittorie a colonna 31
-                goTo(31, TABELLA_RIG_INIZIO + i);
-                printf("%d", Get_vittorie(lista[inizio + i].stats));
+                goto_xy(31, TABLE_ROW_START + i);
+                printf("%d", get_wins(list[start + i].stats));
 
                 // Stampa i pareggi a colonna 50
-                goTo(50, TABELLA_RIG_INIZIO + i);
-                printf("%d", Get_pareggi(lista[inizio + i].stats));
+                goto_xy(50, TABLE_ROW_START + i);
+                printf("%d", get_draws(list[start + i].stats));
 
                 // Stampa le sconfitte a colonna 69
-                goTo(69, TABELLA_RIG_INIZIO + i);
-                printf("%d", Get_sconfitte(lista[inizio + i].stats));
+                goto_xy(69, TABLE_ROW_START + i);
+                printf("%d", get_losses(list[start + i].stats));
 
                 i = i + 1;
             }
-            goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+            goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
             fflush(stdout);
 
-            if (!leggiClick(&riga, &colonna)){
+            if (!read_click(&row, &col)) {
                 continue;
             }
 
-            if (areaCliccata(bLista[0], riga, colonna)){
-                // [ESCI] - torna a StatisticheMenu
-                schermata = SCHERMATA_STAT_MENU;
-            }else if (areaCliccata(bLista[1], riga, colonna)){
+            if (is_area_clicked(btn_list[0], row, col)) {
+                // [ESCI] - torna a StatsMenu
+                screen = STATS_SCREEN_MENU;
+            } else if (is_area_clicked(btn_list[1], row, col)) {
                 // [<--] - pagina precedente
-                if (pagina > 0){
-                    pagina = pagina - 1;
+                if (page > 0) {
+                    page = page - 1;
                 }
-            }else if (areaCliccata(bLista[2], riga, colonna)){
+            } else if (is_area_clicked(btn_list[2], row, col)) {
                 // [-->] - pagina successiva
-                if ((pagina + 1) * AVVERSARI_PER_PAGINA < numAvversari){
-                    pagina = pagina + 1;
+                if ((page + 1) * OPPONENTS_PER_PAGE < num_opponents) {
+                    page = page + 1;
                 }
             }
         }
     }
 
     // Libera la memoria allocata
-    if (lista != NULL)
+    if (list != NULL)
     {
-        free(lista);
+        free(list);
     }
 
     // Ripristina il terminale
-    abilitaTastiera();
+    enable_keyboard();
 #ifdef _WIN32
     system("cls");
 #else

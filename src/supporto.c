@@ -18,18 +18,19 @@
 #pragma region stampa
 
 // Funzione interna per stampare un file di interfaccia (.txt)
-void stampaSchermataSupporto(const char *nomeSchermata) {
+void print_support_screen(const char *screen_name)
+{
   FILE *fp;
-  int c;
-  char nomeCompleto[256];
+  int ch;
+  char full_name[PATH_LENGTH];
 
-  sprintf(nomeCompleto, PERCORSO_SUPPORTO, nomeSchermata);
-  fp = fopen(nomeCompleto, "r");
+  sprintf(full_name, SUPPORT_PATH, screen_name);
+  fp = fopen(full_name, "r");
   if (fp == NULL) {
-    printf("Errore caricamento schermata supporto: %s\n", nomeCompleto);
+    printf("Errore caricamento schermata supporto: %s\n", full_name);
   } else {
-    while ((c = fgetc(fp)) != EOF) {
-      putchar(c);
+    while ((ch = fgetc(fp)) != EOF) {
+      putchar(ch);
     }
     fclose(fp);
     printf("\n");
@@ -42,22 +43,23 @@ void stampaSchermataSupporto(const char *nomeSchermata) {
 #pragma region navigazione
 
 // Funzione principale di navigazione del supporto
-void navigaSupporto(void) {
-  int riga;
-  int colonna;
-  int esciSupporto;
-  int schermata;
-  int pagSuggerimento;
-  char nomeSuggerimento[LUNGHEZZA_NOME_SUGGERIMENTO];
+void navigate_support(void)
+{
+  int row;
+  int col;
+  int quit_support;
+  int screen;
+  int tip_page;
+  char tip_name[HINT_NAME_LENGTH];
 
-  esciSupporto = 0;
-  schermata = PAGINA_SUPPORTO_MAIN;
-  pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE;
+  quit_support = 0;
+  screen = HELP_PAGE_MAIN;
+  tip_page = TIP_PAGE_FIRST;
 
   // abilita il mouse per la navigazione interattiva
-  abilitaMouse();
+  enable_mouse();
 
-  while (!esciSupporto) {
+  while (!quit_support) {
     // pulisce il terminale
     #ifdef _WIN32
       system("cls");
@@ -66,62 +68,62 @@ void navigaSupporto(void) {
     #endif
 
     // stampa la schermata corretta
-    if (schermata == PAGINA_SUPPORTO_MAIN) {
-      stampaSchermataSupporto("Supporto");
-    } else if (schermata == PAGINA_SUPPORTO_REGOLAMENTO) {
-      stampaSchermataSupporto("Regolamento");
-    } else if (schermata == PAGINA_SUPPORTO_MANUALE) {
-      stampaSchermataSupporto("Manuale");
-    } else if (schermata == PAGINA_SUPPORTO_SUGGERIMENTI) {
-      sprintf(nomeSuggerimento, "Suggerimenti%d", pagSuggerimento);
-      stampaSchermataSupporto(nomeSuggerimento);
+    if (screen == HELP_PAGE_MAIN) {
+      print_support_screen("Supporto");
+    } else if (screen == HELP_PAGE_RULES) {
+      print_support_screen("Regolamento");
+    } else if (screen == HELP_PAGE_MANUAL) {
+      print_support_screen("Manuale");
+    } else if (screen == HELP_PAGE_TIPS) {
+      sprintf(tip_name, "Suggerimenti%d", tip_page);
+      print_support_screen(tip_name);
     }
 
-    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+    goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
     fflush(stdout);
 
     // attende ed acquisisce il click del mouse
-    if (!leggiClick(&riga, &colonna)) {
+    if (!read_click(&row, &col)) {
       continue;
     }
 
     // gestione della navigazione in base alla schermata corrente
-    if (schermata == PAGINA_SUPPORTO_MAIN) {
+    if (screen == HELP_PAGE_MAIN) {
       // Menu Principale del Supporto
-      if (areaCliccata(bSupporto[0], riga, colonna)) {
-        schermata = PAGINA_SUPPORTO_REGOLAMENTO;
-      } else if (areaCliccata(bSupporto[1], riga, colonna)) {
-        schermata = PAGINA_SUPPORTO_MANUALE;
-      } else if (areaCliccata(bSupporto[2], riga, colonna)) {
-        schermata = PAGINA_SUPPORTO_SUGGERIMENTI;
-        pagSuggerimento = PAGINA_SUGGERIMENTO_INIZIALE;
-      } else if (areaCliccata(bSupporto[3], riga, colonna)) {
-        esciSupporto = 1;
+      if (is_area_clicked(btn_support[0], row, col)) {
+        screen = HELP_PAGE_RULES;
+      } else if (is_area_clicked(btn_support[1], row, col)) {
+        screen = HELP_PAGE_MANUAL;
+      } else if (is_area_clicked(btn_support[2], row, col)) {
+        screen = HELP_PAGE_TIPS;
+        tip_page = TIP_PAGE_FIRST;
+      } else if (is_area_clicked(btn_support[3], row, col)) {
+        quit_support = 1;
       }
-    } else if (schermata == PAGINA_SUPPORTO_REGOLAMENTO) {
+    } else if (screen == HELP_PAGE_RULES) {
       // Regolamento
-      if (areaCliccata(bManuale, riga, colonna)) {
-        schermata = PAGINA_SUPPORTO_MAIN;
+      if (is_area_clicked(btn_manual, row, col)) {
+        screen = HELP_PAGE_MAIN;
       }
-    } else if (schermata == PAGINA_SUPPORTO_MANUALE) {
+    } else if (screen == HELP_PAGE_MANUAL) {
       // Manuale
-      if (areaCliccata(bManuale, riga, colonna)) {
-        schermata = PAGINA_SUPPORTO_MAIN;
+      if (is_area_clicked(btn_manual, row, col)) {
+        screen = HELP_PAGE_MAIN;
       }
-    } else if (schermata == PAGINA_SUPPORTO_SUGGERIMENTI) {
+    } else if (screen == HELP_PAGE_TIPS) {
       // Suggerimenti (pagine 1 a 5)
-      if (areaCliccata(bSuggerimenti[0], riga, colonna)) {
-        schermata = PAGINA_SUPPORTO_MAIN;
-      } else if (pagSuggerimento > PAGINA_SUGGERIMENTO_INIZIALE && areaCliccata(bSuggerimenti[1], riga, colonna)) {
-        pagSuggerimento = pagSuggerimento - 1;
-      } else if (pagSuggerimento < PAGINA_SUGGERIMENTO_FINALE && areaCliccata(bSuggerimenti[2], riga, colonna)) {
-        pagSuggerimento = pagSuggerimento + 1;
+      if (is_area_clicked(btn_tips[0], row, col)) {
+        screen = HELP_PAGE_MAIN;
+      } else if (tip_page > TIP_PAGE_FIRST && is_area_clicked(btn_tips[1], row, col)) {
+        tip_page = tip_page - 1;
+      } else if (tip_page < TIP_PAGE_LAST && is_area_clicked(btn_tips[2], row, col)) {
+        tip_page = tip_page + 1;
       }
     }
   }
 
-  // ripristina la modalità terminale
-  abilitaTastiera();
+  // ripristina la modalita' terminale
+  enable_keyboard();
   #ifdef _WIN32
     system("cls");
   #else

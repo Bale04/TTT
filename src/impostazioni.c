@@ -13,162 +13,201 @@
 #include <string.h>
 // struttura della gestione delle stringhe, impostazioni e aree cliccabili
 #include "impostazioni.h"
+#include "costanti.h"
 // libreria condivisa per mouse e cursore
 #include "mouse.h"
 
-void resetImpostazioni(Impostazioni *impostazioni);
+void reset_settings(Settings *settings);
 
 // DEFINIZIONE FUNZIONI DI ACCESSO
 #pragma region definizione funzioni di accesso
-void Set_modoPartita(int m, Impostazioni *impostazioni);
-int Get_modoPartita(Impostazioni impostazioni);
-void Set_nomeGiocatore1(Stringa n1, Impostazioni *impostazioni);
-Stringa Get_nomeGiocatore1(Impostazioni impostazioni);
-void Set_nomeGiocatore2(Stringa n2, Impostazioni *impostazioni);
-Stringa Get_nomeGiocatore2(Impostazioni impostazioni);
-void Set_simboloGiocatore1(char s1, Impostazioni *impostazioni);
-char Get_simboloGiocatore1(Impostazioni impostazioni);
-void Set_simboloGiocatore2(char s2, Impostazioni *impostazioni);
-char Get_simboloGiocatore2(Impostazioni impostazioni);
-void Set_partitaPrecedente(Stringa p, Impostazioni *impostazioni);
-Stringa Get_partitaPrecedente(Impostazioni impostazioni);
-void Set_annullaImpostazioni(int x, Impostazioni *impostazioni);
-int Get_annullaImpostazioni(Impostazioni impostazioni);
-void Set_numeroRound(int r, Impostazioni *impostazioni);
-int Get_numeroRound(Impostazioni impostazioni);
-void Set_nomePartita(Stringa n, Impostazioni *impostazioni);
-Stringa Get_nomePartita(Impostazioni impostazioni);
+void set_game_mode(int m, Settings *settings);
+int get_game_mode(Settings settings);
+void set_player1_name(String n1, Settings *settings);
+String get_player1_name(Settings settings);
+void set_player2_name(String n2, Settings *settings);
+String get_player2_name(Settings settings);
+void set_p1_symbol(char s1, Settings *settings);
+char get_p1_symbol(Settings settings);
+void set_p2_symbol(char s2, Settings *settings);
+char get_p2_symbol(Settings settings);
+void set_previous_game(String p, Settings *settings);
+String get_previous_game(Settings settings);
+void set_undo_settings(int x, Settings *settings);
+int get_undo_settings(Settings settings);
+void set_num_rounds(int r, Settings *settings);
+int get_num_rounds(Settings settings);
+void set_game_name(String n, Settings *settings);
+String get_game_name(Settings settings);
 #pragma endregion
 
 // DEFINIZIONE ALTRE FUNZIONI
 #pragma region dichiarazione altre funzioni
-void stampaSchermataImpostazioni(Stringa s);
+void print_settings_screen(String s);
 #pragma endregion
 
 // dichiarazioni funzioni navigazione
 #pragma region input
-void navigaImpostazioni(Impostazioni *impostazioni);
+void navigate_settings(Settings *settings);
 #pragma endregion
 
 // ------------------------------ FUNZIONI DI ACCESSO ------------------------------------
 #pragma region funzioni di accesso
-// ---------------------MODO PARTITA---------------------------
-void Set_modoPartita(int m, Impostazioni *impostazioni) {
-  impostazioni->modoPartita = m;
+// ---------------------GAME MODE---------------------------
+void set_game_mode(int m, Settings *settings)
+{
+  settings->game_mode = m;
 }
-int Get_modoPartita(Impostazioni impostazioni) {
-  return impostazioni.modoPartita;
+
+int get_game_mode(Settings settings)
+{
+  return settings.game_mode;
 }
-// ---------------------NOMI GIOCATORI---------------------------
-void Set_nomeGiocatore1(Stringa n1, Impostazioni *impostazioni) {
-  strncpy(impostazioni->nomeGiocatore1.data, n1.data, sizeof(impostazioni->nomeGiocatore1.data) - 1);
-  // la funzione copia una stringa di caratteri (n1) in un'altra stringa
-  // (nomeGiocatore1) dando come limite la dimensione massima dell'array di
-  // destinazione.
+
+// ---------------------PLAYER NAMES---------------------------
+void set_player1_name(String n1, Settings *settings)
+{
+  strncpy(settings->player1_name.data, n1.data,
+          sizeof(settings->player1_name.data) - 1);
 }
-Stringa Get_nomeGiocatore1(Impostazioni impostazioni) {
-  return impostazioni.nomeGiocatore1;
+
+String get_player1_name(Settings settings)
+{
+  return settings.player1_name;
 }
+
 // ------------------------------------------------
-void Set_nomeGiocatore2(Stringa n2, Impostazioni *impostazioni) {
-  strncpy(impostazioni->nomeGiocatore2.data, n2.data, sizeof(impostazioni->nomeGiocatore2.data) - 1);
+void set_player2_name(String n2, Settings *settings)
+{
+  strncpy(settings->player2_name.data, n2.data,
+          sizeof(settings->player2_name.data) - 1);
 }
-Stringa Get_nomeGiocatore2(Impostazioni impostazioni) {
-  return impostazioni.nomeGiocatore2;
+
+String get_player2_name(Settings settings)
+{
+  return settings.player2_name;
 }
-// --------------------SIMBOLI GIOCATORI----------------------------
-void Set_simboloGiocatore1(char s1, Impostazioni *impostazioni) {
-  impostazioni->simboloGiocatore1 = s1;
+
+// --------------------PLAYER SYMBOLS----------------------------
+void set_p1_symbol(char s1, Settings *settings)
+{
+  settings->p1_symbol = s1;
 }
-char Get_simboloGiocatore1(Impostazioni impostazioni) {
-  return impostazioni.simboloGiocatore1;
+
+char get_p1_symbol(Settings settings)
+{
+  return settings.p1_symbol;
 }
+
 // ------------------------------------------------
-void Set_simboloGiocatore2(char s2, Impostazioni *impostazioni) {
-  impostazioni->simboloGiocatore2 = s2;
+void set_p2_symbol(char s2, Settings *settings)
+{
+  settings->p2_symbol = s2;
 }
-char Get_simboloGiocatore2(Impostazioni impostazioni) {
-  return impostazioni.simboloGiocatore2;
+
+char get_p2_symbol(Settings settings)
+{
+  return settings.p2_symbol;
 }
-// ------------------PARTITA PRECEDENTE------------------------------
-void Set_partitaPrecedente(Stringa p, Impostazioni *impostazioni) {
-  strncpy(impostazioni->partitaPrecedente.data, p.data, sizeof(impostazioni->partitaPrecedente.data) - 1);
+
+// ------------------PREVIOUS GAME------------------------------
+void set_previous_game(String p, Settings *settings)
+{
+  strncpy(settings->previous_game.data, p.data,
+          sizeof(settings->previous_game.data) - 1);
 }
-Stringa Get_partitaPrecedente(Impostazioni impostazioni) {
-  return impostazioni.partitaPrecedente;
+
+String get_previous_game(Settings settings)
+{
+  return settings.previous_game;
 }
-// ---------------------IMPOSTAZIONI DEFAULT---------------------------
-void Set_annullaImpostazioni(int x, Impostazioni *impostazioni) {
-  impostazioni->annullaImpostazioni = x;
-  if (x == IMPOSTAZIONI_DEFAULT) {
-    Set_nomeGiocatore1((Stringa){"giocatore1"}, impostazioni);
-    Set_nomeGiocatore2((Stringa){"giocatore2"}, impostazioni);
-    Set_modoPartita(MODO_CPU, impostazioni);
-    Set_partitaPrecedente((Stringa){""}, impostazioni);
-    Set_simboloGiocatore1('X', impostazioni);
-    Set_simboloGiocatore2('O', impostazioni);
-    Set_numeroRound(1, impostazioni);
-    Set_nomePartita((Stringa){"partita"}, impostazioni);
+
+// ---------------------UNDO SETTINGS---------------------------
+void set_undo_settings(int x, Settings *settings)
+{
+  settings->undo_settings = x;
+  if (x == SETTINGS_DEFAULT) {
+    set_player1_name((String){"giocatore1"}, settings);
+    set_player2_name((String){"giocatore2"}, settings);
+    set_game_mode(MODE_CPU, settings);
+    set_previous_game((String){""}, settings);
+    set_p1_symbol('X', settings);
+    set_p2_symbol('O', settings);
+    set_num_rounds(1, settings);
+    set_game_name((String){"partita"}, settings);
   }
 }
-int Get_annullaImpostazioni(Impostazioni impostazioni) {
-  return impostazioni.annullaImpostazioni;
+
+int get_undo_settings(Settings settings)
+{
+  return settings.undo_settings;
 }
-// ---------------------ROUND DA GIOCARE---------------------------
-void Set_numeroRound(int r, Impostazioni *impostazioni) {
-  if(r>MAX_ROUND){
-    impostazioni->numeroRound = MAX_ROUND;
-  }else{
-    impostazioni->numeroRound = r;
+
+// ---------------------ROUNDS TO PLAY---------------------------
+void set_num_rounds(int r, Settings *settings)
+{
+  if (r > MAX_ROUNDS) {
+    settings->num_rounds = MAX_ROUNDS;
+  } else {
+    settings->num_rounds = r;
   }
-  
 }
-int Get_numeroRound(Impostazioni impostazioni) {
-  return impostazioni.numeroRound;
+
+int get_num_rounds(Settings settings)
+{
+  return settings.num_rounds;
 }
-// ---------------------NOME PARTITA---------------------------
-void Set_nomePartita(Stringa n, Impostazioni *impostazioni) {
-  strncpy(impostazioni->nomePartita.data, n.data, sizeof(impostazioni->nomePartita.data) - 1);
+
+// ---------------------GAME NAME---------------------------
+void set_game_name(String n, Settings *settings)
+{
+  strncpy(settings->game_name.data, n.data,
+          sizeof(settings->game_name.data) - 1);
 }
-Stringa Get_nomePartita(Impostazioni impostazioni) {
-  return impostazioni.nomePartita;
+
+String get_game_name(Settings settings)
+{
+  return settings.game_name;
 }
+
 #pragma endregion
 
 // ALTRE FUNZIONI
 #pragma region altre funzioni
 
-// ---------------------RESET DELLE IMPOSTAZIONI---------------------------
+// ---------------------RESET SETTINGS---------------------------
 // reset delle impostazioni di default all'avvio
 
-void resetImpostazioni(Impostazioni *impostazioni) {
-  Set_nomeGiocatore1((Stringa){"giocatore1"}, impostazioni);
-  Set_nomeGiocatore2((Stringa){"giocatore2"}, impostazioni);
-  Set_modoPartita(MODO_CPU, impostazioni);
-  Set_partitaPrecedente((Stringa){""}, impostazioni);
-  Set_simboloGiocatore1('X', impostazioni);
-  Set_simboloGiocatore2('O', impostazioni);
-  Set_annullaImpostazioni(IMPOSTAZIONI_DEFAULT, impostazioni);
-  Set_numeroRound(1, impostazioni);
-  Set_nomePartita((Stringa){"partita"}, impostazioni);
+void reset_settings(Settings *settings)
+{
+  set_player1_name((String){"giocatore1"}, settings);
+  set_player2_name((String){"giocatore2"}, settings);
+  set_game_mode(MODE_CPU, settings);
+  set_previous_game((String){""}, settings);
+  set_p1_symbol('X', settings);
+  set_p2_symbol('O', settings);
+  set_undo_settings(SETTINGS_DEFAULT, settings);
+  set_num_rounds(1, settings);
+  set_game_name((String){"partita"}, settings);
 }
 
-void stampaSchermataImpostazioni(Stringa s) {
-  FILE *fpImpostazioni;
-  int c;
-  char nomeCompleto[256];
+void print_settings_screen(String s)
+{
+  FILE *fp_settings;
+  int ch;
+  char full_name[PATH_LENGTH];
 
   // apertura del file in lettura per caricare la schermata di impostazioni
-  sprintf(nomeCompleto, PERCORSO_FILE, s.data);
-  fpImpostazioni = fopen(nomeCompleto, "r");
-  if (fpImpostazioni == NULL) {
+  sprintf(full_name, FILE_PATH, s.data);
+  fp_settings = fopen(full_name, "r");
+  if (fp_settings == NULL) {
     printf("Errore Caricamento Schermata\n");
   } else {
-    // finchè non raggiunge la fine del file legge i caratteri man mano e li stampa a schermo
-    while ((c = fgetc(fpImpostazioni)) != EOF) {
-      putchar(c);
+    // finche' non raggiunge la fine del file legge i caratteri man mano e li stampa a schermo
+    while ((ch = fgetc(fp_settings)) != EOF) {
+      putchar(ch);
     }
-    fclose(fpImpostazioni);
+    fclose(fp_settings);
     printf("\n");
   }
 }
@@ -178,196 +217,198 @@ void stampaSchermataImpostazioni(Stringa s) {
 // FUNZIONI CURSORE E NAVIGAZIONE
 #pragma region funzioni cursore
 
-// ---------------------NAVIGAZIONE IMPOSTAZIONI---------------------------
-void navigaImpostazioni(Impostazioni *impostazioni) {
-  int riga;
-  int colonna;
-  int pagina;
-  int esci;
-  Stringa stringaInput;
-  char simboloNuovo;
+// ---------------------NAVIGATE SETTINGS---------------------------
+void navigate_settings(Settings *settings)
+{
+  int row;
+  int col;
+  int page;
+  int quit;
+  String input_string;
+  char new_symbol;
 
-  riga = 0;
-  colonna = 0;
-  pagina = PAGINA_IMPOSTAZIONI_MAIN;
-  esci = 0;
+  row = 0;
+  col = 0;
+  page = SETTINGS_PAGE_MAIN;
+  quit = 0;
 
-  abilitaMouse();
+  enable_mouse();
 
-  while (!esci) {
+  while (!quit) {
     #ifdef _WIN32
       system("cls");
     #else
       system("clear");
     #endif
-    stampaSchermataImpostazioni(schermateImpostazioni[pagina]);
+    print_settings_screen(settings_screens[page]);
     // stampa i dati nelle schermate scelte
-    if (pagina == PAGINA_IMPOSTAZIONI_NOMI) {
+    if (page == SETTINGS_PAGE_NAMES) {
       // pagina dei nomi
-      goTo(bNomi[0].c1+1, bNomi[0].r);
-      printf("%s]", Get_nomeGiocatore1(*impostazioni).data);
-      goTo(bNomi[1].c1+1, bNomi[1].r);
-      printf("%s]", Get_nomeGiocatore2(*impostazioni).data);
+      goto_xy(btn_names[0].col1 + 1, btn_names[0].row);
+      printf("%s]", get_player1_name(*settings).data);
+      goto_xy(btn_names[1].col1 + 1, btn_names[1].row);
+      printf("%s]", get_player2_name(*settings).data);
       fflush(stdout);
-    } else if (pagina == PAGINA_IMPOSTAZIONI_CARICA) {
+    } else if (page == SETTINGS_PAGE_LOAD) {
       // pagina del caricamento partita
-      goTo(bCarica[0].c1+1, bCarica[0].r);
-      printf("%s]", Get_partitaPrecedente(*impostazioni).data);
+      goto_xy(btn_load[0].col1 + 1, btn_load[0].row);
+      printf("%s]", get_previous_game(*settings).data);
       fflush(stdout);
-    } else if (pagina == PAGINA_IMPOSTAZIONI_SIMBOLI) {
+    } else if (page == SETTINGS_PAGE_SYMBOLS) {
       // pagina dei simboli
-      goTo(bSimb[0].c1+1, bSimb[0].r);
-      printf("%c", Get_simboloGiocatore1(*impostazioni));
-      goTo(bSimb[1].c1+1, bSimb[1].r);
-      printf("%c", Get_simboloGiocatore2(*impostazioni));
+      goto_xy(btn_symbols[0].col1 + 1, btn_symbols[0].row);
+      printf("%c", get_p1_symbol(*settings));
+      goto_xy(btn_symbols[1].col1 + 1, btn_symbols[1].row);
+      printf("%c", get_p2_symbol(*settings));
       fflush(stdout);
-    } else if (pagina == PAGINA_IMPOSTAZIONI_ROUND) {
+    } else if (page == SETTINGS_PAGE_ROUND) {
       // pagina del nome partita e round
-      goTo(bRound[0].c1+1, bRound[0].r);
-      printf("%s]", Get_nomePartita(*impostazioni).data);
-      goTo(bRound[1].c1+1, bRound[1].r);
-      printf("%d]", Get_numeroRound(*impostazioni));
+      goto_xy(btn_round[0].col1 + 1, btn_round[0].row);
+      printf("%s]", get_game_name(*settings).data);
+      goto_xy(btn_round[1].col1 + 1, btn_round[1].row);
+      printf("%d]", get_num_rounds(*settings));
       fflush(stdout);
     }
 
-    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+    goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
     fflush(stdout);
 
     // gestione del click nelle pagine
-    if (!leggiClick(&riga, &colonna)) {
+    if (!read_click(&row, &col)) {
       continue;
     }
 
-    if (pagina == PAGINA_IMPOSTAZIONI_MAIN) {
+    if (page == SETTINGS_PAGE_MAIN) {
       // pagina delle impostazioni
-      if (areaCliccata(bMenu[0], riga, colonna)){
+      if (is_area_clicked(btn_menu[0], row, col)) {
         // pagina dei nomi
-        pagina = PAGINA_IMPOSTAZIONI_NOMI;
-      }else if (areaCliccata(bMenu[1], riga, colonna)){
-        // pagina modalità partita
-        pagina = PAGINA_IMPOSTAZIONI_MODALITA;
-      }else if (areaCliccata(bMenu[2], riga, colonna)){
+        page = SETTINGS_PAGE_NAMES;
+      } else if (is_area_clicked(btn_menu[1], row, col)) {
+        // pagina modalita' partita
+        page = SETTINGS_PAGE_MODE;
+      } else if (is_area_clicked(btn_menu[2], row, col)) {
         // pagina avversario
-        pagina = PAGINA_IMPOSTAZIONI_CARICA;
-      }else if (areaCliccata(bMenu[3], riga, colonna)){
+        page = SETTINGS_PAGE_LOAD;
+      } else if (is_area_clicked(btn_menu[3], row, col)) {
         // pagina simbolo
-        pagina = PAGINA_IMPOSTAZIONI_SIMBOLI;
-      }else if (areaCliccata(bMenu[4], riga, colonna)){
+        page = SETTINGS_PAGE_SYMBOLS;
+      } else if (is_area_clicked(btn_menu[4], row, col)) {
         // pagina annulla impostazioni
-        pagina = PAGINA_IMPOSTAZIONI_ANNULLA;
-      }else if (areaCliccata(bMenu[5], riga, colonna)){
+        page = SETTINGS_PAGE_UNDO;
+      } else if (is_area_clicked(btn_menu[5], row, col)) {
         // pagina nome e round
-        pagina = PAGINA_IMPOSTAZIONI_ROUND;
-      }else if (areaCliccata(bMenu[6], riga, colonna)){
+        page = SETTINGS_PAGE_ROUND;
+      } else if (is_area_clicked(btn_menu[6], row, col)) {
         // esci dalle impostazioni
-        esci = 1;
-        }
-      } else if (pagina == PAGINA_IMPOSTAZIONI_NOMI) {
-        // pagina dei nomi giocatori
-      if (areaCliccata(bNomi[0], riga, colonna)) {
+        quit = 1;
+      }
+    } else if (page == SETTINGS_PAGE_NAMES) {
+      // pagina dei nomi giocatori
+      if (is_area_clicked(btn_names[0], row, col)) {
         // nome del primo giocatore
-        goTo(bNomi[0].c1+1, bNomi[0].r);
-        abilitaTastiera();
-        scanf("%19s", stringaInput.data);
-        abilitaMouse();
-        Set_nomeGiocatore1(stringaInput, impostazioni);
-      } else if (areaCliccata(bNomi[1], riga, colonna)) {
+        goto_xy(btn_names[0].col1 + 1, btn_names[0].row);
+        enable_keyboard();
+        scanf("%19s", input_string.data);
+        enable_mouse();
+        set_player1_name(input_string, settings);
+      } else if (is_area_clicked(btn_names[1], row, col)) {
         // nome del secondo giocatore
-        goTo(bNomi[1].c1+1, bNomi[1].r);
-        abilitaTastiera();
-        scanf("%19s", stringaInput.data);
-        abilitaMouse();
-        Set_nomeGiocatore2(stringaInput, impostazioni);
-      } else if (areaCliccata(bNomi[2], riga, colonna)) {
+        goto_xy(btn_names[1].col1 + 1, btn_names[1].row);
+        enable_keyboard();
+        scanf("%19s", input_string.data);
+        enable_mouse();
+        set_player2_name(input_string, settings);
+      } else if (is_area_clicked(btn_names[2], row, col)) {
         // esci dalla pagina dei nomi
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
+        page = SETTINGS_PAGE_MAIN;
       }
-    } else if (pagina == PAGINA_IMPOSTAZIONI_MODALITA) {
-      // pagina della modalità partita
-      if (areaCliccata(bModo[0], riga, colonna)) {
+    } else if (page == SETTINGS_PAGE_MODE) {
+      // pagina della modalita' partita
+      if (is_area_clicked(btn_mode[0], row, col)) {
         // partita tra giocatori
-        Set_modoPartita(MODO_GIOCATORE, impostazioni);
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
-      } else if (areaCliccata(bModo[1], riga, colonna)) {
+        set_game_mode(MODE_PLAYER, settings);
+        page = SETTINGS_PAGE_MAIN;
+      } else if (is_area_clicked(btn_mode[1], row, col)) {
         // partita giocatore-CPU
-        Set_modoPartita(MODO_CPU, impostazioni);
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
-      } else if (areaCliccata(bModo[2], riga, colonna)) {
-        // esci dalla pagina della modalità
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
+        set_game_mode(MODE_CPU, settings);
+        page = SETTINGS_PAGE_MAIN;
+      } else if (is_area_clicked(btn_mode[2], row, col)) {
+        // esci dalla pagina della modalita'
+        page = SETTINGS_PAGE_MAIN;
       }
-    } else if (pagina == PAGINA_IMPOSTAZIONI_CARICA) {
+    } else if (page == SETTINGS_PAGE_LOAD) {
       // pagina di caricamento partita
-      if (areaCliccata(bCarica[0], riga, colonna)) {
+      if (is_area_clicked(btn_load[0], row, col)) {
         // nome della partita
-        goTo(bCarica[0].c1+1, bCarica[0].r);
-        abilitaTastiera();
-        scanf("%s", stringaInput.data);
-        abilitaMouse();
-        Set_partitaPrecedente(stringaInput, impostazioni);
-      } else if (areaCliccata(bCarica[1], riga, colonna)) {
+        goto_xy(btn_load[0].col1 + 1, btn_load[0].row);
+        enable_keyboard();
+        scanf("%s", input_string.data);
+        enable_mouse();
+        set_previous_game(input_string, settings);
+      } else if (is_area_clicked(btn_load[1], row, col)) {
         // esci
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
+        page = SETTINGS_PAGE_MAIN;
       }
-    } else if (pagina == PAGINA_IMPOSTAZIONI_SIMBOLI) {
+    } else if (page == SETTINGS_PAGE_SYMBOLS) {
       // pagina dei simboli
-      if (areaCliccata(bSimb[0], riga, colonna)) {
+      if (is_area_clicked(btn_symbols[0], row, col)) {
         // simbolo del primo giocatore
-        goTo(bSimb[0].c1+1, bSimb[0].r);
-        abilitaTastiera();
-        scanf("%c", &simboloNuovo);
-        abilitaMouse();
-        Set_simboloGiocatore1(simboloNuovo, impostazioni);
-      } else if (areaCliccata(bSimb[1], riga, colonna)) {
+        goto_xy(btn_symbols[0].col1 + 1, btn_symbols[0].row);
+        enable_keyboard();
+        scanf("%c", &new_symbol);
+        enable_mouse();
+        set_p1_symbol(new_symbol, settings);
+      } else if (is_area_clicked(btn_symbols[1], row, col)) {
         // simbolo del secondo giocatore
-        goTo(bSimb[1].c1+1, bSimb[1].r);
-        abilitaTastiera();
-        scanf("%c", &simboloNuovo);
-        abilitaMouse();
-        Set_simboloGiocatore2(simboloNuovo, impostazioni);
-      } else if (areaCliccata(bSimb[2], riga, colonna)) {
+        goto_xy(btn_symbols[1].col1 + 1, btn_symbols[1].row);
+        enable_keyboard();
+        scanf("%c", &new_symbol);
+        enable_mouse();
+        set_p2_symbol(new_symbol, settings);
+      } else if (is_area_clicked(btn_symbols[2], row, col)) {
         // esci
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
+        page = SETTINGS_PAGE_MAIN;
       }
-    } else if (pagina == PAGINA_IMPOSTAZIONI_ANNULLA) {
+    } else if (page == SETTINGS_PAGE_UNDO) {
       // pagina annulla impostazioni
-      if (areaCliccata(bAnnulla[0], riga, colonna)) {
+      if (is_area_clicked(btn_undo[0], row, col)) {
         // annulla impostazioni
-        resetImpostazioni(impostazioni);
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
-      } else if (areaCliccata(bAnnulla[1], riga, colonna)) {
+        reset_settings(settings);
+        page = SETTINGS_PAGE_MAIN;
+      } else if (is_area_clicked(btn_undo[1], row, col)) {
         // esci
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
+        page = SETTINGS_PAGE_MAIN;
       }
-    } else if (pagina == PAGINA_IMPOSTAZIONI_ROUND) {
+    } else if (page == SETTINGS_PAGE_ROUND) {
       // pagina nome e round
-      if (areaCliccata(bRound[0], riga, colonna)) {
+      if (is_area_clicked(btn_round[0], row, col)) {
         // nome della partita
-        goTo(bRound[0].c1+1, bRound[0].r);
-        abilitaTastiera();
-        scanf("%19s", stringaInput.data);
-        abilitaMouse();
-        Set_nomePartita(stringaInput, impostazioni);
-      } else if (areaCliccata(bRound[1], riga, colonna)) {
+        goto_xy(btn_round[0].col1 + 1, btn_round[0].row);
+        enable_keyboard();
+        scanf("%19s", input_string.data);
+        enable_mouse();
+        set_game_name(input_string, settings);
+      } else if (is_area_clicked(btn_round[1], row, col)) {
         // numero di round
-        goTo(bRound[1].c1+1, bRound[1].r);
-        abilitaTastiera();
-        scanf("%3s", stringaInput.data);
-        abilitaMouse();
-        Set_numeroRound(atoi(stringaInput.data), impostazioni);
-      } else if (areaCliccata(bRound[2], riga, colonna)) {
+        goto_xy(btn_round[1].col1 + 1, btn_round[1].row);
+        enable_keyboard();
+        scanf("%3s", input_string.data);
+        enable_mouse();
+        set_num_rounds(atoi(input_string.data), settings);
+      } else if (is_area_clicked(btn_round[2], row, col)) {
         // esci
-        pagina = PAGINA_IMPOSTAZIONI_MAIN;
+        page = SETTINGS_PAGE_MAIN;
       }
     }
   }
 
   // ripristina il terminale
-  abilitaTastiera();
+  enable_keyboard();
   #ifdef _WIN32
     system("cls");
   #else
     system("clear");
   #endif
 }
+
 #pragma endregion

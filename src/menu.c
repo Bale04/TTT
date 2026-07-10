@@ -2,7 +2,7 @@
  ============================================================================
  Name        : menu.c
  Author      : Mattia Emanuele Balestrucci, Vincenzo Basilio, Luigi Bonasia, Ruggiero Dicorato 
- Version     : V 1.0
+ Version     : V 1.0 
  Copyright   : Your copyright notice
  Description : file di gestione del menu principale
  ============================================================================
@@ -19,35 +19,36 @@
 
 #pragma region funzioni esterne
 // funzioni esterne da supporto.c
-extern void navigaSupporto(void);
+extern void navigate_support(void);
 
 // funzioni esterne da impostazioni.c
-extern void navigaImpostazioni(Impostazioni *impostazioni);
-extern void resetImpostazioni(Impostazioni *impostazioni);
-extern Stringa Get_nomePartita(Impostazioni impostazioni);
+extern void navigate_settings(Settings *settings);
+extern void reset_settings(Settings *settings);
+extern String get_game_name(Settings settings);
 
 // funzioni esterne da gioco.c
-extern void navigaPartita(Partita *partita, Impostazioni *impostazioni);
+extern void navigate_game(Game *game, Settings *settings);
 
 // funzioni esterne da statistiche.c
-extern void navigaStatistiche(void);
+extern void navigate_stats(void);
 #pragma endregion
 
 #pragma region dichiarazioni funzioni
 // funzioni locali
-void stampaSchermataMenu(Stringa s);
-void navigaMenu(Impostazioni *impostazioni);
+void print_menu_screen(String s);
+void navigate_menu(Settings *settings);
 #pragma endregion
 
 #pragma region main
 
-int main() {
+int main()
+{
   // le impostazioni vengono create una sola volta e persistono per tutto il programma
-  Impostazioni impostazioni;
-  resetImpostazioni(&impostazioni);
+  Settings settings;
+  reset_settings(&settings);
 
   // avvia la navigazione del menu principale
-  navigaMenu(&impostazioni);
+  navigate_menu(&settings);
 
   return EXIT_SUCCESS;
 }
@@ -57,18 +58,19 @@ int main() {
 // ----------------- STAMPA SCHERMATA MENU ------------------
 #pragma region stampa
 
-void stampaSchermataMenu(Stringa s) {
+void print_menu_screen(String s)
+{
   FILE *fp;
-  int c;
-  char nomeCompleto[256];
+  int ch;
+  char full_name[PATH_LENGTH];
 
-  sprintf(nomeCompleto, PERCORSO_MENU, s.data);
-  fp = fopen(nomeCompleto, "r");
+  sprintf(full_name, MENU_PATH, s.data);
+  fp = fopen(full_name, "r");
   if (fp == NULL) {
-    printf("Errore caricamento schermata menu: %s\n", nomeCompleto);
+    printf("Errore caricamento schermata menu: %s\n", full_name);
   } else {
-    while ((c = fgetc(fp)) != EOF) {
-      putchar(c);
+    while ((ch = fgetc(fp)) != EOF) {
+      putchar(ch);
     }
     fclose(fp);
   }
@@ -79,18 +81,19 @@ void stampaSchermataMenu(Stringa s) {
 // --------------------- NAVIGAZIONE MENU PRINCIPALE -----------------------------
 #pragma region navigazione
 
-void navigaMenu(Impostazioni *impostazioni) {
-  int esci;
-  int riga;
-  int colonna;
-  Partita partita;
+void navigate_menu(Settings *settings)
+{
+  int quit;
+  int row;
+  int col;
+  Game game;
 
-  esci = 0;
+  quit = 0;
 
   // abilita il mouse tramite la libreria mouse.h
-  abilitaMouse();
+  enable_mouse();
 
-  while (!esci) {
+  while (!quit) {
     // pulisce il terminale
     #ifdef _WIN32
       system("cls");
@@ -99,46 +102,46 @@ void navigaMenu(Impostazioni *impostazioni) {
     #endif
 
     // stampa la schermata del menu principale
-    stampaSchermataMenu(schermateMenu[INDICE_MENU_PRINCIPALE]);
-    goTo(CURSORE_BASE.col, CURSORE_BASE.rig);
+    print_menu_screen(menu_screens[MAIN_MENU_INDEX]);
+    goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
     fflush(stdout);
 
     // legge il click dell'utente
-    if (!leggiClick(&riga, &colonna)) {
+    if (!read_click(&row, &col)) {
       continue;
     }
 
     // gestione click sui bottoni del menu
-    if (areaCliccata(bMainMenu[0], riga, colonna)) {
+    if (is_area_clicked(btn_main_menu[0], row, col)) {
       // tasto gioca
-      abilitaTastiera();
-      navigaPartita(&partita, impostazioni);
+      enable_keyboard();
+      navigate_game(&game, settings);
       // quando il gioco termina si torna al menu
-      abilitaMouse();
-    } else if (areaCliccata(bMainMenu[1], riga, colonna)) {
+      enable_mouse();
+    } else if (is_area_clicked(btn_main_menu[1], row, col)) {
       // apre le impostazioni
-      abilitaTastiera();
-      navigaImpostazioni(impostazioni);
+      enable_keyboard();
+      navigate_settings(settings);
       // quando si preme ESCI dalla schermata principale delle impostazioni si torna qui
-      abilitaMouse();
-    } else if (areaCliccata(bMainMenu[2], riga, colonna)) {
+      enable_mouse();
+    } else if (is_area_clicked(btn_main_menu[2], row, col)) {
       // apre il supporto
-      abilitaTastiera();
-      navigaSupporto();
-      abilitaMouse();
-    } else if (areaCliccata(bMainMenu[3], riga, colonna)) {
+      enable_keyboard();
+      navigate_support();
+      enable_mouse();
+    } else if (is_area_clicked(btn_main_menu[3], row, col)) {
       // apre le statistiche
-      abilitaTastiera();
-      navigaStatistiche();
-      abilitaMouse();
-    } else if (areaCliccata(bMainMenu[4], riga, colonna)) {
+      enable_keyboard();
+      navigate_stats();
+      enable_mouse();
+    } else if (is_area_clicked(btn_main_menu[4], row, col)) {
       // esce dal programma
-      esci = 1;
+      quit = 1;
     }
   }
 
   // ripristina il terminale
-  abilitaTastiera();
+  enable_keyboard();
   #ifdef _WIN32
     system("cls");
   #else

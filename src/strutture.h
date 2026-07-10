@@ -1,54 +1,54 @@
-#ifndef strutture_H
-#define strutture_H
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
 
 #include "costanti.h"
 
 // Definizione della stringa di caratteri
 typedef struct {
-  char data[LUNGHEZZA_STRINGA];
-} Stringa;
+  char data[STRING_LENGTH];
+} String;
 
 // struttura delle impostazioni della partita
 typedef struct {
-  Stringa nomeGiocatore1;    // nome del giocatore 1
-  Stringa nomeGiocatore2;    // nome del giocatore 2
-  int modoPartita;           // 1 - CPU,   0 - Giocatore
-  Stringa partitaPrecedente; // nome della partita da riprendere
-  char simboloGiocatore1;    // simbolo giocatore 1
-  char simboloGiocatore2;    // simbolo del giocatore 2
-  int annullaImpostazioni;   // 1 - Default,  0 - Modificate
-  int numeroRound;           // numero dei round
-  Stringa nomePartita;       // nome della partita da giocare
-} Impostazioni;
+  String player1_name;    // nome del giocatore 1
+  String player2_name;    // nome del giocatore 2
+  int game_mode;           // 1 - CPU,   0 - Giocatore
+  String previous_game; // nome della partita da riprendere
+  char p1_symbol;    // simbolo giocatore 1
+  char p2_symbol;    // simbolo del giocatore 2
+  int undo_settings;   // 1 - Default,  0 - Modificate
+  int num_rounds;           // numero dei round
+  String game_name;       // nome della partita da giocare
+} Settings;
 
 // struttura delle zone cliccabili dello schermo
 typedef struct {
-  int r;  // riga del pulsante
-  int c1; // colonna di inizio
-  int c2; // colonna di fine
-} AreaCliccabile;
+  int row;  // riga del pulsante
+  int col1; // colonna di inizio
+  int col2; // colonna di fine
+} ClickableArea;
 
 // struttura delle statistiche per giocatore
 typedef struct {
-  char nomeAvversario[LUNGHEZZA_STRINGA]; // nome dell'avversario affrontato
-  int numeroVittorie;     // numero di vittorie di un giocatore
-  int numeroSconfitte;    // numero di sconfitte di un giocatore
-  int numeroPareggi;      // numero di pareggi di un giocatore
-} Statistiche;
+  char opponent_name[STRING_LENGTH]; // nome dell'avversario affrontato
+  int wins;     // numero di vittorie di un giocatore
+  int losses;    // numero di sconfitte di un giocatore
+  int draws;      // numero di pareggi di un giocatore
+} Stats;
 
 // struttura della partita
 typedef struct {
-  char griglia[DIMENSIONE_GRIGLIA][DIMENSIONE_GRIGLIA]; // griglia di gioco
-  int turno;          // turno del giocatore che deve muovere (1 o 2)
+  char grid[GRID_SIZE][GRID_SIZE]; // griglia di gioco
+  int turn;          // turno del giocatore che deve muovere (1 o 2)
   int round;          // round corrente
-  Statistiche statisticheG1;
-  Statistiche statisticheG2;
-} Partita;
+  Stats p1_stats;
+  Stats p2_stats;
+} Game;
 
 // struttura per la posizione del cursore nel terminale
 typedef struct {
   int col; // colonna
-  int rig; // riga
-} Cursore;
+  int row; // riga
+} Cursor;
 
 #endif
