@@ -107,9 +107,7 @@ void navigate_menu(Settings *settings)
     fflush(stdout);
 
     // legge il click dell'utente
-    if (!read_click(&row, &col)) {
-      continue;
-    }
+    if (read_click(&row, &col)) {
 
     // gestione click sui bottoni del menu
     if (is_area_clicked(btn_main_menu[0], row, col)) {
@@ -137,6 +135,7 @@ void navigate_menu(Settings *settings)
     } else if (is_area_clicked(btn_main_menu[4], row, col)) {
       // esce dal programma
       quit = 1;
+    }
     }
   }
 

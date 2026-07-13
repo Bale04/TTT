@@ -125,16 +125,26 @@ String get_previous_game(Settings settings)
 // ---------------------UNDO SETTINGS---------------------------
 void set_undo_settings(int x, Settings *settings)
 {
+  String nome_p1_default;
+  String nome_p2_default;
+  String stringa_vuota;
+  String nome_partita_default;
+
+  strcpy(nome_p1_default.data, "giocatore1");
+  strcpy(nome_p2_default.data, "giocatore2");
+  strcpy(stringa_vuota.data, "");
+  strcpy(nome_partita_default.data, "partita");
+
   settings->undo_settings = x;
   if (x == SETTINGS_DEFAULT) {
-    set_player1_name((String){"giocatore1"}, settings);
-    set_player2_name((String){"giocatore2"}, settings);
+    set_player1_name(nome_p1_default, settings);
+    set_player2_name(nome_p2_default, settings);
     set_game_mode(MODE_CPU, settings);
-    set_previous_game((String){""}, settings);
+    set_previous_game(stringa_vuota, settings);
     set_p1_symbol('X', settings);
     set_p2_symbol('O', settings);
     set_num_rounds(1, settings);
-    set_game_name((String){"partita"}, settings);
+    set_game_name(nome_partita_default, settings);
   }
 }
 
@@ -180,15 +190,25 @@ String get_game_name(Settings settings)
 
 void reset_settings(Settings *settings)
 {
-  set_player1_name((String){"giocatore1"}, settings);
-  set_player2_name((String){"giocatore2"}, settings);
+  String nome_p1_default;
+  String nome_p2_default;
+  String stringa_vuota;
+  String nome_partita_default;
+
+  strcpy(nome_p1_default.data, "giocatore1");
+  strcpy(nome_p2_default.data, "giocatore2");
+  strcpy(stringa_vuota.data, "");
+  strcpy(nome_partita_default.data, "partita");
+
+  set_player1_name(nome_p1_default, settings);
+  set_player2_name(nome_p2_default, settings);
   set_game_mode(MODE_CPU, settings);
-  set_previous_game((String){""}, settings);
+  set_previous_game(stringa_vuota, settings);
   set_p1_symbol('X', settings);
   set_p2_symbol('O', settings);
   set_undo_settings(SETTINGS_DEFAULT, settings);
   set_num_rounds(1, settings);
-  set_game_name((String){"partita"}, settings);
+  set_game_name(nome_partita_default, settings);
 }
 
 void print_settings_screen(String s)
@@ -274,9 +294,7 @@ void navigate_settings(Settings *settings)
     fflush(stdout);
 
     // gestione del click nelle pagine
-    if (!read_click(&row, &col)) {
-      continue;
-    }
+    if (read_click(&row, &col)) {
 
     if (page == SETTINGS_PAGE_MAIN) {
       // pagina delle impostazioni
@@ -399,6 +417,7 @@ void navigate_settings(Settings *settings)
         // esci
         page = SETTINGS_PAGE_MAIN;
       }
+    }
     }
   }
 

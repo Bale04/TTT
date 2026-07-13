@@ -3,6 +3,7 @@
 
 #include "costanti.h"
 #include "strutture.h"
+#include "mouse.h"
 
 // i centri delle celle per posizionare i simboli
 int GRID_CENTER_COL[GRID_SIZE] = {32, 40, 48};
@@ -73,6 +74,6 @@ static inline int get_clicked_cell(int row, int col)
 
 // vettore delle schermate della partita
 String game_screens[] = {{"Gioco"}, {"SalvaPartita"}, {"Supporto"}, {"Vittoria"}};
-const char GAME_PATH[] = "C:/Users/utente/Desktop/TTT/Interfacce/Gioco";
+const char GAME_PATH[] = "C:/Users/Bale/Desktop/git/TTT/Interfacce/Gioco/%s.txt";
 
 #endif

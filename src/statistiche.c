@@ -226,9 +226,7 @@ void navigate_stats(void)
             goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
             fflush(stdout);
 
-            if (!read_click(&row, &col)) {
-                continue;
-            }
+            if (read_click(&row, &col)) {
 
             if (is_area_clicked(btn_stat_menu[0], row, col)) {
                 // [RICERCA] - input nome giocatore
@@ -260,6 +258,7 @@ void navigate_stats(void)
             } else if (is_area_clicked(btn_stat_menu[1], row, col)) {
                 // [ESCI] - torna al menu principale
                 quit = 1;
+            }
             }
         } else if (screen == STATS_SCREEN_LIST) {
             // ----- StatsList -----
@@ -295,9 +294,7 @@ void navigate_stats(void)
             goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
             fflush(stdout);
 
-            if (!read_click(&row, &col)) {
-                continue;
-            }
+            if (read_click(&row, &col)) {
 
             if (is_area_clicked(btn_list[0], row, col)) {
                 // [ESCI] - torna a StatsMenu
@@ -312,6 +309,7 @@ void navigate_stats(void)
                 if ((page + 1) * OPPONENTS_PER_PAGE < num_opponents) {
                     page = page + 1;
                 }
+            }
             }
         }
     }

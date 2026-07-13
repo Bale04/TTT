@@ -83,9 +83,7 @@ void navigate_support(void)
     fflush(stdout);
 
     // attende ed acquisisce il click del mouse
-    if (!read_click(&row, &col)) {
-      continue;
-    }
+    if (read_click(&row, &col)) {
 
     // gestione della navigazione in base alla schermata corrente
     if (screen == HELP_PAGE_MAIN) {
@@ -119,6 +117,7 @@ void navigate_support(void)
       } else if (tip_page < TIP_PAGE_LAST && is_area_clicked(btn_tips[2], row, col)) {
         tip_page = tip_page + 1;
       }
+    }
     }
   }
 

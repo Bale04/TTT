@@ -25,9 +25,11 @@ extern String get_previous_game(Settings settings);
 int save_game(const Settings *settings, const Game *game)
 {
   char path[PATH_LENGTH];
+  FILE *fp;
+
   // Il nome del file e' il nome della partita
   sprintf(path, SAVE_FILE_PATH, get_game_name(*settings).data);
-  FILE *fp = fopen(path, "wb");
+  fp = fopen(path, "wb");
   if (fp == NULL) {
     printf("Errore apertura file per il salvataggio: %s\n", path);
     return STATUS_ERROR;
@@ -41,9 +43,11 @@ int save_game(const Settings *settings, const Game *game)
 int load_game(Settings *settings, Game *game)
 {
   char path[PATH_LENGTH];
+  FILE *fp;
+
   // Il file da caricare e' specificato in previous_game
   sprintf(path, SAVE_FILE_PATH, get_previous_game(*settings).data);
-  FILE *fp = fopen(path, "rb");
+  fp = fopen(path, "rb");
   if (fp == NULL) {
     printf("Errore apertura file per il caricamento: %s\n", path);
     return STATUS_ERROR;

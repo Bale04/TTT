@@ -2,6 +2,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Avvia TTT (Windows)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/TTT.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build TTT (Windows)",
+            "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe"
+        }/*,
+        {
             "name": "Avvia TTT (Linux)",
             "type": "cppdbg",
             "request": "launch",
@@ -19,8 +40,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build TTT",
+            "preLaunchTask": "Build TTT (Linux)",
             "miDebuggerPath": "/usr/bin/gdb"
-        }
+        }*/
     ]
 }

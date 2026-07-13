@@ -11,8 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mouse.h"
 #include "gioco.h"
+#include "mouse.h"
 
 #pragma region funzioni esterne
 // funzioni esterne da supporto.c
@@ -609,12 +609,11 @@ void navigate_game(Game *game, Settings *settings)
                             }
                             fflush(stdout);
                             goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
-                            if (!read_click(&row, &col)) {
-                                continue;
-                            }
-                            if (is_area_clicked(btn_victory[0], row, col)) {
-                                confirmed = 1;
-                                quit = 1;
+                            if (read_click(&row, &col)) {
+                                if (is_area_clicked(btn_victory[0], row, col)) {
+                                    confirmed = 1;
+                                    quit = 1;
+                                }
                             }
                         }
                     } else {
@@ -639,13 +638,10 @@ void navigate_game(Game *game, Settings *settings)
                     set_turn(game, PLAYER1_TURN);
                 }
             }
-            continue;
-        }
+        } else {
 
         // legge il click del giocatore
-        if (!read_click(&row, &col)) {
-            continue;
-        }
+        if (read_click(&row, &col)) {
         // rilevamento della cella cliccata tramite la funzione get_clicked_cell di gioco.h
         cell = get_clicked_cell(row, col);
 
@@ -661,7 +657,7 @@ void navigate_game(Game *game, Settings *settings)
             }
 
             // se la cella e' ancora libera
-            if ((get_grid(*game, row, col) == ' ') || (get_grid(*game, row, col) == '\0')) {
+            if ((get_grid(*game, r, c) == ' ') || (get_grid(*game, r, c) == '\0')) {
                 // simbolo del giocatore corrente letto dalle impostazioni
                 if (get_turn(*game) == PLAYER1_TURN) {
                     current_symbol = get_p1_symbol(*settings);
@@ -670,7 +666,7 @@ void navigate_game(Game *game, Settings *settings)
                 }
 
                 // piazza il simbolo nella cella
-                set_grid(game, row, col, current_symbol);
+                set_grid(game, r, c, current_symbol);
 
                 // controllo fine round
                 winner = get_round_winner(*game);
@@ -750,14 +746,13 @@ void navigate_game(Game *game, Settings *settings)
                             fflush(stdout);
                             goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
 
-                            if (!read_click(&row, &col)) {
-                                continue;
-                            }
+                            if (read_click(&row, &col)) {
 
                             // Verifica click su btn_victory[0]
                             if (is_area_clicked(btn_victory[0], row, col)) {
                                 confirmed = 1;
                                 quit = 1;
+                            }
                             }
                         }
                     } else {
@@ -804,9 +799,7 @@ void navigate_game(Game *game, Settings *settings)
                 goto_xy(CURSOR_BASE.col, CURSOR_BASE.row);
                 fflush(stdout);
 
-                if (!read_click(&row, &col)) {
-                    continue;
-                }
+                if (read_click(&row, &col)) {
 
                 if (is_area_clicked(btn_save_confirm[0], row, col)) {
                     // salva la partita ed esci al menu principale
@@ -817,12 +810,15 @@ void navigate_game(Game *game, Settings *settings)
                     // ritorna al gioco
                     confirmed = 1;
                 }
+                }
             }
         } else if (is_area_clicked(btn_game_menu[2], row, col)) {
             // apre il supporto del gioco
             enable_keyboard();
             navigate_support();
             enable_mouse();
+        }
+        }
         }
     }
 
